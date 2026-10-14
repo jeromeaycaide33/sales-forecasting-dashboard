@@ -203,20 +203,21 @@ df = load_forecast()
 actual_df = load_actual()
 
 
-
 # ==========================================
 # SIDEBAR
 # ==========================================
 
 
-st.sidebar.header(
-    "Forecast Model Selection"
+st.sidebar.markdown(
+"""
+<h2 style='color:white;'>Forecast Control</h2>
+""",
+unsafe_allow_html=True
 )
 
 
-
 selected_model = st.sidebar.selectbox(
-    "Choose Forecasting Model",
+    "Select Forecasting Model",
     df["model_name"].unique()
 )
 
@@ -226,45 +227,29 @@ st.sidebar.divider()
 
 
 
-st.sidebar.subheader(
-    "System Information"
-)
-
-
-
-st.sidebar.info(
+st.sidebar.markdown(
 """
-Dataset
+<h3 style='color:white;'>System Details</h3>
 
-Sta. Cruz Laguna Sales Dataset
+<b>Dataset</b><br>
+Sta. Cruz Laguna Sales Dataset<br><br>
 
+<b>Forecasting Models</b><br>
+• ARIMA<br>
+• SARIMA<br>
+• Prophet<br>
+• Random Forest<br><br>
 
-Forecasting Models
+<b>Evaluation Metrics</b><br>
+• MAE<br>
+• MAPE<br><br>
 
-ARIMA
-SARIMA
-Prophet
-Random Forest
-
-
-Evaluation Metrics
-
-MAE
-MAPE
-
-
-Development Platform
-
+<b>Platform</b><br>
 Python + Streamlit
-"""
+
+""",
+unsafe_allow_html=True
 )
-
-
-
-model_data = df[
-    df["model_name"] == selected_model
-]
-
 
 
 # ==========================================
