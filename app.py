@@ -26,6 +26,8 @@ st.markdown(
 }
 
 
+/* Main Titles */
+
 h1 {
     font-size: 42px !important;
     font-weight: 700;
@@ -43,27 +45,47 @@ h3 {
 }
 
 
+/* Metric Values */
+
 [data-testid="stMetricValue"] {
+
     font-size: 32px;
     font-weight: 700;
+
 }
 
 
 [data-testid="stMetricLabel"] {
+
     font-size: 15px;
+
 }
 
+
+/* Metric Cards */
 
 div[data-testid="stMetric"] {
 
     background-color: #151a24;
-    padding: 20px;
-    border-radius: 12px;
+    padding: 22px;
+    border-radius: 14px;
+    border: 1px solid #30363d;
+    min-height: 125px;
+
+}
+
+
+/* Remove default focus/highlight border */
+
+div[data-testid="stMetric"]:focus-within {
+
     border: 1px solid #30363d;
 
 }
 
 
+
+/* Data Tables */
 
 .stDataFrame {
 
@@ -72,6 +94,8 @@ div[data-testid="stMetric"] {
 }
 
 
+
+/* Sidebar */
 
 section[data-testid="stSidebar"] {
 
@@ -94,6 +118,16 @@ section[data-testid="stSidebar"] h2 {
 
 }
 
+
+section[data-testid="stSidebar"] h3 {
+
+    color: white;
+
+}
+
+
+
+/* Alerts */
 
 .stAlert {
 
