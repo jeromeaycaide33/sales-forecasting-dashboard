@@ -76,6 +76,14 @@ div[data-testid="stMetric"] {
 section[data-testid="stSidebar"] {
 
     background-color: #111827;
+    width: 330px !important;
+
+}
+
+
+section[data-testid="stSidebar"] > div {
+
+    width: 330px !important;
 
 }
 
