@@ -324,8 +324,9 @@ def dashboard_card(title, value, description):
     background:#151a24;
     padding:22px;
     border-radius:15px;
-    border:1px solid #30363d;
+    border:1px solid #00aaff;
     height:130px;
+    box-shadow:0 0 8px rgba(0,170,255,0.15);
     ">
 
     <p style="
