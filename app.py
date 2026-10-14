@@ -160,11 +160,12 @@ st.markdown(
 width:92%;
 margin:20px auto 30px auto;
 background:linear-gradient(135deg, #151a24, #1f2937);
-padding:32px 38px;
+padding:38px 42px;
 border-radius:18px;
-border:1px solid #30363d;
-box-shadow:0px 8px 25px rgba(0,0,0,0.35);
+border:1px solid #38bdf8;
+box-shadow:0px 8px 25px rgba(56,189,248,0.15);
 ">
+
 
 <h1 style="
 font-size:46px;
@@ -177,26 +178,29 @@ Sales Forecasting System
 </h1>
 
 
+
 <p style="
 font-size:18px;
-margin-top:12px;
+margin-top:15px;
 color:#cbd5e1;
-line-height:1.5;
-max-width:850px;
+line-height:1.6;
+max-width:800px;
 ">
 A comparative forecasting system using ARIMA, SARIMA, Prophet,
 and Random Forest models for accurate sales demand prediction.
 </p>
 
 
+
 <div style="
-margin-top:20px;
-height:3px;
+margin-top:22px;
+height:4px;
 width:120px;
 background:#38bdf8;
 border-radius:10px;
 ">
 </div>
+
 
 
 </div>
