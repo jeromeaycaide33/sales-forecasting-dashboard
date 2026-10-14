@@ -264,6 +264,7 @@ unsafe_allow_html=True
 )
 
 
+
 selected_model = st.sidebar.selectbox(
     "Select Forecasting Model",
     df["model_name"].unique()
@@ -283,14 +284,14 @@ st.sidebar.markdown(
 Sta. Cruz Laguna Sales Dataset<br><br>
 
 <b>Forecasting Models</b><br>
-• ARIMA<br>
-• SARIMA<br>
-• Prophet<br>
-• Random Forest<br><br>
+ARIMA<br>
+SARIMA<br>
+Prophet<br>
+Random Forest<br><br>
 
 <b>Evaluation Metrics</b><br>
-• MAE<br>
-• MAPE<br><br>
+MAE<br>
+MAPE<br><br>
 
 <b>Platform</b><br>
 Python + Streamlit
@@ -298,6 +299,16 @@ Python + Streamlit
 """,
 unsafe_allow_html=True
 )
+
+
+
+# ==========================================
+# SELECTED MODEL DATA
+# ==========================================
+
+model_data = df[
+    df["model_name"] == selected_model
+]
 
 
 # ==========================================
