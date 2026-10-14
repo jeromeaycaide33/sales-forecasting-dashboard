@@ -409,9 +409,7 @@ col1, col2, col3, col4 = st.columns(4)
 
 
 
-def summary_card(title, value, description, highlight=False):
-
-    border = "#38bdf8" if highlight else "#30363d"
+def summary_card(title, value, description):
 
     st.markdown(
     f"""
@@ -419,7 +417,7 @@ def summary_card(title, value, description, highlight=False):
     background-color:#151a24;
     padding:18px;
     border-radius:15px;
-    border:1px solid {border};
+    border:1px solid #38bdf8;
     height:120px;
     overflow:hidden;
     ">
@@ -500,8 +498,7 @@ with col3:
     summary_card(
         "Recommended Model",
         best_model,
-        "Best performing forecasting model",
-        True
+        "Best performing forecasting model"
     )
 
 
@@ -511,10 +508,8 @@ with col4:
     summary_card(
         "Lowest MAPE",
         f"{lowest_mape:.2f}%",
-        "Lowest forecasting error achieved",
-        True
+        "Lowest forecasting error achieved"
     )
-
 
 # ==========================================
 # MODEL PERFORMANCE
