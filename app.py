@@ -309,7 +309,14 @@ unsafe_allow_html=True
 model_data = df[
     df["model_name"] == selected_model
 ]
+st.write("Selected Model Data Check")
+st.write("Current Model:", selected_model)
+st.dataframe(model_data.head())
 
+st.write(
+    "Missing forecast dates:",
+    model_data["forecast_date"].isna().sum()
+)
 
 # ==========================================
 # DATASET OVERVIEW
