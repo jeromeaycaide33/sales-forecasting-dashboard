@@ -107,6 +107,19 @@ section[data-testid="stSidebar"] h2 {
 unsafe_allow_html=True
 )
 
+section[data-testid="stSidebar"] h2 {
+    font-size: 26px !important;
+}
+
+section[data-testid="stSidebar"] h3 {
+    font-size: 20px !important;
+}
+
+section[data-testid="stSidebar"] p {
+    font-size: 15px !important;
+    line-height: 1.7;
+}
+
 
 
 # ==========================================
