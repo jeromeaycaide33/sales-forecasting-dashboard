@@ -20,120 +20,121 @@ st.set_page_config(
 st.markdown(
 """
 <style>
+:root {
+    --dashboard-blue: #00aaff;
+    --dashboard-blue-glow: rgba(0, 170, 255, 0.16);
+}
 
 .main {
     background-color: #0e1117;
 }
 
-
-/* Main Titles */
-
+/* Typography */
 h1 {
     font-size: 42px !important;
     font-weight: 700;
 }
-
-
 h2 {
     font-size: 32px !important;
     font-weight: 650;
 }
-
-
 h3 {
     font-size: 26px !important;
 }
 
-
-/* Metric Values */
-
+/* Metric cards */
+div[data-testid="stMetric"] {
+    background-color: #151a24 !important;
+    padding: 22px !important;
+    border-radius: 14px !important;
+    border: 1px solid var(--dashboard-blue) !important;
+    min-height: 125px;
+    box-shadow: 0 0 8px var(--dashboard-blue-glow);
+}
+div[data-testid="stMetric"]:focus-within {
+    border: 1px solid var(--dashboard-blue) !important;
+}
 [data-testid="stMetricValue"] {
-
     font-size: 32px;
     font-weight: 700;
-
 }
-
-
 [data-testid="stMetricLabel"] {
-
     font-size: 15px;
-
 }
 
-
-/* Metric Cards */
-
-div[data-testid="stMetric"] {
-    background-color: #151a24;
-    padding: 22px;
-    border-radius: 14px;
-    border: 1px solid #30363d;
-    min-height: 125px;
-}
-
-
-/* Remove default focus/highlight border */
-
-div[data-testid="stMetric"]:focus-within {
-
-    border: 1px solid #30363d;
-
-}
-
-
-
-/* Data Tables */
-
+/* Data tables */
+div[data-testid="stDataFrame"],
+div[data-testid="stTable"],
 .stDataFrame {
-
-    border-radius: 10px;
-
+    border: 1px solid var(--dashboard-blue) !important;
+    border-radius: 10px !important;
+    overflow: hidden;
 }
 
+/* Plotly chart panels */
+div[data-testid="stPlotlyChart"] {
+    border: 1px solid var(--dashboard-blue) !important;
+    border-radius: 12px !important;
+    padding: 8px;
+    box-shadow: 0 0 8px var(--dashboard-blue-glow);
+}
 
+/* Alerts, including recommendation messages */
+div[data-testid="stAlert"],
+.stAlert {
+    border: 1px solid var(--dashboard-blue) !important;
+    border-radius: 12px !important;
+}
+
+/* Explicitly bordered Streamlit containers and expanders */
+div[data-testid="stVerticalBlockBorderWrapper"],
+div[data-testid="stExpander"] {
+    border: 1px solid var(--dashboard-blue) !important;
+    border-radius: 12px !important;
+}
+
+/* Forecast Control selectbox — blue border in normal and focused states */
+div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+    border: 1px solid var(--dashboard-blue) !important;
+    border-radius: 10px !important;
+}
+div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:focus,
+div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:focus-within,
+div[data-testid="stSelectbox"]:focus-within div[data-baseweb="select"] > div {
+    border-color: var(--dashboard-blue) !important;
+    box-shadow: 0 0 0 1px var(--dashboard-blue) !important;
+}
+
+/* Buttons */
+div[data-testid="stDownloadButton"] button,
+.stButton button,
+button[kind="secondary"],
+button[kind="primary"] {
+    border: 1px solid var(--dashboard-blue) !important;
+    border-radius: 9px !important;
+}
+
+/* Input controls, in case they are added later */
+div[data-testid="stTextInput"] input,
+div[data-testid="stNumberInput"] input,
+div[data-testid="stTextArea"] textarea,
+div[data-testid="stDateInput"] input {
+    border-color: var(--dashboard-blue) !important;
+    border-radius: 9px !important;
+}
 
 /* Sidebar */
-
 section[data-testid="stSidebar"] {
-
     background-color: #111827;
     width: 330px !important;
-
 }
-
-
 section[data-testid="stSidebar"] > div {
-
     width: 330px !important;
-
 }
-
-
-section[data-testid="stSidebar"] h2 {
-
-    color: white;
-
-}
-
-
+section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-
     color: white;
-
 }
-
-
-
-/* Alerts */
-
-.stAlert {
-
-    border-radius: 12px;
-
-}
-
-
 </style>
 """,
 unsafe_allow_html=True
@@ -160,8 +161,8 @@ margin:20px auto 30px auto;
 background:linear-gradient(135deg, #151a24, #1f2937);
 padding:38px 42px;
 border-radius:18px;
-border:1px solid #38bdf8;
-box-shadow:0px 8px 25px rgba(56,189,248,0.15);
+border:1px solid #00aaff;
+box-shadow:0px 8px 25px rgba(0,170,255,0.15);
 ">
 
 
@@ -194,7 +195,7 @@ and Random Forest models for accurate sales demand prediction.
 margin-top:22px;
 height:4px;
 width:120px;
-background:#38bdf8;
+background:#00aaff;
 border-radius:10px;
 ">
 </div>
@@ -307,14 +308,6 @@ unsafe_allow_html=True
 model_data = df[
     df["model_name"] == selected_model
 ]
-st.write("Selected Model Data Check")
-st.write("Current Model:", selected_model)
-st.dataframe(model_data.head())
-
-st.write(
-    "Missing forecast dates:",
-    model_data["forecast_date"].isna().sum()
-)
 
 # ==========================================
 # DATASET OVERVIEW
@@ -437,7 +430,7 @@ def summary_card(title, value, description):
     background-color:#151a24;
     padding:18px;
     border-radius:15px;
-    border:1px solid #38bdf8;
+    border:1px solid #00aaff;
     height:120px;
     overflow:hidden;
     ">
