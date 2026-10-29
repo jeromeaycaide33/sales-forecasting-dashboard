@@ -65,13 +65,11 @@ h3 {
 /* Metric Cards */
 
 div[data-testid="stMetric"] {
-
     background-color: #151a24;
     padding: 22px;
     border-radius: 14px;
     border: 1px solid #30363d;
     min-height: 125px;
-
 }
 
 
