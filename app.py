@@ -43,10 +43,15 @@ st.markdown(
 
     .block-container {
         max-width: 1800px;
-        padding-top: 1.15rem;
+        /* Keep the dashboard header below Streamlit's floating top toolbar. */
+        padding-top: 4.1rem !important;
         padding-bottom: 2.5rem;
         padding-left: clamp(1rem, 2vw, 2rem);
         padding-right: clamp(1rem, 2vw, 2rem);
+    }
+
+    section[data-testid="stMain"] .block-container {
+        padding-top: 4.1rem !important;
     }
 
     div[data-testid="stHorizontalBlock"] {
@@ -74,7 +79,7 @@ st.markdown(
         border: 1px solid #29384d;
         border-radius: 13px;
         padding: 19px 24px;
-        margin: 0 0 1rem 0;
+        margin: 0.15rem 0 1.15rem 0;
         box-shadow: none;
     }
 
