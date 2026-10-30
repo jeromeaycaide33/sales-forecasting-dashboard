@@ -43,8 +43,28 @@ st.markdown(
 
     .block-container {
         max-width: 1600px;
-        padding-top: 1.35rem;
-        padding-bottom: 2.5rem;
+        padding-top: 1.8rem;
+        padding-bottom: 3rem;
+        padding-left: clamp(1.25rem, 3vw, 3rem);
+        padding-right: clamp(1.25rem, 3vw, 3rem);
+    }
+
+    /* Consistent breathing room between Streamlit sections and columns */
+    div[data-testid="stHorizontalBlock"] {
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+
+    div[data-testid="stTabs"] [data-baseweb="tab-panel"] {
+        padding-top: 1.25rem;
+    }
+
+    div[data-testid="stPlotlyChart"] {
+        overflow: hidden !important;
+    }
+
+    div[data-testid="stPlotlyChart"] > div {
+        overflow: hidden !important;
     }
 
     h1, h2, h3, p, label {
@@ -165,7 +185,7 @@ st.markdown(
         color: #eaf6ff;
         font-size: 1.12rem;
         font-weight: 750;
-        margin: 1.2rem 0 0.65rem 0;
+        margin: 1.7rem 0 0.9rem 0;
     }
 
     .sf-section-caption {
@@ -199,7 +219,9 @@ st.markdown(
         background: #101b2a;
         border: 1px solid var(--blue) !important;
         border-radius: 13px !important;
-        padding: 7px;
+        padding: 10px 12px 8px;
+        margin: 0.35rem 0 1.25rem 0;
+        overflow: hidden !important;
         box-shadow: 0 0 10px rgba(0,170,255,0.055);
     }
 
@@ -318,28 +340,46 @@ def kpi_card(label: str, value: str, note: str, icon: str = "✦") -> None:
     )
 
 
-def style_figure(fig, height: int = 390):
+def style_figure(fig, height: int = 410):
+    """Apply consistent chart spacing, title placement, and readable axes."""
     fig.update_layout(
         template="plotly_dark",
         height=height,
+        autosize=True,
         paper_bgcolor="#101b2a",
         plot_bgcolor="#101b2a",
-        font=dict(color="#e5edf7", family="Arial"),
-        margin=dict(l=25, r=25, t=65, b=35),
+        font=dict(color="#e5edf7", family="Arial", size=11),
+        title=dict(
+            x=0.02,
+            xanchor="left",
+            y=0.98,
+            yanchor="top",
+            font=dict(size=15, color="#f8fafc"),
+        ),
+        # Extra top space separates chart titles from legends.
+        margin=dict(l=58, r=35, t=105, b=65),
         legend=dict(
             bgcolor="rgba(0,0,0,0)",
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=1.08,
             xanchor="right",
-            x=1,
+            x=0.98,
+            font=dict(size=10),
+            itemwidth=75,
         ),
     )
     fig.update_xaxes(
+        title_font=dict(size=11),
+        tickfont=dict(size=10),
+        automargin=True,
         gridcolor="rgba(148,163,184,0.12)",
         zerolinecolor="rgba(148,163,184,0.18)",
     )
     fig.update_yaxes(
+        title_font=dict(size=11),
+        tickfont=dict(size=10),
+        automargin=True,
         gridcolor="rgba(148,163,184,0.12)",
         zerolinecolor="rgba(148,163,184,0.18)",
     )
@@ -658,8 +698,8 @@ with tab_overview:
         line=dict(color="#38bdf8", width=2.5),
         fillcolor="rgba(0,170,255,0.16)",
     )
-    style_figure(fig_monthly_overview, 370)
-    st.plotly_chart(fig_monthly_overview, use_container_width=True)
+    style_figure(fig_monthly_overview, 410)
+    st.plotly_chart(fig_monthly_overview, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     section_heading(
         "Sales Demand Heatmap",
@@ -678,8 +718,8 @@ with tab_overview:
         },
         title="Average Demand by Month and Weekday",
     )
-    style_figure(fig_heatmap, 410)
-    st.plotly_chart(fig_heatmap, use_container_width=True)
+    style_figure(fig_heatmap, 440)
+    st.plotly_chart(fig_heatmap, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     section_heading(
         "Model Performance Snapshot",
@@ -694,9 +734,14 @@ with tab_overview:
         title="MAPE Comparison Across Forecasting Models",
         color_discrete_sequence=["#00aaff", "#38bdf8", "#0ea5e9", "#7dd3fc"],
     )
-    fig_overview_models.update_traces(texttemplate="%{text:.2f}%", textposition="outside")
-    style_figure(fig_overview_models, 350)
-    st.plotly_chart(fig_overview_models, use_container_width=True)
+    fig_overview_models.update_traces(
+        texttemplate="%{text:.2f}%",
+        textposition="outside",
+        cliponaxis=False,
+    )
+    fig_overview_models.update_layout(showlegend=False)
+    style_figure(fig_overview_models, 390)
+    st.plotly_chart(fig_overview_models, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     st.success(
         f"Based on the saved evaluation results, {best_model} has the lowest "
@@ -727,9 +772,14 @@ with tab_evaluation:
             labels={"model_name": "Forecasting Model", "mape": "MAPE (%)"},
             color_discrete_sequence=["#00aaff", "#38bdf8", "#0ea5e9", "#7dd3fc"],
         )
-        fig_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside")
-        style_figure(fig_mape, 390)
-        st.plotly_chart(fig_mape, use_container_width=True)
+        fig_mape.update_traces(
+            texttemplate="%{text:.2f}%",
+            textposition="outside",
+            cliponaxis=False,
+        )
+        fig_mape.update_layout(showlegend=False)
+        style_figure(fig_mape, 410)
+        st.plotly_chart(fig_mape, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     with metric_col2:
         fig_mae = px.bar(
@@ -742,9 +792,14 @@ with tab_evaluation:
             labels={"model_name": "Forecasting Model", "mae": "MAE"},
             color_discrete_sequence=["#00aaff", "#38bdf8", "#0ea5e9", "#7dd3fc"],
         )
-        fig_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside")
-        style_figure(fig_mae, 390)
-        st.plotly_chart(fig_mae, use_container_width=True)
+        fig_mae.update_traces(
+            texttemplate="%{text:.2f}",
+            textposition="outside",
+            cliponaxis=False,
+        )
+        fig_mae.update_layout(showlegend=False)
+        style_figure(fig_mae, 410)
+        st.plotly_chart(fig_mae, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     section_heading("Model Performance Summary")
     performance_display = performance.copy()
@@ -800,12 +855,23 @@ with tab_evaluation:
             y="mape",
             color="Approach",
             text="mape",
-            title="Average MAPE by Forecasting Approach",
+            title="MAPE by Forecasting Approach",
             color_discrete_sequence=["#00aaff", "#38bdf8"],
         )
-        fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside")
-        style_figure(fig_approach_mape, 350)
-        st.plotly_chart(fig_approach_mape, use_container_width=True)
+        fig_approach_mape.update_traces(
+            texttemplate="%{text:.2f}%",
+            textposition="outside",
+            cliponaxis=False,
+        )
+        fig_approach_mape.update_layout(showlegend=False)
+        fig_approach_mape.update_xaxes(title_text="", tickfont=dict(size=10))
+        fig_approach_mape.update_yaxes(title_text="MAPE (%)")
+        style_figure(fig_approach_mape, 405)
+        st.plotly_chart(
+            fig_approach_mape,
+            use_container_width=True,
+            config={"responsive": True, "displayModeBar": False},
+        )
 
     with approach_col2:
         fig_approach_mae = px.bar(
@@ -814,12 +880,23 @@ with tab_evaluation:
             y="mae",
             color="Approach",
             text="mae",
-            title="Average MAE by Forecasting Approach",
+            title="MAE by Forecasting Approach",
             color_discrete_sequence=["#00aaff", "#38bdf8"],
         )
-        fig_approach_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside")
-        style_figure(fig_approach_mae, 350)
-        st.plotly_chart(fig_approach_mae, use_container_width=True)
+        fig_approach_mae.update_traces(
+            texttemplate="%{text:.2f}",
+            textposition="outside",
+            cliponaxis=False,
+        )
+        fig_approach_mae.update_layout(showlegend=False)
+        fig_approach_mae.update_xaxes(title_text="", tickfont=dict(size=10))
+        fig_approach_mae.update_yaxes(title_text="MAE")
+        style_figure(fig_approach_mae, 405)
+        st.plotly_chart(
+            fig_approach_mae,
+            use_container_width=True,
+            config={"responsive": True, "displayModeBar": False},
+        )
 
     st.info(
         "Interpretation note: the ranking uses the MAE and MAPE values saved in the CSV. "
@@ -872,7 +949,7 @@ with tab_analysis:
     )
     fig_compare.update_traces(line=dict(width=2))
     style_figure(fig_compare, 430)
-    st.plotly_chart(fig_compare, use_container_width=True)
+    st.plotly_chart(fig_compare, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     section_heading("Monthly Historical Sales Trend")
     fig_month_analysis = px.line(
@@ -884,8 +961,8 @@ with tab_analysis:
         color_discrete_sequence=["#00aaff"],
         labels={"month": "Month", "daily_demand": "Total Demand"},
     )
-    style_figure(fig_month_analysis, 370)
-    st.plotly_chart(fig_month_analysis, use_container_width=True)
+    style_figure(fig_month_analysis, 410)
+    st.plotly_chart(fig_month_analysis, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     section_heading("Forecast Error Analysis")
     error_data = comparison.dropna(subset=["error"]).copy()
@@ -898,8 +975,8 @@ with tab_analysis:
         labels={"forecast_date": "Date", "error": "Forecast Error"},
     )
     fig_error.add_hline(y=0, line_dash="dash", line_color="#94a3b8")
-    style_figure(fig_error, 370)
-    st.plotly_chart(fig_error, use_container_width=True)
+    style_figure(fig_error, 410)
+    st.plotly_chart(fig_error, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     section_heading(f"{selected_model} Forecast Trend")
     fig_forecast = px.line(
@@ -914,8 +991,8 @@ with tab_analysis:
         },
     )
     fig_forecast.update_traces(line=dict(width=2.5))
-    style_figure(fig_forecast, 370)
-    st.plotly_chart(fig_forecast, use_container_width=True)
+    style_figure(fig_forecast, 410)
+    st.plotly_chart(fig_forecast, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     if comparison["daily_demand"].notna().any():
         actual_available = comparison.dropna(subset=["daily_demand", "predicted_demand"])
@@ -1007,7 +1084,7 @@ with tab_downloads:
 st.divider()
 st.markdown(
     """
-    <div style="text-align:center;color:#71859c;font-size:0.76rem;padding:8px 0 0 0;">
+    <div style="text-align:center;color:#71859c;font-size:0.76rem;padding:18px 0 8px 0;">
         Sales Forecasting System · Python & Streamlit · ARIMA · SARIMA · Prophet · Random Forest
     </div>
     """,
