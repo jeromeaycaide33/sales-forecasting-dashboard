@@ -24,280 +24,281 @@ st.markdown(
     """
     <style>
     :root {
-        --blue: #00aaff;
-        --blue-light: #38bdf8;
-        --blue-glow: rgba(0, 170, 255, 0.16);
-        --page: #0b1220;
-        --panel: #121d2d;
-        --panel-2: #17263a;
-        --text: #f8fafc;
-        --muted: #9fb0c5;
+        --page: #0a1220;
+        --panel: #111c2c;
+        --panel-alt: #172438;
+        --border: #29384d;
+        --blue: #4b8fe8;
+        --blue-light: #65b5f0;
+        --teal: #42c6a5;
+        --gold: #f2c35b;
+        --text: #edf3fb;
+        --muted: #9aaac0;
     }
 
     .stApp {
-        background:
-            radial-gradient(circle at 10% 0%, rgba(0,170,255,0.08), transparent 28%),
-            linear-gradient(180deg, #0b1220 0%, #0e1726 100%);
+        background: #0a1220;
         color: var(--text);
     }
 
     .block-container {
-        max-width: 1600px;
-        padding-top: 1.8rem;
-        padding-bottom: 3rem;
-        padding-left: clamp(1.25rem, 3vw, 3rem);
-        padding-right: clamp(1.25rem, 3vw, 3rem);
+        max-width: 1800px;
+        padding-top: 1.15rem;
+        padding-bottom: 2.5rem;
+        padding-left: clamp(1rem, 2vw, 2rem);
+        padding-right: clamp(1rem, 2vw, 2rem);
     }
 
-    /* Consistent breathing room between Streamlit sections and columns */
     div[data-testid="stHorizontalBlock"] {
-        gap: 1.5rem;
+        gap: 0.9rem;
         align-items: stretch;
     }
 
     div[data-testid="stTabs"] [data-baseweb="tab-panel"] {
-        padding-top: 1.25rem;
-    }
-
-    div[data-testid="stPlotlyChart"] {
-        overflow: hidden !important;
-    }
-
-    div[data-testid="stPlotlyChart"] > div {
-        overflow: hidden !important;
+        padding-top: 1rem;
     }
 
     h1, h2, h3, p, label {
         color: var(--text);
     }
 
-    h1 { font-size: 2.15rem !important; font-weight: 800 !important; }
-    h2 { font-size: 1.55rem !important; font-weight: 750 !important; }
-    h3 { font-size: 1.18rem !important; font-weight: 700 !important; }
+    h1 { font-size: 1.9rem !important; font-weight: 800 !important; }
+    h2 { font-size: 1.35rem !important; font-weight: 750 !important; }
+    h3 { font-size: 1.05rem !important; font-weight: 700 !important; }
 
-    /* Hero header */
+    /* Compact BI-style dashboard header */
     .sf-hero {
         position: relative;
         overflow: hidden;
-        background: linear-gradient(120deg, #14243a 0%, #172b43 52%, #102034 100%);
-        border: 1px solid var(--blue);
-        border-radius: 20px;
-        padding: 30px 34px;
-        margin: 0 0 1.15rem 0;
-        box-shadow: 0 12px 32px rgba(0,170,255,0.10);
+        background: linear-gradient(110deg, #101b2c 0%, #142238 100%);
+        border: 1px solid #29384d;
+        border-radius: 13px;
+        padding: 19px 24px;
+        margin: 0 0 1rem 0;
+        box-shadow: none;
     }
 
-    .sf-hero:after {
-        content: "";
-        position: absolute;
-        width: 220px;
-        height: 220px;
-        right: -75px;
-        top: -105px;
-        border-radius: 50%;
-        border: 1px solid rgba(56,189,248,0.25);
-        box-shadow: 0 0 0 22px rgba(56,189,248,0.035),
-                    0 0 0 48px rgba(56,189,248,0.025);
-        pointer-events: none;
-    }
+    .sf-hero:after { display: none; }
 
     .sf-eyebrow {
-        color: var(--blue-light);
-        font-size: 0.76rem;
+        color: #75a9e8;
+        font-size: 0.68rem;
         font-weight: 800;
-        letter-spacing: 0.17em;
+        letter-spacing: 0.16em;
         text-transform: uppercase;
-        margin-bottom: 0.65rem;
+        margin-bottom: 0.45rem;
     }
 
     .sf-title {
-        color: #ffffff;
-        font-size: 2.25rem;
-        font-weight: 850;
-        line-height: 1.12;
+        color: #f4f7fc;
+        font-size: 1.85rem;
+        font-weight: 800;
+        line-height: 1.15;
         margin: 0;
     }
 
     .sf-subtitle {
-        color: #c4d2e2;
-        font-size: 0.98rem;
-        line-height: 1.6;
-        max-width: 850px;
-        margin: 0.8rem 0 0 0;
+        color: #a9b8ca;
+        font-size: 0.84rem;
+        line-height: 1.45;
+        max-width: 900px;
+        margin: 0.45rem 0 0 0;
     }
 
     .sf-accent {
-        width: 105px;
-        height: 4px;
-        border-radius: 20px;
-        background: var(--blue);
-        margin-top: 1.1rem;
-        box-shadow: 0 0 14px rgba(0,170,255,0.45);
+        width: 62px;
+        height: 3px;
+        border-radius: 10px;
+        background: #4b8fe8;
+        margin-top: 0.8rem;
+        box-shadow: none;
     }
 
-    /* Advanced KPI cards */
-    .sf-kpi {
-        background: linear-gradient(145deg, #17263a 0%, #111c2b 100%);
-        border: 1px solid var(--blue);
-        border-radius: 15px;
-        padding: 18px 19px;
-        min-height: 137px;
-        box-shadow: 0 0 13px rgba(0,170,255,0.075);
+    /* Dashboard panel headings */
+    .sf-panel-title {
+        color: #e9f0f9;
+        font-size: 0.91rem;
+        font-weight: 750;
+        line-height: 1.3;
+        margin: 0 0 0.2rem 0;
     }
 
-    .sf-kpi-top {
+    .sf-panel-subtitle {
+        color: #8799b0;
+        font-size: 0.70rem;
+        line-height: 1.4;
+        margin: 0 0 0.65rem 0;
+    }
+
+    .sf-panel-divider {
+        border: 0;
+        border-top: 1px solid #29384d;
+        margin: 0.55rem 0;
+    }
+
+    /* Compact metric rows inspired by enterprise BI dashboards */
+    .sf-metric-row {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 8px;
-        margin-bottom: 13px;
+        align-items: center;
+        gap: 10px;
+        padding: 0.68rem 0;
+        border-bottom: 1px solid rgba(130, 151, 178, 0.17);
     }
 
-    .sf-kpi-label {
-        color: #a9bad0;
-        font-size: 0.79rem;
-        font-weight: 650;
+    .sf-metric-row:last-child { border-bottom: 0; }
+
+    .sf-metric-label {
+        color: #b6c2d2;
+        font-size: 0.76rem;
         line-height: 1.35;
     }
 
-    .sf-kpi-icon {
-        color: var(--blue-light);
-        font-size: 1.2rem;
+    .sf-metric-value {
+        color: #f3f6fb;
+        font-size: 1.03rem;
+        font-weight: 800;
+        white-space: nowrap;
+        text-align: right;
     }
 
-    .sf-kpi-value {
-        color: #ffffff;
-        font-size: 1.72rem;
-        line-height: 1.15;
-        font-weight: 850;
-        overflow-wrap: anywhere;
+    .sf-metric-note {
+        color: #42c6a5;
+        font-size: 0.65rem;
+        font-weight: 650;
+        margin-top: 2px;
+        text-align: right;
     }
 
-    .sf-kpi-note {
-        color: #7f93aa;
-        font-size: 0.73rem;
-        line-height: 1.4;
-        margin-top: 9px;
+    .sf-recommendation {
+        background: #10263a;
+        border: 1px solid #294d6c;
+        border-left: 3px solid #4b8fe8;
+        color: #c9d8e9;
+        border-radius: 8px;
+        padding: 0.75rem 0.9rem;
+        font-size: 0.78rem;
+        line-height: 1.5;
+        margin-top: 0.8rem;
     }
 
-    /* Section labels */
-    .sf-section-label {
-        color: #eaf6ff;
-        font-size: 1.12rem;
-        font-weight: 750;
-        margin: 1.7rem 0 0.9rem 0;
+    /* Streamlit bordered containers become dashboard panels */
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background: linear-gradient(150deg, #121f31 0%, #101a29 100%);
+        border: 1px solid #29384d !important;
+        border-radius: 11px !important;
+        padding: 0.78rem 0.82rem 0.65rem 0.82rem;
+        box-shadow: none;
     }
 
-    .sf-section-caption {
-        color: #91a5bc;
-        font-size: 0.82rem;
-        margin-top: -0.35rem;
-        margin-bottom: 0.8rem;
-    }
-
-    /* Streamlit metric cards */
+    /* Standard metrics in detail tabs */
     div[data-testid="stMetric"] {
-        background: var(--panel);
-        border: 1px solid var(--blue) !important;
-        border-radius: 13px !important;
-        padding: 15px 17px;
-        min-height: 105px;
-        box-shadow: 0 0 9px rgba(0,170,255,0.07);
+        background: #142237;
+        border: 1px solid #2b4058 !important;
+        border-radius: 9px !important;
+        padding: 11px 13px;
+        min-height: 88px;
+        box-shadow: none;
     }
 
     [data-testid="stMetricLabel"] {
-        color: var(--muted) !important;
+        color: #9eafc4 !important;
+        font-size: 0.75rem !important;
     }
 
     [data-testid="stMetricValue"] {
-        color: #ffffff !important;
+        color: #f4f7fc !important;
         font-weight: 800 !important;
+        font-size: 1.35rem !important;
     }
 
-    /* Chart and table frames */
+    /* Plotly charts sit cleanly inside their parent panels */
     div[data-testid="stPlotlyChart"] {
-        background: #101b2a;
-        border: 1px solid var(--blue) !important;
-        border-radius: 13px !important;
-        padding: 10px 12px 8px;
-        margin: 0.35rem 0 1.25rem 0;
+        background: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
         overflow: hidden !important;
-        box-shadow: 0 0 10px rgba(0,170,255,0.055);
+        box-shadow: none !important;
+    }
+
+    div[data-testid="stPlotlyChart"] > div {
+        overflow: hidden !important;
     }
 
     div[data-testid="stDataFrame"],
     div[data-testid="stTable"],
     .stDataFrame {
-        border: 1px solid var(--blue) !important;
-        border-radius: 11px !important;
+        border: 1px solid #29384d !important;
+        border-radius: 9px !important;
         overflow: hidden;
     }
 
-    /* Alerts, containers and expanders */
     div[data-testid="stAlert"],
     .stAlert,
-    div[data-testid="stVerticalBlockBorderWrapper"],
     div[data-testid="stExpander"] {
-        border: 1px solid var(--blue) !important;
-        border-radius: 12px !important;
+        border-radius: 9px !important;
     }
 
     /* Sidebar */
     section[data-testid="stSidebar"] {
-        background: #101b2a;
-        border-right: 1px solid rgba(0,170,255,0.42);
-        min-width: 300px;
+        background: #0f1a2a;
+        border-right: 1px solid #29384d;
+        min-width: 270px;
     }
 
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3 {
-        color: #ffffff !important;
+        color: #f1f5fb !important;
     }
 
     div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
-        border: 1px solid var(--blue) !important;
-        border-radius: 10px !important;
-        background: #111d2c;
+        border: 1px solid #344b66 !important;
+        border-radius: 8px !important;
+        background: #111d2d;
     }
 
-    /* Tabs */
+    /* Compact navigation tabs */
     div[data-testid="stTabs"] [role="tablist"] {
-        gap: 7px;
-        border-bottom: 1px solid rgba(0,170,255,0.28);
-        padding-bottom: 7px;
+        gap: 6px;
+        border-bottom: 1px solid #29384d;
+        padding-bottom: 6px;
     }
 
     div[data-testid="stTabs"] button[role="tab"] {
-        background: #142237;
-        border: 1px solid #2b4058;
-        border-radius: 10px 10px 7px 7px;
-        color: #c6d4e4;
+        background: #121f31;
+        border: 1px solid #29384d;
+        border-radius: 8px 8px 5px 5px;
+        color: #aebdd0;
         font-weight: 650;
-        padding: 9px 14px;
+        padding: 8px 12px;
+        font-size: 0.82rem;
     }
 
     div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-        background: #12304a;
-        border: 1px solid var(--blue);
+        background: #1b3554;
+        border: 1px solid #4b8fe8;
         color: #ffffff;
-        box-shadow: 0 0 9px rgba(0,170,255,0.12);
+        box-shadow: none;
     }
 
-    /* Buttons and controls */
     div[data-testid="stDownloadButton"] button,
     .stButton button {
-        border: 1px solid var(--blue) !important;
-        border-radius: 9px !important;
+        border: 1px solid #385778 !important;
+        border-radius: 8px !important;
     }
 
     hr {
-        border-color: rgba(0,170,255,0.25) !important;
+        border-color: #29384d !important;
     }
 
-    @media (max-width: 900px) {
-        .sf-hero { padding: 23px; }
-        .sf-title { font-size: 1.75rem; }
-        .sf-kpi { min-height: 120px; }
+    @media (max-width: 1100px) {
+        .sf-title { font-size: 1.55rem; }
+        .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
     }
     </style>
     """,
@@ -340,48 +341,76 @@ def kpi_card(label: str, value: str, note: str, icon: str = "✦") -> None:
     )
 
 
-def style_figure(fig, height: int = 410):
-    """Apply consistent chart spacing, title placement, and readable axes."""
+def panel_heading(title: str, subtitle: str | None = None) -> None:
+    safe_title = html.escape(str(title))
+    subtitle_html = ""
+    if subtitle:
+        subtitle_html = (
+            f'<div class="sf-panel-subtitle">{html.escape(str(subtitle))}</div>'
+        )
+    st.markdown(
+        f'<div class="sf-panel-title">{safe_title}</div>{subtitle_html}',
+        unsafe_allow_html=True,
+    )
+
+
+def dashboard_metric(label: str, value: str, note: str = "") -> None:
+    safe_label = html.escape(str(label))
+    safe_value = html.escape(str(value))
+    note_html = (
+        f'<div class="sf-metric-note">{html.escape(str(note))}</div>'
+        if note else ""
+    )
+    st.markdown(
+        f"""
+        <div class="sf-metric-row">
+            <div class="sf-metric-label">{safe_label}</div>
+            <div>
+                <div class="sf-metric-value">{safe_value}</div>
+                {note_html}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def style_figure(fig, height: int = 340):
+    """Apply compact enterprise-dashboard styling to Plotly figures."""
     fig.update_layout(
         template="plotly_dark",
         height=height,
         autosize=True,
-        paper_bgcolor="#101b2a",
-        plot_bgcolor="#101b2a",
-        font=dict(color="#e5edf7", family="Arial", size=11),
-        title=dict(
-            x=0.02,
-            xanchor="left",
-            y=0.98,
-            yanchor="top",
-            font=dict(size=15, color="#f8fafc"),
-        ),
-        # Extra top space separates chart titles from legends.
-        margin=dict(l=58, r=35, t=105, b=65),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#dce6f2", family="Arial", size=10),
+        margin=dict(l=42, r=18, t=38, b=42),
+        showlegend=False,
         legend=dict(
             bgcolor="rgba(0,0,0,0)",
             orientation="h",
             yanchor="bottom",
-            y=1.08,
+            y=1.02,
             xanchor="right",
-            x=0.98,
-            font=dict(size=10),
-            itemwidth=75,
+            x=1,
+            font=dict(size=9),
         ),
     )
     fig.update_xaxes(
-        title_font=dict(size=11),
-        tickfont=dict(size=10),
+        title_font=dict(size=10),
+        tickfont=dict(size=9, color="#9eafc4"),
         automargin=True,
-        gridcolor="rgba(148,163,184,0.12)",
-        zerolinecolor="rgba(148,163,184,0.18)",
+        gridcolor="rgba(130,151,178,0.13)",
+        zerolinecolor="rgba(130,151,178,0.18)",
+        showline=False,
     )
     fig.update_yaxes(
-        title_font=dict(size=11),
-        tickfont=dict(size=10),
+        title_font=dict(size=10),
+        tickfont=dict(size=9, color="#9eafc4"),
         automargin=True,
-        gridcolor="rgba(148,163,184,0.12)",
-        zerolinecolor="rgba(148,163,184,0.18)",
+        gridcolor="rgba(130,151,178,0.13)",
+        zerolinecolor="rgba(130,151,178,0.18)",
+        showline=False,
     )
     return fig
 
@@ -546,11 +575,11 @@ weekday_labels = ["Monday", "Tuesday", "Wednesday", "Thursday",
 st.markdown(
     """
     <div class="sf-hero">
-        <div class="sf-eyebrow">Analytics · Forecasting · Decision Support</div>
-        <div class="sf-title">Sales Forecasting System</div>
+        <div class="sf-eyebrow">Sta. Cruz Laguna · Business Intelligence</div>
+        <div class="sf-title">Sales Forecasting Dashboard</div>
         <p class="sf-subtitle">
-            A comparative forecasting system using ARIMA, SARIMA, Prophet,
-            and Random Forest models for sales-demand analysis and prediction.
+            Historical demand monitoring, forecasting model evaluation,
+            and demand prediction in one analytics workspace.
         </p>
         <div class="sf-accent"></div>
     </div>
@@ -564,12 +593,12 @@ st.markdown(
 # =========================================================
 st.sidebar.markdown(
     """
-    <div style="padding: 5px 0 10px 0;">
-        <div style="font-size:1.42rem;font-weight:850;color:#f8fafc;">
-            Forecast Control
+    <div style="padding: 4px 0 8px 0;">
+        <div style="font-size:1.22rem;font-weight:800;color:#f1f5fb;">
+            Forecast Controls
         </div>
-        <div style="font-size:0.82rem;color:#9fb0c5;margin-top:5px;">
-            Choose a model to update forecast analysis
+        <div style="font-size:0.76rem;color:#91a4bb;margin-top:5px;line-height:1.45;">
+            Select a forecasting model to inspect its saved predictions.
         </div>
     </div>
     """,
@@ -577,30 +606,28 @@ st.sidebar.markdown(
 )
 
 selected_model = st.sidebar.selectbox(
-    "Select Forecasting Model",
+    "Forecasting Model",
     model_options,
     key="forecast_model_selector",
 )
 
 st.sidebar.divider()
-st.sidebar.markdown(
-    """
-    <h3>System Details</h3>
-    <b>Dataset</b><br>
-    Sta. Cruz Laguna Sales Dataset<br><br>
-    <b>Forecasting Models</b><br>
-    ARIMA<br>
-    SARIMA<br>
-    Prophet<br>
-    Random Forest<br><br>
-    <b>Evaluation Metrics</b><br>
-    MAE<br>
-    MAPE<br><br>
-    <b>Platform</b><br>
-    Python + Streamlit
-    """,
-    unsafe_allow_html=True,
-)
+with st.sidebar.expander("System Information", expanded=False):
+    st.markdown(
+        """
+        **Dataset**  
+        Sta. Cruz Laguna Sales Dataset
+
+        **Forecasting Models**  
+        ARIMA · SARIMA · Prophet · Random Forest
+
+        **Evaluation Metrics**  
+        MAE · MAPE
+
+        **Platform**  
+        Python + Streamlit
+        """
+    )
 
 model_data = df[df["model_name"] == selected_model].copy()
 comparison = model_data.merge(
@@ -630,11 +657,6 @@ tab_overview, tab_evaluation, tab_analysis, tab_downloads = st.tabs(
 # TAB 1 — OVERVIEW
 # =========================================================
 with tab_overview:
-    section_heading(
-        "Dashboard Overview",
-        "A quick summary of historical demand and saved forecasting results.",
-    )
-
     total_demand = actual_df["daily_demand"].sum()
     average_demand = actual_df["daily_demand"].mean()
     highest_demand = actual_df["daily_demand"].max()
@@ -642,113 +664,193 @@ with tab_overview:
         actual_df["daily_demand"].idxmax(), "date"
     ].date()
 
-    kpi_cols = st.columns(4, gap="medium")
-    with kpi_cols[0]:
-        kpi_card(
-            "Historical Sales Records",
-            f"{len(actual_df):,}",
-            "Daily demand observations",
-            "▦",
-        )
-    with kpi_cols[1]:
-        kpi_card(
-            "Forecast Records",
-            f"{len(df):,}",
-            "Saved predictions across all models",
-            "⌁",
-        )
-    with kpi_cols[2]:
-        kpi_card(
-            "Models Evaluated",
-            str(df["model_name"].nunique()),
-            "Available forecasting algorithms",
-            "◈",
-        )
-    with kpi_cols[3]:
-        kpi_card(
-            "Recommended Model",
-            best_model,
-            f"Lowest saved average MAPE: {lowest_mape:.2f}%",
-            "★",
-        )
-
-    section_heading("Historical Demand Snapshot")
-    hist_cols = st.columns(4, gap="medium")
-    with hist_cols[0]:
-        st.metric("Total Demand", f"{total_demand:,.0f}")
-    with hist_cols[1]:
-        st.metric("Average Daily Demand", f"{average_demand:,.2f}")
-    with hist_cols[2]:
-        st.metric("Highest Daily Demand", f"{highest_demand:,.0f}")
-    with hist_cols[3]:
-        st.metric("Highest Demand Date", str(highest_demand_date))
-
-    section_heading(
-        "Monthly Historical Sales Trend",
-        "Total daily demand aggregated by calendar month.",
-    )
-    fig_monthly_overview = px.area(
-        monthly_sales,
-        x="month",
-        y="daily_demand",
-        title="Monthly Sales Demand",
-        color_discrete_sequence=["#00aaff"],
-    )
-    fig_monthly_overview.update_traces(
-        line=dict(color="#38bdf8", width=2.5),
-        fillcolor="rgba(0,170,255,0.16)",
-    )
-    style_figure(fig_monthly_overview, 410)
-    st.plotly_chart(fig_monthly_overview, use_container_width=True, config={"responsive": True, "displayModeBar": False})
-
-    section_heading(
-        "Sales Demand Heatmap",
-        "Average daily demand by month and day of the week. Brighter cells indicate higher average demand.",
-    )
-    fig_heatmap = px.imshow(
-        heatmap_values,
-        x=weekday_labels,
-        y=month_labels,
-        aspect="auto",
-        color_continuous_scale=["#102337", "#075985", "#00aaff", "#bae6fd"],
-        labels={
-            "x": "Day of Week",
-            "y": "Month",
-            "color": "Average Demand",
-        },
-        title="Average Demand by Month and Weekday",
-    )
-    style_figure(fig_heatmap, 440)
-    st.plotly_chart(fig_heatmap, use_container_width=True, config={"responsive": True, "displayModeBar": False})
-
-    section_heading(
-        "Model Performance Snapshot",
-        "Models ranked by their saved average MAPE values.",
-    )
-    fig_overview_models = px.bar(
-        ranking.sort_values("mape", ascending=True),
-        x="model_name",
-        y="mape",
-        color="model_name",
-        text="mape",
-        title="MAPE Comparison Across Forecasting Models",
-        color_discrete_sequence=["#00aaff", "#38bdf8", "#0ea5e9", "#7dd3fc"],
-    )
-    fig_overview_models.update_traces(
-        texttemplate="%{text:.2f}%",
-        textposition="outside",
-        cliponaxis=False,
-    )
-    fig_overview_models.update_layout(showlegend=False)
-    style_figure(fig_overview_models, 390)
-    st.plotly_chart(fig_overview_models, use_container_width=True, config={"responsive": True, "displayModeBar": False})
-
-    st.success(
-        f"Based on the saved evaluation results, {best_model} has the lowest "
-        f"average MAPE at {lowest_mape:.2f}%. This recommendation reflects the "
-        "metrics currently stored in forecast_results_final.csv."
+    # Top row: summary metrics, model performance, and monthly demand.
+    top_left, top_center, top_right = st.columns(
+        [1.02, 1.38, 1.12],
+        gap="small",
     )
 
+    with top_left:
+        with st.container(border=True):
+            panel_heading("Sales Metrics", "Historical demand overview")
+            dashboard_metric("Total Demand", f"{total_demand:,.0f}")
+            dashboard_metric("Average Daily Demand", f"{average_demand:,.2f}")
+            dashboard_metric("Highest Daily Demand", f"{highest_demand:,.0f}")
+            dashboard_metric("Highest Demand Date", str(highest_demand_date))
+            dashboard_metric("Historical Records", f"{len(actual_df):,}")
+            dashboard_metric("Forecast Records", f"{len(df):,}")
+            st.markdown(
+                f"""
+                <div class="sf-recommendation">
+                    <b>Top-performing model</b><br>
+                    {html.escape(best_model)} · MAPE {lowest_mape:.2f}%
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    with top_center:
+        with st.container(border=True):
+            panel_heading(
+                "Forecast Model Performance",
+                "Model comparison based on saved MAPE values · lower is better",
+            )
+            model_chart_data = ranking.sort_values("mape", ascending=True).copy()
+            fig_overview_models = px.bar(
+                model_chart_data,
+                x="mape",
+                y="model_name",
+                orientation="h",
+                text="mape",
+                color="model_name",
+                color_discrete_map={
+                    "ARIMA": "#5b8fd9",
+                    "SARIMA": "#3975bd",
+                    "Prophet": "#42a6c8",
+                    "Random Forest": "#42b99a",
+                },
+                labels={"mape": "MAPE (%)", "model_name": ""},
+            )
+            fig_overview_models.update_traces(
+                texttemplate="%{text:.2f}%",
+                textposition="outside",
+                cliponaxis=False,
+            )
+            fig_overview_models.update_layout(
+                showlegend=False,
+                xaxis_title="MAPE (%)",
+                yaxis_title="",
+            )
+            style_figure(fig_overview_models, 315)
+            st.plotly_chart(
+                fig_overview_models,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
+
+    with top_right:
+        with st.container(border=True):
+            panel_heading(
+                "Monthly Demand",
+                "Total historical demand by month",
+            )
+            fig_monthly_overview = px.bar(
+                monthly_sales,
+                x="month",
+                y="daily_demand",
+                color_discrete_sequence=["#477fc4"],
+                labels={"month": "", "daily_demand": "Demand"},
+            )
+            fig_monthly_overview.update_traces(
+                marker_line_width=0,
+                opacity=0.92,
+            )
+            fig_monthly_overview.update_xaxes(
+                dtick="M6",
+                tickformat="%b<br>%Y",
+                title_text="",
+            )
+            fig_monthly_overview.update_yaxes(title_text="")
+            style_figure(fig_monthly_overview, 315)
+            st.plotly_chart(
+                fig_monthly_overview,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
+
+    # Bottom row: demand pattern heatmap and selected-model forecast.
+    bottom_left, bottom_right = st.columns(
+        [1.02, 2.48],
+        gap="small",
+    )
+
+    with bottom_left:
+        with st.container(border=True):
+            panel_heading(
+                "Demand Pattern",
+                "Average daily demand by month and weekday",
+            )
+            fig_heatmap = px.imshow(
+                heatmap_values,
+                x=weekday_labels,
+                y=month_labels,
+                aspect="auto",
+                color_continuous_scale=[
+                    "#17263b",
+                    "#244b79",
+                    "#397fc0",
+                    "#75b5e7",
+                ],
+                labels={"x": "", "y": "", "color": "Avg. demand"},
+            )
+            fig_heatmap.update_layout(
+                coloraxis_colorbar=dict(
+                    thickness=9,
+                    len=0.78,
+                    tickfont=dict(size=8, color="#9eafc4"),
+                    title=dict(text="", font=dict(size=8)),
+                )
+            )
+            fig_heatmap.update_xaxes(tickfont=dict(size=8), side="bottom")
+            fig_heatmap.update_yaxes(tickfont=dict(size=9))
+            style_figure(fig_heatmap, 340)
+            st.plotly_chart(
+                fig_heatmap,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
+
+    with bottom_right:
+        with st.container(border=True):
+            panel_heading(
+                f"Demand Forecast · {selected_model}",
+                "Saved predicted demand values for the selected forecasting model",
+            )
+            fig_forecast_overview = px.line(
+                model_data,
+                x="forecast_date",
+                y="predicted_demand",
+                color_discrete_sequence=["#e8bd58"],
+                labels={
+                    "forecast_date": "",
+                    "predicted_demand": "Predicted demand",
+                },
+            )
+            fig_forecast_overview.update_traces(
+                line=dict(width=2.2, color="#e8bd58"),
+                mode="lines",
+            )
+            fig_forecast_overview.update_yaxes(title_text="")
+            fig_forecast_overview.update_xaxes(title_text="")
+            style_figure(fig_forecast_overview, 265)
+            st.plotly_chart(
+                fig_forecast_overview,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
+
+            forecast_kpis = st.columns(3, gap="small")
+            with forecast_kpis[0]:
+                st.metric(
+                    "Average Forecast",
+                    f"{model_data['predicted_demand'].mean():,.1f}",
+                )
+            with forecast_kpis[1]:
+                st.metric(
+                    "Peak Forecast",
+                    f"{model_data['predicted_demand'].max():,.1f}",
+                )
+            with forecast_kpis[2]:
+                st.metric(
+                    "Forecast Records",
+                    f"{len(model_data):,}",
+                )
+
+    st.caption(
+        "Dashboard values are calculated from the historical sales file and saved forecast results. "
+        "Regional and product panels from the visual reference were adapted to demand-pattern "
+        "and model-performance panels because the current dataset does not contain region or product fields."
+    )
 
 # =========================================================
 # TAB 2 — MODEL EVALUATION
@@ -1085,7 +1187,7 @@ st.divider()
 st.markdown(
     """
     <div style="text-align:center;color:#71859c;font-size:0.76rem;padding:18px 0 8px 0;">
-        Sales Forecasting System · Python & Streamlit · ARIMA · SARIMA · Prophet · Random Forest
+        STA. CRUZ LAGUNA SALES FORECASTING SYSTEM · PYTHON + STREAMLIT
     </div>
     """,
     unsafe_allow_html=True,
