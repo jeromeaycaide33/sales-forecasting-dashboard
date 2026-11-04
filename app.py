@@ -452,21 +452,44 @@ def build_css(t):
         letter-spacing: -0.025em;
     }}
 
+    /* Larger, clearer text-only navigation tabs */
     div[data-testid="stTabs"] [role="tablist"] {{
-        gap: 8px;
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
         border-bottom: 1px solid var(--border);
-        padding: 0 0 9px 0;
+        padding: 0 0 10px 0;
     }}
 
     div[data-testid="stTabs"] button[role="tab"] {{
-        border-radius: 10px;
-        padding: 10px 15px;
-        transition: background 150ms ease, border-color 150ms ease;
+        min-height: 56px !important;
+        padding: 14px 23px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 11px 11px 8px 8px !important;
+        background: var(--tab-bg) !important;
+        color: var(--tab-text) !important;
+        white-space: nowrap !important;
+        transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
     }}
 
     div[data-testid="stTabs"] button[role="tab"] p {{
-        font-size: 0.84rem;
-        font-weight: 650;
+        margin: 0 !important;
+        font-size: 1rem !important;
+        line-height: 1.25 !important;
+        font-weight: 750 !important;
+    }}
+
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
+        background: var(--tab-active) !important;
+        color: var(--text) !important;
+        border-color: var(--tab-active-border) !important;
+        border-bottom: 3px solid var(--blue) !important;
+    }}
+
+    div[data-testid="stTabs"] button[role="tab"]:hover {{
+        background: var(--tab-active) !important;
+        border-color: var(--blue) !important;
+        color: var(--text) !important;
     }}
 
     .stButton button, div[data-testid="stDownloadButton"] button,
@@ -516,7 +539,12 @@ def build_css(t):
             flex-wrap: nowrap;
         }}
         div[data-testid="stTabs"] button[role="tab"] {{
-            white-space: nowrap;
+            min-height: 50px !important;
+            padding: 12px 17px !important;
+            white-space: nowrap !important;
+        }}
+        div[data-testid="stTabs"] button[role="tab"] p {{
+            font-size: 0.92rem !important;
         }}
     }}
 
@@ -790,7 +818,7 @@ with st.sidebar.expander("System Information", expanded=False):
 
 # Theme control directly below System Information.
 st.sidebar.markdown('<div class="theme-label">Appearance</div>', unsafe_allow_html=True)
-theme_button_label = "☀️ Switch to Light Mode" if st.session_state.theme_mode == "dark" else "🌙 Switch to Dark Mode"
+theme_button_label = "Switch to Light Mode" if st.session_state.theme_mode == "dark" else "Switch to Dark Mode"
 st.sidebar.button(
     theme_button_label,
     on_click=toggle_theme,
