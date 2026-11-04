@@ -148,8 +148,16 @@ def build_css(t):
         padding-top: 1rem;
     }}
 
-    h1, h2, h3, p, label, span, div {{
+    h1, h2, h3, p, label {{
         color: var(--text);
+    }}
+
+    .stMarkdown, .stMarkdown p, .stMarkdown li {{
+        color: var(--text);
+    }}
+
+    .stCaption, [data-testid="stCaptionContainer"] {{
+        color: var(--muted) !important;
     }}
 
     h1 {{ font-size: 1.9rem !important; font-weight: 800 !important; }}
@@ -378,6 +386,140 @@ def build_css(t):
         border-color: var(--border) !important;
     }}
 
+    /* Refined dashboard styling */
+    html, body, [class*="css"] {{
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }}
+
+    .stApp {{
+        background-attachment: fixed;
+    }}
+
+    .block-container {{
+        max-width: 1680px;
+        padding-top: 2.25rem !important;
+    }}
+
+    .sf-hero {{
+        border-radius: 18px;
+        padding: 25px 28px;
+        box-shadow: 0 12px 34px rgba(0, 0, 0, 0.10);
+        position: relative;
+        overflow: hidden;
+    }}
+
+    .sf-hero:after {{
+        content: "";
+        position: absolute;
+        width: 210px;
+        height: 210px;
+        right: -72px;
+        top: -105px;
+        border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--blue) 35%, transparent);
+        box-shadow: 0 0 0 22px color-mix(in srgb, var(--blue) 6%, transparent),
+                    0 0 0 46px color-mix(in srgb, var(--blue) 4%, transparent);
+        pointer-events: none;
+    }}
+
+    .sf-title {{
+        font-size: clamp(1.65rem, 2.5vw, 2.2rem);
+        letter-spacing: -0.035em;
+    }}
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {{
+        border-radius: 15px !important;
+        padding: 1rem 1rem 0.85rem 1rem;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.055);
+        transition: border-color 160ms ease, transform 160ms ease;
+    }}
+
+    div[data-testid="stMetric"] {{
+        border-radius: 14px !important;
+        padding: 15px 16px;
+        min-height: 108px;
+        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.045);
+    }}
+
+    [data-testid="stMetricLabel"] p {{
+        color: var(--muted) !important;
+        font-size: 0.78rem !important;
+        font-weight: 650 !important;
+    }}
+
+    [data-testid="stMetricValue"] {{
+        font-size: clamp(1.25rem, 2vw, 1.75rem) !important;
+        letter-spacing: -0.025em;
+    }}
+
+    div[data-testid="stTabs"] [role="tablist"] {{
+        gap: 8px;
+        border-bottom: 1px solid var(--border);
+        padding: 0 0 9px 0;
+    }}
+
+    div[data-testid="stTabs"] button[role="tab"] {{
+        border-radius: 10px;
+        padding: 10px 15px;
+        transition: background 150ms ease, border-color 150ms ease;
+    }}
+
+    div[data-testid="stTabs"] button[role="tab"] p {{
+        font-size: 0.84rem;
+        font-weight: 650;
+    }}
+
+    .stButton button, div[data-testid="stDownloadButton"] button,
+    section[data-testid="stSidebar"] button {{
+        min-height: 42px;
+        font-weight: 650;
+        transition: transform 150ms ease, border-color 150ms ease, filter 150ms ease;
+    }}
+
+    .stButton button:hover, div[data-testid="stDownloadButton"] button:hover,
+    section[data-testid="stSidebar"] button:hover {{
+        border-color: var(--blue) !important;
+        filter: brightness(1.04);
+        transform: translateY(-1px);
+    }}
+
+    section[data-testid="stSidebar"] {{
+        padding-top: 0.75rem;
+    }}
+
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{
+        gap: 0.75rem;
+    }}
+
+    div[data-testid="stDataFrame"], div[data-testid="stTable"] {{
+        border-radius: 12px !important;
+    }}
+
+    div[data-testid="stAlert"] {{
+        border-radius: 12px !important;
+    }}
+
+    @media (max-width: 768px) {{
+        .block-container {{
+            padding-top: 1.25rem !important;
+            padding-left: 0.85rem;
+            padding-right: 0.85rem;
+        }}
+        .sf-hero {{
+            padding: 20px 18px;
+        }}
+        .sf-subtitle {{
+            font-size: 0.8rem;
+        }}
+        div[data-testid="stTabs"] [role="tablist"] {{
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }}
+        div[data-testid="stTabs"] button[role="tab"] {{
+            white-space: nowrap;
+        }}
+    }}
+
     @media (max-width: 1100px) {{
         .sf-title {{ font-size: 1.55rem; }}
         .block-container {{
@@ -426,7 +568,7 @@ def dashboard_metric(label: str, value: str, note: str = "") -> None:
 
 def style_figure(fig, height: int = 340):
     fig.update_layout(
-        template="plotly_dark",
+        template="plotly_dark" if theme["name"] == "dark" else "plotly_white",
         height=height,
         autosize=True,
         paper_bgcolor="rgba(0,0,0,0)",
@@ -648,7 +790,7 @@ with st.sidebar.expander("System Information", expanded=False):
 
 # Theme control directly below System Information.
 st.sidebar.markdown('<div class="theme-label">Appearance</div>', unsafe_allow_html=True)
-theme_button_label = "🌙 Dark Mode" if st.session_state.theme_mode == "dark" else "☀️ Light Mode"
+theme_button_label = "☀️ Switch to Light Mode" if st.session_state.theme_mode == "dark" else "🌙 Switch to Dark Mode"
 st.sidebar.button(
     theme_button_label,
     on_click=toggle_theme,
@@ -671,10 +813,10 @@ comparison["absolute_error"] = comparison["error"].abs()
 # =========================================================
 tab_overview, tab_evaluation, tab_analysis, tab_downloads = st.tabs(
     [
-        "📊 Overview",
-        "🏆 Model Evaluation",
-        "📈 Forecast Analysis",
-        "📁 Downloads & Data",
+        "Overview",
+        "Model Evaluation",
+        "Forecast Analysis",
+        "Downloads & Data",
     ]
 )
 
@@ -690,32 +832,30 @@ with tab_overview:
         actual_df["daily_demand"].idxmax(), "date"
     ].date()
 
-    top_left, top_center, top_right = st.columns([1.02, 1.38, 1.12], gap="small")
+    # High-level KPIs are placed first so users can understand the dataset quickly.
+    kpi_cols = st.columns(4, gap="medium")
+    with kpi_cols[0]:
+        st.metric("Total Historical Demand", f"{total_demand:,.0f}")
+    with kpi_cols[1]:
+        st.metric("Average Daily Demand", f"{average_demand:,.2f}")
+    with kpi_cols[2]:
+        st.metric("Peak Daily Demand", f"{highest_demand:,.0f}", help=f"Recorded on {highest_demand_date}")
+    with kpi_cols[3]:
+        st.metric("Best Model · MAPE", f"{lowest_mape:.2f}%", help=f"Top-performing model: {best_model}")
+
+    st.caption(
+        f"Historical coverage: {actual_df['date'].min():%b %d, %Y} – "
+        f"{actual_df['date'].max():%b %d, %Y}  ·  "
+        f"{len(actual_df):,} historical records  ·  {len(df):,} forecast records"
+    )
+
+    top_left, top_right = st.columns([1.15, 1], gap="medium")
 
     with top_left:
         with st.container(border=True):
-            panel_heading("Sales Metrics", "Historical demand overview")
-            dashboard_metric("Total Demand", f"{total_demand:,.0f}")
-            dashboard_metric("Average Daily Demand", f"{average_demand:,.2f}")
-            dashboard_metric("Highest Daily Demand", f"{highest_demand:,.0f}")
-            dashboard_metric("Highest Demand Date", str(highest_demand_date))
-            dashboard_metric("Historical Records", f"{len(actual_df):,}")
-            dashboard_metric("Forecast Records", f"{len(df):,}")
-            st.markdown(
-                f"""
-                <div class="sf-recommendation">
-                    <b>Top-performing model</b><br>
-                    {html.escape(best_model)} · MAPE {lowest_mape:.2f}%
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-    with top_center:
-        with st.container(border=True):
             panel_heading(
                 "Forecast Model Performance",
-                "Model comparison based on saved MAPE values · lower is better",
+                "Model comparison using saved MAPE values · lower is better",
             )
             model_chart_data = ranking.sort_values("mape", ascending=True).copy()
             fig_overview_models = px.bar(
@@ -739,8 +879,12 @@ with tab_overview:
                 cliponaxis=False,
             )
             fig_overview_models.update_layout(showlegend=False, xaxis_title="MAPE (%)", yaxis_title="")
-            style_figure(fig_overview_models, 315)
-            st.plotly_chart(fig_overview_models, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+            style_figure(fig_overview_models, 320)
+            st.plotly_chart(
+                fig_overview_models,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
 
     with top_right:
         with st.container(border=True):
@@ -755,14 +899,18 @@ with tab_overview:
             fig_monthly_overview.update_traces(marker_line_width=0, opacity=0.92)
             fig_monthly_overview.update_xaxes(dtick="M6", tickformat="%b<br>%Y", title_text="")
             fig_monthly_overview.update_yaxes(title_text="")
-            style_figure(fig_monthly_overview, 315)
-            st.plotly_chart(fig_monthly_overview, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+            style_figure(fig_monthly_overview, 320)
+            st.plotly_chart(
+                fig_monthly_overview,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
 
-    bottom_left, bottom_right = st.columns([1.02, 2.48], gap="small")
+    bottom_left, bottom_right = st.columns([1, 1.7], gap="medium")
 
     with bottom_left:
         with st.container(border=True):
-            panel_heading("Demand Pattern", "Average daily demand by month and weekday")
+            panel_heading("Demand Pattern", "Average demand by month and weekday")
             fig_heatmap = px.imshow(
                 heatmap_values,
                 x=weekday_labels,
@@ -786,8 +934,12 @@ with tab_overview:
             )
             fig_heatmap.update_xaxes(tickfont=dict(size=8), side="bottom")
             fig_heatmap.update_yaxes(tickfont=dict(size=9))
-            style_figure(fig_heatmap, 340)
-            st.plotly_chart(fig_heatmap, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+            style_figure(fig_heatmap, 350)
+            st.plotly_chart(
+                fig_heatmap,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
 
     with bottom_right:
         with st.container(border=True):
@@ -802,11 +954,18 @@ with tab_overview:
                 color_discrete_sequence=[theme["gold"]],
                 labels={"forecast_date": "", "predicted_demand": "Predicted demand"},
             )
-            fig_forecast_overview.update_traces(line=dict(width=2.2, color=theme["gold"]), mode="lines")
+            fig_forecast_overview.update_traces(
+                line=dict(width=2.5, color=theme["gold"]),
+                mode="lines",
+            )
             fig_forecast_overview.update_yaxes(title_text="")
             fig_forecast_overview.update_xaxes(title_text="")
-            style_figure(fig_forecast_overview, 265)
-            st.plotly_chart(fig_forecast_overview, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+            style_figure(fig_forecast_overview, 275)
+            st.plotly_chart(
+                fig_forecast_overview,
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": False},
+            )
 
             forecast_kpis = st.columns(3, gap="small")
             with forecast_kpis[0]:
@@ -819,7 +978,6 @@ with tab_overview:
     st.caption(
         "Dashboard values are calculated from the historical sales file and saved forecast results."
     )
-
 
 # =========================================================
 # MODEL EVALUATION
