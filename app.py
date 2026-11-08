@@ -1326,40 +1326,40 @@ approach_df = pd.DataFrame(
     }
 )
 
-    approach_col1, approach_col2 = st.columns(2, gap="medium")
-    with approach_col1:
-        fig_approach_mape = px.bar(
-            approach_df,
-            x="Approach",
-            y="mape",
-            color="Approach",
-            text="mape",
-           title="2024 Final-Test MAPE by Forecasting Approach",
-            color_discrete_sequence=[theme["teal"], theme["blue"]],
-        )
-        fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
-        fig_approach_mape.update_layout(showlegend=False)
-        fig_approach_mape.update_xaxes(title_text="", tickfont=dict(size=10))
-        fig_approach_mape.update_yaxes(title_text="MAPE (%)")
-        style_figure(fig_approach_mape, 405)
-        st.plotly_chart(fig_approach_mape, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+approach_col1, approach_col2 = st.columns(2, gap="medium")
+with approach_col1:
+fig_approach_mape = px.bar(
+    approach_df,
+    x="Approach",
+    y="mape",
+    color="Approach",
+    text="mape",
+   title="2024 Final-Test MAPE by Forecasting Approach",
+    color_discrete_sequence=[theme["teal"], theme["blue"]],
+)
+fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
+fig_approach_mape.update_layout(showlegend=False)
+fig_approach_mape.update_xaxes(title_text="", tickfont=dict(size=10))
+fig_approach_mape.update_yaxes(title_text="MAPE (%)")
+style_figure(fig_approach_mape, 405)
+st.plotly_chart(fig_approach_mape, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
-    with approach_col2:
-        fig_approach_mae = px.bar(
-            approach_df,
-            x="Approach",
-            y="mae",
-            color="Approach",
-            text="mae",
-            title="2024 Final-Test MAE by Forecasting Approach",
-            color_discrete_sequence=[theme["teal"], theme["blue"]],
-        )
-        fig_approach_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
-        fig_approach_mae.update_layout(showlegend=False)
-        fig_approach_mae.update_xaxes(title_text="", tickfont=dict(size=10))
-        fig_approach_mae.update_yaxes(title_text="MAE")
-        style_figure(fig_approach_mae, 405)
-        st.plotly_chart(fig_approach_mae, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+with approach_col2:
+    fig_approach_mae = px.bar(
+        approach_df,
+        x="Approach",
+        y="mae",
+        color="Approach",
+        text="mae",
+        title="2024 Final-Test MAE by Forecasting Approach",
+        color_discrete_sequence=[theme["teal"], theme["blue"]],
+    )
+    fig_approach_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
+    fig_approach_mae.update_layout(showlegend=False)
+    fig_approach_mae.update_xaxes(title_text="", tickfont=dict(size=10))
+    fig_approach_mae.update_yaxes(title_text="MAE")
+    style_figure(fig_approach_mae, 405)
+    st.plotly_chart(fig_approach_mae, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
  st.info(
     "Interpretation: Models are ranked using 2023 validation WAPE. "
