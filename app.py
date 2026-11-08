@@ -636,84 +636,255 @@ def style_figure(fig, height: int = 340):
 # =========================================================
 # DATA LOADING
 # =========================================================
-@st.cache_data
-def load_forecast():
-    file_path = Path("forecast_results_final.csv")
-    if not file_path.exists():
+DATA_DIR = Path("data")
+
+
+def read_required_csv(filename: str) -> pd.DataFrame:
+    path = DATA_DIR / filename
+    if not path.is_file():
         raise FileNotFoundError(
-            "forecast_results_final.csv was not found. "
-            "Place it in the same GitHub root folder as app.py."
+            f"Required file '{path.as_posix()}' was not found. "
+            "Check that the standardized CSV files are in the repository's data/ folder."
         )
-
-    data = pd.read_csv(file_path)
-    required = {"forecast_date", "predicted_demand", "model_name", "mae", "mape"}
-    missing = required.difference(data.columns)
-    if missing:
-        raise ValueError(
-            "forecast_results_final.csv is missing these columns: "
-            + ", ".join(sorted(missing))
-        )
-
-    data["forecast_date"] = pd.to_datetime(data["forecast_date"], errors="coerce")
-    for col in ["predicted_demand", "mae", "mape"]:
-        data[col] = pd.to_numeric(data[col], errors="coerce")
-
-    data["model_name"] = data["model_name"].astype(str)
-    data = data.dropna(subset=["forecast_date", "predicted_demand", "model_name"])
-    data = data.sort_values(["model_name", "forecast_date"])
-    return data
+    return pd.read_csv(path)
 
 
 @st.cache_data
-def load_actual():
-    file_path = Path("daily_sales_clean.csv")
-    if not file_path.exists():
-        raise FileNotFoundError(
-            "daily_sales_clean.csv was not found. "
-            "Place it in the same GitHub root folder as app.py."
-        )
-
-    data = pd.read_csv(file_path)
-    required = {"date", "daily_demand"}
-    missing = required.difference(data.columns)
+def load_standardized_data():
+    # 1. Historical daily demand
+    actual = read_required_csv("aggregated_daily_demand.csv")
+    required = {"Date", "Daily_Demand"}
+    missing = required.difference(actual.columns)
     if missing:
         raise ValueError(
-            "daily_sales_clean.csv is missing these columns: "
+            "aggregated_daily_demand.csv is missing columns: "
             + ", ".join(sorted(missing))
         )
 
-    data["date"] = pd.to_datetime(data["date"], errors="coerce")
-    data["daily_demand"] = pd.to_numeric(data["daily_demand"], errors="coerce")
-    data = data.dropna(subset=["date", "daily_demand"]).sort_values("date")
-    return data
+    actual = actual.rename(
+        columns={"Date": "date", "Daily_Demand": "daily_demand"}
+    )
+    actual["date"] = pd.to_datetime(actual["date"], errors="coerce")
+    actual["daily_demand"] = pd.to_numeric(
+        actual["daily_demand"], errors="coerce"
+    )
+    actual = actual.dropna(subset=["date", "daily_demand"])
+    actual = actual.sort_values("date").reset_index(drop=True)
+
+    if actual["date"].duplicated().any():
+        raise ValueError(
+            "aggregated_daily_demand.csv contains duplicate dates. "
+            "Resolve duplicates in the notebook before deployment."
+        )
+
+    # 2. Performance metrics
+    def load_metrics(filename: str) -> pd.DataFrame:
+        metrics = read_required_csv(filename)
+        required_metrics = {"Model", "MAE", "RMSE", "MAPE (%)", "WAPE (%)"}
+        missing_metrics = required_metrics.difference(metrics.columns)
+        if missing_metrics:
+            raise ValueError(
+                f"{filename} is missing columns: "
+                + ", ".join(sorted(missing_metrics))
+            )
+
+        metrics = metrics.rename(
+            columns={
+                "Model": "model_name",
+                "MAE": "mae",
+                "RMSE": "rmse",
+                "MAPE (%)": "mape",
+                "WAPE (%)": "wape",
+            }
+        )
+        metrics["model_name"] = metrics["model_name"].astype(str).str.strip()
+        for column in ["mae", "rmse", "mape", "wape"]:
+            metrics[column] = pd.to_numeric(metrics[column], errors="coerce")
+
+        metrics = metrics.dropna(
+            subset=["model_name", "mae", "rmse", "mape", "wape"]
+        )
+        if metrics["model_name"].duplicated().any():
+            raise ValueError(f"{filename} contains duplicate model rows.")
+        return metrics
+
+    validation_metrics = load_metrics("validation_model_performance.csv")
+    test_metrics = load_metrics("test_model_performance_2024.csv")
+
+    # 3. Validation and final-test predictions
+    def load_forecasts(filename: str) -> pd.DataFrame:
+        forecasts = read_required_csv(filename)
+        required_forecasts = {
+            "Forecast_Date",
+            "Actual_Demand",
+            "Model",
+            "Predicted_Demand",
+        }
+        missing_forecasts = required_forecasts.difference(forecasts.columns)
+        if missing_forecasts:
+            raise ValueError(
+                f"{filename} is missing columns: "
+                + ", ".join(sorted(missing_forecasts))
+            )
+
+        forecasts = forecasts.rename(
+            columns={
+                "Forecast_Date": "forecast_date",
+                "Actual_Demand": "actual_demand",
+                "Model": "model_name",
+                "Predicted_Demand": "predicted_demand",
+            }
+        )
+        forecasts["forecast_date"] = pd.to_datetime(
+            forecasts["forecast_date"], errors="coerce"
+        )
+        forecasts["actual_demand"] = pd.to_numeric(
+            forecasts["actual_demand"], errors="coerce"
+        )
+        forecasts["predicted_demand"] = pd.to_numeric(
+            forecasts["predicted_demand"], errors="coerce"
+        )
+        forecasts["model_name"] = forecasts["model_name"].astype(str).str.strip()
+        forecasts = forecasts.dropna(
+            subset=[
+                "forecast_date",
+                "actual_demand",
+                "predicted_demand",
+                "model_name",
+            ]
+        )
+        return forecasts.sort_values(
+            ["model_name", "forecast_date"]
+        ).reset_index(drop=True)
+
+    validation_predictions = load_forecasts("validation_forecasts_2023.csv")
+    test_predictions = load_forecasts("test_forecasts_2024.csv")
+
+    # 4. Future forecasts: historical academic simulation, not live 2026 forecasts
+    future = read_required_csv("future_forecasts.csv")
+    required_future = {
+        "Forecast_Date",
+        "Model",
+        "Predicted_Demand",
+        "Forecast_Origin",
+        "Forecast_Type",
+    }
+    missing_future = required_future.difference(future.columns)
+    if missing_future:
+        raise ValueError(
+            "future_forecasts.csv is missing columns: "
+            + ", ".join(sorted(missing_future))
+        )
+
+    future = future.rename(
+        columns={
+            "Forecast_Date": "forecast_date",
+            "Model": "model_name",
+            "Predicted_Demand": "predicted_demand",
+            "Forecast_Origin": "forecast_origin",
+            "Forecast_Type": "forecast_type",
+        }
+    )
+    future["forecast_date"] = pd.to_datetime(
+        future["forecast_date"], errors="coerce"
+    )
+    future["predicted_demand"] = pd.to_numeric(
+        future["predicted_demand"], errors="coerce"
+    )
+    future["model_name"] = future["model_name"].astype(str).str.strip()
+    future = future.dropna(
+        subset=["forecast_date", "predicted_demand", "model_name"]
+    ).sort_values(["model_name", "forecast_date"])
+
+    # 5. Model-selection summary
+    selection = read_required_csv("model_selection_summary.csv")
+    required_selection = {
+        "Selected_Model",
+        "Selection_Metric",
+        "Selection_Period",
+        "Selected_Model_Validation_WAPE_Percent",
+    }
+    missing_selection = required_selection.difference(selection.columns)
+    if missing_selection:
+        raise ValueError(
+            "model_selection_summary.csv is missing columns: "
+            + ", ".join(sorted(missing_selection))
+        )
+
+    return (
+        actual,
+        validation_metrics,
+        test_metrics,
+        validation_predictions,
+        test_predictions,
+        future,
+        selection,
+    )
 
 
 try:
-    df = load_forecast()
-    actual_df = load_actual()
+    (
+        actual_df,
+        validation_performance,
+        test_performance,
+        validation_forecasts,
+        test_forecasts,
+        future_df,
+        model_selection_summary,
+    ) = load_standardized_data()
 except Exception as error:
-    st.error(f"Unable to load dashboard data: {error}")
+    st.error(f"Unable to load standardized forecasting data: {error}")
     st.stop()
 
-if df.empty or actual_df.empty:
-    st.error("The forecast file or historical sales file contains no usable records.")
+if (
+    actual_df.empty
+    or validation_performance.empty
+    or test_performance.empty
+    or validation_forecasts.empty
+    or test_forecasts.empty
+):
+    st.error("One or more standardized CSV files contain no usable records.")
     st.stop()
+
+# Keep the existing website's expected variables so its charts continue to work.
+# df represents 2024 final-test predictions, with 2024 test metrics attached.
+df = test_forecasts.merge(
+    test_performance,
+    on="model_name",
+    how="left",
+    validate="many_to_one",
+)
 
 preferred_order = ["ARIMA", "SARIMA", "Prophet", "Random Forest"]
 available_models = df["model_name"].dropna().unique().tolist()
 model_options = [name for name in preferred_order if name in available_models]
 model_options += [name for name in available_models if name not in model_options]
 
-performance = (
-    df.groupby("model_name", as_index=False)
-    .agg(
-        mae=("mae", "mean"),
-        mape=("mape", "mean"),
-        forecast_records=("predicted_demand", "count"),
-    )
+# Validation results are used for model selection and ranking.
+performance = validation_performance.copy()
+validation_counts = (
+    validation_forecasts.groupby("model_name")
+    .size()
+    .rename("forecast_records")
+)
+performance = performance.merge(
+    validation_counts,
+    left_on="model_name",
+    right_index=True,
+    how="left",
+)
+performance["forecast_records"] = (
+    performance["forecast_records"].fillna(0).astype(int)
 )
 
-ranking = performance.sort_values("mape", ascending=True).reset_index(drop=True)
+ranking = (
+    performance.sort_values("wape", ascending=True, na_position="last")
+    .reset_index(drop=True)
+)
+if ranking["wape"].notna().sum() == 0:
+    st.error("Validation WAPE is unavailable. Model selection cannot proceed.")
+    st.stop()
+
 ranking.insert(0, "Rank", range(1, len(ranking) + 1))
 
 
@@ -732,11 +903,17 @@ def performance_level(mape):
 ranking["Performance Level"] = ranking["mape"].apply(performance_level)
 best_row = ranking.iloc[0]
 best_model = str(best_row["model_name"])
-lowest_mape = float(best_row["mape"])
+lowest_wape = float(best_row["wape"])
+lowest_mape = float(best_row["mape"])  # Retained for compatibility if referenced elsewhere.
 
+# Historical summaries used by the existing Overview and Forecast Analysis tabs.
 historical_monthly = actual_df.copy()
-historical_monthly["month"] = historical_monthly["date"].dt.to_period("M").dt.to_timestamp()
-monthly_sales = historical_monthly.groupby("month", as_index=False)["daily_demand"].sum()
+historical_monthly["month"] = (
+    historical_monthly["date"].dt.to_period("M").dt.to_timestamp()
+)
+monthly_sales = (
+    historical_monthly.groupby("month", as_index=False)["daily_demand"].sum()
+)
 
 heatmap_source = actual_df.copy()
 heatmap_source["month_num"] = heatmap_source["date"].dt.month
@@ -747,14 +924,17 @@ heatmap_values = (
         columns="weekday_num",
         values="daily_demand",
         aggfunc="mean",
-    )
-    .reindex(index=range(1, 13), columns=range(0, 7))
+    ).reindex(index=range(1, 13), columns=range(0, 7))
 )
-month_labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-weekday_labels = ["Monday", "Tuesday", "Wednesday", "Thursday",
-                  "Friday", "Saturday", "Sunday"]
 
+month_labels = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+]
+weekday_labels = [
+    "Monday", "Tuesday", "Wednesday", "Thursday",
+    "Friday", "Saturday", "Sunday",
+]
 
 # =========================================================
 # HEADER
@@ -808,8 +988,8 @@ with st.sidebar.expander("System Information", expanded=False):
         **Forecasting Models**  
         ARIMA · SARIMA · Prophet · Random Forest
 
-        **Evaluation Metrics**  
-        MAE · MAPE
+       **Evaluation Metrics**
+MAE · RMSE · MAPE · WAPE
 
         **Platform**  
         Python + Streamlit
@@ -869,8 +1049,11 @@ with tab_overview:
     with kpi_cols[2]:
         st.metric("Peak Daily Demand", f"{highest_demand:,.0f}", help=f"Recorded on {highest_demand_date}")
     with kpi_cols[3]:
-        st.metric("Best Model · MAPE", f"{lowest_mape:.2f}%", help=f"Top-performing model: {best_model}")
-
+       st.metric(
+    "Best Model · Validation WAPE",
+    f"{lowest_wape:.2f}%",
+    help=f"Selected using 2023 validation WAPE: {best_model}",
+)
     st.caption(
         f"Historical coverage: {actual_df['date'].min():%b %d, %Y} – "
         f"{actual_df['date'].max():%b %d, %Y}  ·  "
@@ -885,13 +1068,13 @@ with tab_overview:
                 "Forecast Model Performance",
                 "Model comparison using saved MAPE values · lower is better",
             )
-            model_chart_data = ranking.sort_values("mape", ascending=True).copy()
+            model_chart_data = ranking.sort_values("wape", ascending=True)
             fig_overview_models = px.bar(
                 model_chart_data,
-                x="mape",
+               x="wape",
                 y="model_name",
                 orientation="h",
-                text="mape",
+                text="wape",
                 color="model_name",
                 color_discrete_map={
                     "ARIMA": theme["blue"],
@@ -899,14 +1082,14 @@ with tab_overview:
                     "Prophet": theme["teal"],
                     "Random Forest": theme["gold"],
                 },
-                labels={"mape": "MAPE (%)", "model_name": ""},
+               labels={"wape": "WAPE (%)", "model_name": ""}
             )
             fig_overview_models.update_traces(
                 texttemplate="%{text:.2f}%",
                 textposition="outside",
                 cliponaxis=False,
             )
-            fig_overview_models.update_layout(showlegend=False, xaxis_title="MAPE (%)", yaxis_title="")
+            fig_overview_models.update_layout(showlegend=False, xaxis_title="Validation WAPE (%)", yaxis_title="")
             style_figure(fig_overview_models, 320)
             st.plotly_chart(
                 fig_overview_models,
@@ -1064,27 +1247,84 @@ with tab_evaluation:
     performance_display["mape"] = performance_display["mape"].round(2)
     st.dataframe(performance_display, use_container_width=True, hide_index=True)
 
-    st.subheader("Model Performance Ranking")
-    ranking_display = ranking.copy()
-    ranking_display["mae"] = ranking_display["mae"].round(2)
-    ranking_display["mape"] = ranking_display["mape"].round(2)
-    st.dataframe(ranking_display, use_container_width=True, hide_index=True)
+   # 2023 VALIDATION PERFORMANCE
+st.subheader("Model Performance Ranking (2023 Validation)")
 
-    st.subheader("Forecasting Approach Comparison")
-    st.caption("Machine-learning and statistical approaches are compared using the same saved metric fields.")
+ranking_display = ranking.copy()
 
-    machine_learning_mae = df.loc[df["model_name"] == "Random Forest", "mae"].mean()
-    statistical_mae = df.loc[df["model_name"].isin(["ARIMA", "SARIMA"]), "mae"].mean()
-    machine_learning_mape = df.loc[df["model_name"] == "Random Forest", "mape"].mean()
-    statistical_mape = df.loc[df["model_name"].isin(["ARIMA", "SARIMA"]), "mape"].mean()
+for col in ["mae", "rmse", "mape", "wape"]:
+    ranking_display[col] = ranking_display[col].round(3)
 
-    approach_df = pd.DataFrame(
-        {
-            "Approach": ["Machine Learning Model", "Statistical Model"],
-            "mae": [machine_learning_mae, statistical_mae],
-            "mape": [machine_learning_mape, statistical_mape],
-        }
-    )
+st.dataframe(
+    ranking_display,
+    use_container_width=True,
+    hide_index=True
+)
+
+# 2024 FINAL HOLDOUT PERFORMANCE
+st.subheader("2024 Final Holdout Performance")
+
+st.caption(
+    "Final test results are reported separately. "
+    "These results are not used for model selection."
+)
+
+test_display = test_performance.copy()
+
+for col in ["mae", "rmse", "mape", "wape"]:
+    test_display[col] = test_display[col].round(3)
+
+st.dataframe(
+    test_display,
+    use_container_width=True,
+    hide_index=True
+)
+
+# FORECASTING APPROACH COMPARISON
+st.subheader("Forecasting Approach Comparison")
+
+st.caption(
+    "Statistical and machine-learning approaches are compared "
+    "using 2024 final-test performance metrics."
+)
+
+   # 2024 FINAL TEST: FORECASTING APPROACH COMPARISON
+
+machine_learning_models = ["Random Forest"]
+time_series_models = ["ARIMA", "SARIMA", "Prophet"]
+
+machine_learning_results = test_performance[
+    test_performance["model_name"].isin(machine_learning_models)
+]
+
+time_series_results = test_performance[
+    test_performance["model_name"].isin(time_series_models)
+]
+
+approach_df = pd.DataFrame(
+    {
+        "Approach": [
+            "Machine Learning Model",
+            "Time Series Models",
+        ],
+        "mae": [
+            machine_learning_results["mae"].mean(),
+            time_series_results["mae"].mean(),
+        ],
+        "rmse": [
+            machine_learning_results["rmse"].mean(),
+            time_series_results["rmse"].mean(),
+        ],
+        "mape": [
+            machine_learning_results["mape"].mean(),
+            time_series_results["mape"].mean(),
+        ],
+        "wape": [
+            machine_learning_results["wape"].mean(),
+            time_series_results["wape"].mean(),
+        ],
+    }
+)
 
     approach_col1, approach_col2 = st.columns(2, gap="medium")
     with approach_col1:
@@ -1094,7 +1334,7 @@ with tab_evaluation:
             y="mape",
             color="Approach",
             text="mape",
-            title="MAPE by Forecasting Approach",
+           title="2024 Final-Test MAPE by Forecasting Approach",
             color_discrete_sequence=[theme["teal"], theme["blue"]],
         )
         fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
@@ -1111,7 +1351,7 @@ with tab_evaluation:
             y="mae",
             color="Approach",
             text="mae",
-            title="MAE by Forecasting Approach",
+            title="2024 Final-Test MAE by Forecasting Approach",
             color_discrete_sequence=[theme["teal"], theme["blue"]],
         )
         fig_approach_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
@@ -1121,10 +1361,12 @@ with tab_evaluation:
         style_figure(fig_approach_mae, 405)
         st.plotly_chart(fig_approach_mae, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
-    st.info(
-        "Interpretation note: the ranking uses the MAE and MAPE values saved in the CSV. "
-        "For a defensible thesis comparison, verify that all four models were evaluated on the same holdout dates using the same metric calculation."
-    )
+ st.info(
+    "Interpretation: Models are ranked using 2023 validation WAPE. "
+    "The 2024 final-test metrics are reported separately and are not used "
+    "for model selection. All four models are compared using the same "
+    "evaluation period and demand target."
+)
 
 
 # =========================================================
@@ -1222,7 +1464,39 @@ with tab_downloads:
         st.download_button("Model Ranking Report", ranking_csv, file_name="model_ranking_report.csv", mime="text/csv", use_container_width=True)
     with download_cols[3]:
         st.download_button("Historical Sales Data", actual_csv, file_name="daily_sales_clean.csv", mime="text/csv", use_container_width=True)
+    st.divider()
 
+    st.subheader("Standardized DSS Data Exports")
+
+    st.caption(
+        "Download the standardized datasets used by the academic "
+        "forecasting and decision support system."
+    )
+
+    export_files = [
+        ("Daily Demand Data", "aggregated_daily_demand.csv"),
+        ("2023 Validation Metrics", "validation_model_performance.csv"),
+        ("2024 Test Metrics", "test_model_performance_2024.csv"),
+        ("2023 Validation Forecasts", "validation_forecasts_2023.csv"),
+        ("2024 Test Forecasts", "test_forecasts_2024.csv"),
+        ("Future Forecasts", "future_forecasts.csv"),
+        ("Model Selection Summary", "model_selection_summary.csv"),
+    ]
+
+    for start in range(0, len(export_files), 2):
+        cols = st.columns(2, gap="medium")
+
+        for col, item in zip(cols, export_files[start:start + 2]):
+            label, filename = item
+
+            with col:
+                st.download_button(
+                    label,
+                    data=(DATA_DIR / filename).read_bytes(),
+                    file_name=filename,
+                    mime="text/csv",
+                    use_container_width=True,
+                )
     st.divider()
     st.subheader("Forecast Data")
     st.caption(f"Saved forecast records for the selected model: {selected_model}.")
