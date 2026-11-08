@@ -1,0 +1,2 @@
+Selected_Model,Selection_Metric,Selection_Period,Selected_Model_Validation_WAPE_Percent,Selected_Model_Final_Test_WAPE_2024_Percent,Training_Data_Cutoff_For_Academic_Future_Forecast,Academic_Future_Forecast_Start,Academic_Future_Forecast_End,Academic_Future_Forecast_Horizon_Days
+Random Forest,WAPE (%),2023 validation,6.879919248965906,6.560251519721408,2024-12-31,2025-01-01,2025-03-31,90

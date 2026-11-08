@@ -1,0 +1,361 @@
+Forecast_Date,Model,Predicted_Demand,Forecast_Origin,Forecast_Type
+2025-01-01,ARIMA,1556.5791889886534,2024-12-31,Academic historical simulation
+2025-01-02,ARIMA,1241.4315604175783,2024-12-31,Academic historical simulation
+2025-01-03,ARIMA,1314.5856569358168,2024-12-31,Academic historical simulation
+2025-01-04,ARIMA,1761.6937325269778,2024-12-31,Academic historical simulation
+2025-01-05,ARIMA,1775.6973182959232,2024-12-31,Academic historical simulation
+2025-01-06,ARIMA,1503.39088394485,2024-12-31,Academic historical simulation
+2025-01-07,ARIMA,1453.3214075010983,2024-12-31,Academic historical simulation
+2025-01-08,ARIMA,1436.3991350636372,2024-12-31,Academic historical simulation
+2025-01-09,ARIMA,1304.3523794937787,2024-12-31,Academic historical simulation
+2025-01-10,ARIMA,1396.315657538492,2024-12-31,Academic historical simulation
+2025-01-11,ARIMA,1679.2189393585209,2024-12-31,Academic historical simulation
+2025-01-12,ARIMA,1738.5487939297975,2024-12-31,Academic historical simulation
+2025-01-13,ARIMA,1574.420803307976,2024-12-31,Academic historical simulation
+2025-01-14,ARIMA,1454.619973611835,2024-12-31,Academic historical simulation
+2025-01-15,ARIMA,1381.9743764903249,2024-12-31,Academic historical simulation
+2025-01-16,ARIMA,1329.692739595141,2024-12-31,Academic historical simulation
+2025-01-17,ARIMA,1434.7404660144734,2024-12-31,Academic historical simulation
+2025-01-18,ARIMA,1645.509758242056,2024-12-31,Academic historical simulation
+2025-01-19,ARIMA,1715.6905808593406,2024-12-31,Academic historical simulation
+2025-01-20,ARIMA,1603.3062478375589,2024-12-31,Academic historical simulation
+2025-01-21,ARIMA,1459.204332609151,2024-12-31,Academic historical simulation
+2025-01-22,ARIMA,1360.092156690299,2024-12-31,Academic historical simulation
+2025-01-23,ARIMA,1340.0357575184605,2024-12-31,Academic historical simulation
+2025-01-24,ARIMA,1453.1344314684943,2024-12-31,Academic historical simulation
+2025-01-25,ARIMA,1630.792484669438,2024-12-31,Academic historical simulation
+2025-01-26,ARIMA,1701.8983886210033,2024-12-31,Academic historical simulation
+2025-01-27,ARIMA,1613.969044122183,2024-12-31,Academic historical simulation
+2025-01-28,ARIMA,1463.3955388343632,2024-12-31,Academic historical simulation
+2025-01-29,ARIMA,1352.626246099925,2024-12-31,Academic historical simulation
+2025-01-30,ARIMA,1345.3063637109185,2024-12-31,Academic historical simulation
+2025-01-31,ARIMA,1461.904996461908,2024-12-31,Academic historical simulation
+2025-02-01,ARIMA,1623.6061719001746,2024-12-31,Academic historical simulation
+2025-02-02,ARIMA,1693.0444843510381,2024-12-31,Academic historical simulation
+2025-02-03,ARIMA,1617.0207080107066,2024-12-31,Academic historical simulation
+2025-02-04,ARIMA,1466.5234285862007,2024-12-31,Academic historical simulation
+2025-02-05,ARIMA,1351.486957807453,2024-12-31,Academic historical simulation
+2025-02-06,ARIMA,1348.9728714980004,2024-12-31,Academic historical simulation
+2025-02-07,ARIMA,1466.1768490683596,2024-12-31,Academic historical simulation
+2025-02-08,ARIMA,1619.3352722296204,2024-12-31,Academic historical simulation
+2025-02-09,ARIMA,1686.7781377789036,2024-12-31,Academic historical simulation
+2025-02-10,ARIMA,1616.9529535456572,2024-12-31,Academic historical simulation
+2025-02-11,ARIMA,1468.8011474395958,2024-12-31,Academic historical simulation
+2025-02-12,ARIMA,1353.0554230113614,2024-12-31,Academic historical simulation
+2025-02-13,ARIMA,1352.1934830231703,2024-12-31,Academic historical simulation
+2025-02-14,ARIMA,1468.3811148659565,2024-12-31,Academic historical simulation
+2025-02-15,ARIMA,1616.1782684701536,2024-12-31,Academic historical simulation
+2025-02-16,ARIMA,1681.83836607388,2024-12-31,Academic historical simulation
+2025-02-17,ARIMA,1615.6443778358248,2024-12-31,Academic historical simulation
+2025-02-18,ARIMA,1470.5353449760719,2024-12-31,Academic historical simulation
+2025-02-19,ARIMA,1355.7401703143341,2024-12-31,Academic historical simulation
+2025-02-20,ARIMA,1355.3107672177664,2024-12-31,Academic historical simulation
+2025-02-21,ARIMA,1469.6492293906135,2024-12-31,Academic historical simulation
+2025-02-22,ARIMA,1613.451223667363,2024-12-31,Academic historical simulation
+2025-02-23,ARIMA,1677.5807423717686,2024-12-31,Academic historical simulation
+2025-02-24,ARIMA,1613.8670811465852,2024-12-31,Academic historical simulation
+2025-02-25,ARIMA,1471.9510741526624,2024-12-31,Academic historical simulation
+2025-02-26,ARIMA,1358.8517672923606,2024-12-31,Academic historical simulation
+2025-02-27,ARIMA,1358.4019703075921,2024-12-31,Academic historical simulation
+2025-02-28,ARIMA,1470.4983760061982,2024-12-31,Academic historical simulation
+2025-03-01,ARIMA,1610.9038764580257,2024-12-31,Academic historical simulation
+2025-03-02,ARIMA,1673.6866598319489,2024-12-31,Academic historical simulation
+2025-03-03,ARIMA,1611.9322624503402,2024-12-31,Academic historical simulation
+2025-03-04,ARIMA,1473.1849585797017,2024-12-31,Academic historical simulation
+2025-03-05,ARIMA,1362.0964248102293,2024-12-31,Academic historical simulation
+2025-03-06,ARIMA,1361.469409721269,2024-12-31,Academic historical simulation
+2025-03-07,ARIMA,1471.1611699115704,2024-12-31,Academic historical simulation
+2025-03-08,ARIMA,1608.449040494227,2024-12-31,Academic historical simulation
+2025-03-09,ARIMA,1670.0023173502966,2024-12-31,Academic historical simulation
+2025-03-10,ARIMA,1609.9623838283126,2024-12-31,Academic historical simulation
+2025-03-11,ARIMA,1474.312678525955,2024-12-31,Academic historical simulation
+2025-03-12,ARIMA,1365.351383133791,2024-12-31,Academic historical simulation
+2025-03-13,ARIMA,1364.5008904916665,2024-12-31,Academic historical simulation
+2025-03-14,ARIMA,1471.7406582784238,2024-12-31,Academic historical simulation
+2025-03-15,ARIMA,1606.0583318899057,2024-12-31,Academic historical simulation
+2025-03-16,ARIMA,1666.4546248817505,2024-12-31,Academic historical simulation
+2025-03-17,ARIMA,1608.0041065228659,2024-12-31,Academic historical simulation
+2025-03-18,ARIMA,1475.3739974724567,2024-12-31,Academic historical simulation
+2025-03-19,ARIMA,1368.5667317764742,2024-12-31,Academic historical simulation
+2025-03-20,ARIMA,1367.4858547057913,2024-12-31,Academic historical simulation
+2025-03-21,ARIMA,1472.2818219183137,2024-12-31,Academic historical simulation
+2025-03-22,ARIMA,1603.7233077680355,2024-12-31,Academic historical simulation
+2025-03-23,ARIMA,1663.0090337620643,2024-12-31,Academic historical simulation
+2025-03-24,ARIMA,1606.0743374126537,2024-12-31,Academic historical simulation
+2025-03-25,ARIMA,1476.3891803028039,2024-12-31,Academic historical simulation
+2025-03-26,ARIMA,1371.7231088016079,2024-12-31,Academic historical simulation
+2025-03-27,ARIMA,1370.4178972926286,2024-12-31,Academic historical simulation
+2025-03-28,ARIMA,1472.8040052956462,2024-12-31,Academic historical simulation
+2025-03-29,ARIMA,1601.4416314398536,2024-12-31,Academic historical simulation
+2025-03-30,ARIMA,1659.6490243904395,2024-12-31,Academic historical simulation
+2025-03-31,ARIMA,1604.178630867446,2024-12-31,Academic historical simulation
+2025-01-01,SARIMA,1445.0494203199905,2024-12-31,Academic historical simulation
+2025-01-02,SARIMA,1447.2347800210548,2024-12-31,Academic historical simulation
+2025-01-03,SARIMA,1431.2021009940513,2024-12-31,Academic historical simulation
+2025-01-04,SARIMA,1838.7028854210798,2024-12-31,Academic historical simulation
+2025-01-05,SARIMA,1839.9868487902731,2024-12-31,Academic historical simulation
+2025-01-06,SARIMA,1436.699364418921,2024-12-31,Academic historical simulation
+2025-01-07,SARIMA,1441.5178924932707,2024-12-31,Academic historical simulation
+2025-01-08,SARIMA,1440.9378904072116,2024-12-31,Academic historical simulation
+2025-01-09,SARIMA,1445.8536281203806,2024-12-31,Academic historical simulation
+2025-01-10,SARIMA,1444.9813698092887,2024-12-31,Academic historical simulation
+2025-01-11,SARIMA,1839.3126267030013,2024-12-31,Academic historical simulation
+2025-01-12,SARIMA,1837.2626659259522,2024-12-31,Academic historical simulation
+2025-01-13,SARIMA,1441.276131883088,2024-12-31,Academic historical simulation
+2025-01-14,SARIMA,1443.8121548905965,2024-12-31,Academic historical simulation
+2025-01-15,SARIMA,1445.371091631205,2024-12-31,Academic historical simulation
+2025-01-16,SARIMA,1446.0209301316331,2024-12-31,Academic historical simulation
+2025-01-17,SARIMA,1449.2382671302678,2024-12-31,Academic historical simulation
+2025-01-18,SARIMA,1841.2221976607007,2024-12-31,Academic historical simulation
+2025-01-19,SARIMA,1840.4695627248427,2024-12-31,Academic historical simulation
+2025-01-20,SARIMA,1443.492305171293,2024-12-31,Academic historical simulation
+2025-01-21,SARIMA,1446.6518485621173,2024-12-31,Academic historical simulation
+2025-01-22,SARIMA,1448.0205975032147,2024-12-31,Academic historical simulation
+2025-01-23,SARIMA,1448.6127395497085,2024-12-31,Academic historical simulation
+2025-01-24,SARIMA,1451.9470966345323,2024-12-31,Academic historical simulation
+2025-01-25,SARIMA,1843.7927670430663,2024-12-31,Academic historical simulation
+2025-01-26,SARIMA,1843.2027072766336,2024-12-31,Academic historical simulation
+2025-01-27,SARIMA,1446.06903300576,2024-12-31,Academic historical simulation
+2025-01-28,SARIMA,1449.3497563150443,2024-12-31,Academic historical simulation
+2025-01-29,SARIMA,1450.6337359457139,2024-12-31,Academic historical simulation
+2025-01-30,SARIMA,1451.2852436762573,2024-12-31,Academic historical simulation
+2025-01-31,SARIMA,1454.5804434842048,2024-12-31,Academic historical simulation
+2025-02-01,SARIMA,1846.4476296008727,2024-12-31,Academic historical simulation
+2025-02-02,SARIMA,1845.848474648714,2024-12-31,Academic historical simulation
+2025-02-03,SARIMA,1448.717197800294,2024-12-31,Academic historical simulation
+2025-02-04,SARIMA,1451.998804279702,2024-12-31,Academic historical simulation
+2025-02-05,SARIMA,1453.2803335569706,2024-12-31,Academic historical simulation
+2025-02-06,SARIMA,1453.9344956763773,2024-12-31,Academic historical simulation
+2025-02-07,SARIMA,1457.2278447518704,2024-12-31,Academic historical simulation
+2025-02-08,SARIMA,1849.0957134155337,2024-12-31,Academic historical simulation
+2025-02-09,SARIMA,1848.4969818173806,2024-12-31,Academic historical simulation
+2025-02-10,SARIMA,1451.3643345524547,2024-12-31,Academic historical simulation
+2025-02-11,SARIMA,1454.6480858798675,2024-12-31,Academic historical simulation
+2025-02-12,SARIMA,1455.9269058613093,2024-12-31,Academic historical simulation
+2025-02-13,SARIMA,1456.5841293452968,2024-12-31,Academic historical simulation
+2025-02-14,SARIMA,1459.8742308072676,2024-12-31,Academic historical simulation
+2025-02-15,SARIMA,1851.745419830205,2024-12-31,Academic historical simulation
+2025-02-16,SARIMA,1851.143373326517,2024-12-31,Academic historical simulation
+2025-02-17,SARIMA,1454.0139842653093,2024-12-31,Academic historical simulation
+2025-02-18,SARIMA,1457.294560637898,2024-12-31,Academic historical simulation
+2025-02-19,SARIMA,1458.5764640807552,2024-12-31,Academic historical simulation
+2025-02-20,SARIMA,1459.230693882927,2024-12-31,Academic historical simulation
+2025-02-21,SARIMA,1462.523705681911,2024-12-31,Academic historical simulation
+2025-02-22,SARIMA,1854.3920589626155,2024-12-31,Academic historical simulation
+2025-02-23,SARIMA,1853.7927828455345,2024-12-31,Academic historical simulation
+2025-02-24,SARIMA,1456.6606805408346,2024-12-31,Academic historical simulation
+2025-02-25,SARIMA,1459.9439195620853,2024-12-31,Academic historical simulation
+2025-02-26,SARIMA,1461.2232060128522,2024-12-31,Academic historical simulation
+2025-02-27,SARIMA,1461.8800107022525,2024-12-31,Academic historical simulation
+2025-02-28,SARIMA,1465.170487332472,2024-12-31,Academic historical simulation
+2025-03-01,SARIMA,1857.0413375573671,2024-12-31,Academic historical simulation
+2025-03-02,SARIMA,1856.4396018228394,2024-12-31,Academic historical simulation
+2025-03-03,SARIMA,1459.3099223500942,2024-12-31,Academic historical simulation
+2025-03-04,SARIMA,1462.5907749773953,2024-12-31,Academic historical simulation
+2025-03-05,SARIMA,1463.872411649733,2024-12-31,Academic historical simulation
+2025-03-06,SARIMA,1464.526902029998,2024-12-31,Academic historical simulation
+2025-03-07,SARIMA,1467.819657353257,2024-12-31,Academic historical simulation
+2025-03-08,SARIMA,1859.688264153449,2024-12-31,Academic historical simulation
+2025-03-09,SARIMA,1859.0887369744914,2024-12-31,Academic historical simulation
+2025-03-10,SARIMA,1461.9568833715211,2024-12-31,Academic historical simulation
+2025-03-11,SARIMA,1465.2398761817058,2024-12-31,Academic historical simulation
+2025-03-12,SARIMA,1466.519406117786,2024-12-31,Academic historical simulation
+2025-03-13,SARIMA,1467.1759703007215,2024-12-31,Academic historical simulation
+2025-03-14,SARIMA,1470.4666842376942,2024-12-31,Academic historical simulation
+2025-03-15,SARIMA,1862.3373005232036,2024-12-31,Academic historical simulation
+2025-03-16,SARIMA,1861.7357952503323,2024-12-31,Academic historical simulation
+2025-03-17,SARIMA,1464.6058888511309,2024-12-31,Academic historical simulation
+2025-03-18,SARIMA,1467.8869648559387,2024-12-31,Academic historical simulation
+2025-03-19,SARIMA,1469.1683816809011,2024-12-31,Academic historical simulation
+2025-03-20,SARIMA,1469.823088419251,2024-12-31,Academic historical simulation
+2025-03-21,SARIMA,1473.1156308194422,2024-12-31,Academic historical simulation
+2025-03-22,SARIMA,1864.984447168892,2024-12-31,Academic historical simulation
+2025-03-23,SARIMA,1864.3847137509597,2024-12-31,Academic historical simulation
+2025-03-24,SARIMA,1467.2530631395753,2024-12-31,Academic historical simulation
+2025-03-25,SARIMA,1470.5358561449132,2024-12-31,Academic historical simulation
+2025-03-26,SARIMA,1471.815582756828,2024-12-31,Academic historical simulation
+2025-03-27,SARIMA,1472.4719533382333,2024-12-31,Academic historical simulation
+2025-03-28,SARIMA,1475.7628578543577,2024-12-31,Academic historical simulation
+2025-03-29,SARIMA,1867.6332865335457,2024-12-31,Academic historical simulation
+2025-03-30,SARIMA,1867.031965941772,2024-12-31,Academic historical simulation
+2025-03-31,SARIMA,1469.9018777406309,2024-12-31,Academic historical simulation
+2025-01-01,Prophet,1178.7417246955854,2024-12-31,Academic historical simulation
+2025-01-02,Prophet,1152.2931777883987,2024-12-31,Academic historical simulation
+2025-01-03,Prophet,1124.9921482500906,2024-12-31,Academic historical simulation
+2025-01-04,Prophet,1489.2845234179308,2024-12-31,Academic historical simulation
+2025-01-05,Prophet,1461.406166698031,2024-12-31,Academic historical simulation
+2025-01-06,Prophet,1043.0814320562486,2024-12-31,Academic historical simulation
+2025-01-07,Prophet,1023.8930959432022,2024-12-31,Academic historical simulation
+2025-01-08,Prophet,1002.9503696523079,2024-12-31,Academic historical simulation
+2025-01-09,Prophet,988.6711951785228,2024-12-31,Academic historical simulation
+2025-01-10,Prophet,975.2178157727659,2024-12-31,Academic historical simulation
+2025-01-11,Prophet,1354.7224527235385,2024-12-31,Academic historical simulation
+2025-01-12,Prophet,1343.083323470546,2024-12-31,Academic historical simulation
+2025-01-13,Prophet,941.6717301111076,2024-12-31,Academic historical simulation
+2025-01-14,Prophet,939.7108228188151,2024-12-31,Academic historical simulation
+2025-01-15,Prophet,935.9524691480699,2024-12-31,Academic historical simulation
+2025-01-16,Prophet,938.4682024438806,2024-12-31,Academic historical simulation
+2025-01-17,Prophet,941.0930189842974,2024-12-31,Academic historical simulation
+2025-01-18,Prophet,1335.6586479558077,2024-12-31,Academic historical simulation
+2025-01-19,Prophet,1337.7963414371202,2024-12-31,Academic historical simulation
+2025-01-20,Prophet,948.6497498553733,2024-12-31,Academic historical simulation
+2025-01-21,Prophet,957.2583522615148,2024-12-31,Academic historical simulation
+2025-01-22,Prophet,962.237768905089,2024-12-31,Academic historical simulation
+2025-01-23,Prophet,971.5728599339949,2024-12-31,Academic historical simulation
+2025-01-24,Prophet,979.0623459556027,2024-12-31,Academic historical simulation
+2025-01-25,Prophet,1376.5515766202725,2024-12-31,Academic historical simulation
+2025-01-26,Prophet,1379.7335318837536,2024-12-31,Academic historical simulation
+2025-01-27,Prophet,989.8586927980724,2024-12-31,Academic historical simulation
+2025-01-28,Prophet,996.114354062624,2024-12-31,Academic historical simulation
+2025-01-29,Prophet,997.2998369780073,2024-12-31,Academic historical simulation
+2025-01-30,Prophet,1001.613662056598,2024-12-31,Academic historical simulation
+2025-01-31,Prophet,1003.0915921668773,2024-12-31,Academic historical simulation
+2025-02-01,Prophet,1393.8323621268241,2024-12-31,Academic historical simulation
+2025-02-02,Prophet,1389.7913783843278,2024-12-31,Academic historical simulation
+2025-02-03,Prophet,992.4832282410885,2024-12-31,Academic historical simulation
+2025-02-04,Prophet,991.353771500606,2024-12-31,Academic historical simulation
+2025-02-05,Prophet,985.4484663193866,2024-12-31,Academic historical simulation
+2025-02-06,Prophet,983.1931690779861,2024-12-31,Academic historical simulation
+2025-02-07,Prophet,978.8264822074556,2024-12-31,Academic historical simulation
+2025-02-08,Prophet,1364.620607342849,2024-12-31,Academic historical simulation
+2025-02-09,Prophet,1356.6711036834486,2024-12-31,Academic historical simulation
+2025-02-10,Prophet,956.5964792354267,2024-12-31,Academic historical simulation
+2025-02-11,Prophet,953.9084460584045,2024-12-31,Academic historical simulation
+2025-02-12,Prophet,947.6795184238127,2024-12-31,Academic historical simulation
+2025-02-13,Prophet,946.3241894889038,2024-12-31,Academic historical simulation
+2025-02-14,Prophet,944.0327255239469,2024-12-31,Academic historical simulation
+2025-02-15,Prophet,1332.9944709912047,2024-12-31,Academic historical simulation
+2025-02-16,Prophet,1329.1909733809555,2024-12-31,Academic historical simulation
+2025-02-17,Prophet,934.0997406649046,2024-12-31,Academic historical simulation
+2025-02-18,Prophet,937.0693274172824,2024-12-31,Academic historical simulation
+2025-02-19,Prophet,936.9922774276379,2024-12-31,Academic historical simulation
+2025-02-20,Prophet,942.091995762083,2024-12-31,Academic historical simulation
+2025-02-21,Prophet,946.3624199871356,2024-12-31,Academic historical simulation
+2025-02-22,Prophet,1341.7972127147357,2024-12-31,Academic historical simulation
+2025-02-23,Prophet,1344.1886163155693,2024-12-31,Academic historical simulation
+2025-02-24,Prophet,954.8366224533617,2024-12-31,Academic historical simulation
+2025-02-25,Prophet,962.9290044446923,2024-12-31,Academic historical simulation
+2025-02-26,Prophet,967.2186085390113,2024-12-31,Academic historical simulation
+2025-02-27,Prophet,975.8138649675586,2024-12-31,Academic historical simulation
+2025-02-28,Prophet,982.6212989962497,2024-12-31,Academic historical simulation
+2025-03-01,Prophet,1379.576699328169,2024-12-31,Academic historical simulation
+2025-03-02,Prophet,1382.4450460504995,2024-12-31,Academic historical simulation
+2025-03-03,Prophet,992.5298388502795,2024-12-31,Academic historical simulation
+2025-03-04,Prophet,999.0523882696948,2024-12-31,Academic historical simulation
+2025-03-05,Prophet,1000.8275064936544,2024-12-31,Academic historical simulation
+2025-03-06,Prophet,1006.0516230648952,2024-12-31,Academic historical simulation
+2025-03-07,Prophet,1008.7421920432489,2024-12-31,Academic historical simulation
+2025-03-08,Prophet,1400.9651531241614,2024-12-31,Academic historical simulation
+2025-03-09,Prophet,1398.6306695675412,2024-12-31,Academic historical simulation
+2025-03-10,Prophet,1003.1979159899988,2024-12-31,Academic historical simulation
+2025-03-11,Prophet,1004.0496187481784,2024-12-31,Academic historical simulation
+2025-03-12,Prophet,1000.1629287717756,2024-12-31,Academic historical simulation
+2025-03-13,Prophet,999.8927947424902,2024-12-31,Academic historical simulation
+2025-03-14,Prophet,997.4068406371209,2024-12-31,Academic historical simulation
+2025-03-15,Prophet,1384.9086387149396,2024-12-31,Academic historical simulation
+2025-03-16,Prophet,1378.4297168079943,2024-12-31,Academic historical simulation
+2025-03-17,Prophet,979.5311732550633,2024-12-31,Academic historical simulation
+2025-03-18,Prophet,977.675684067058,2024-12-31,Academic historical simulation
+2025-03-19,Prophet,971.8965436309638,2024-12-31,Academic historical simulation
+2025-03-20,Prophet,970.5799463038978,2024-12-31,Academic historical simulation
+2025-03-21,Prophet,967.8995297632539,2024-12-31,Academic historical simulation
+2025-03-22,Prophet,1356.0400652363257,2024-12-31,Academic historical simulation
+2025-03-23,Prophet,1350.9906053475606,2024-12-31,Academic historical simulation
+2025-03-24,Prophet,954.2479138691276,2024-12-31,Academic historical simulation
+2025-03-25,Prophet,955.1908938408164,2024-12-31,Academic historical simulation
+2025-03-26,Prophet,952.7525704688537,2024-12-31,Academic historical simulation
+2025-03-27,Prophet,955.2057374619903,2024-12-31,Academic historical simulation
+2025-03-28,Prophet,956.6011782324855,2024-12-31,Academic historical simulation
+2025-03-29,Prophet,1348.9952304820647,2024-12-31,Academic historical simulation
+2025-03-30,Prophet,1348.2468846963568,2024-12-31,Academic historical simulation
+2025-03-31,Prophet,955.7251207579536,2024-12-31,Academic historical simulation
+2025-01-01,Random Forest,984.1099841269845,2024-12-31,Academic historical simulation
+2025-01-02,Random Forest,925.0027520442517,2024-12-31,Academic historical simulation
+2025-01-03,Random Forest,930.2809636844635,2024-12-31,Academic historical simulation
+2025-01-04,Random Forest,1334.037284391535,2024-12-31,Academic historical simulation
+2025-01-05,Random Forest,1346.7764457671965,2024-12-31,Academic historical simulation
+2025-01-06,Random Forest,992.5326653439154,2024-12-31,Academic historical simulation
+2025-01-07,Random Forest,931.6472698412701,2024-12-31,Academic historical simulation
+2025-01-08,Random Forest,947.9000211640209,2024-12-31,Academic historical simulation
+2025-01-09,Random Forest,956.1387539682539,2024-12-31,Academic historical simulation
+2025-01-10,Random Forest,957.0235595238096,2024-12-31,Academic historical simulation
+2025-01-11,Random Forest,1344.160015873016,2024-12-31,Academic historical simulation
+2025-01-12,Random Forest,1353.5703597883598,2024-12-31,Academic historical simulation
+2025-01-13,Random Forest,949.121325396825,2024-12-31,Academic historical simulation
+2025-01-14,Random Forest,951.6107764550266,2024-12-31,Academic historical simulation
+2025-01-15,Random Forest,940.0260423280426,2024-12-31,Academic historical simulation
+2025-01-16,Random Forest,924.1399007936515,2024-12-31,Academic historical simulation
+2025-01-17,Random Forest,961.7679603174606,2024-12-31,Academic historical simulation
+2025-01-18,Random Forest,1348.6672473544975,2024-12-31,Academic historical simulation
+2025-01-19,Random Forest,1351.1133637566134,2024-12-31,Academic historical simulation
+2025-01-20,Random Forest,967.6424444444449,2024-12-31,Academic historical simulation
+2025-01-21,Random Forest,938.7603769841272,2024-12-31,Academic historical simulation
+2025-01-22,Random Forest,942.5044259259258,2024-12-31,Academic historical simulation
+2025-01-23,Random Forest,959.6596706349205,2024-12-31,Academic historical simulation
+2025-01-24,Random Forest,964.5786230158736,2024-12-31,Academic historical simulation
+2025-01-25,Random Forest,1350.6202208994712,2024-12-31,Academic historical simulation
+2025-01-26,Random Forest,1353.5484206349204,2024-12-31,Academic historical simulation
+2025-01-27,Random Forest,963.6064087301589,2024-12-31,Academic historical simulation
+2025-01-28,Random Forest,947.4978849206352,2024-12-31,Academic historical simulation
+2025-01-29,Random Forest,933.0703902116404,2024-12-31,Academic historical simulation
+2025-01-30,Random Forest,931.5372486772491,2024-12-31,Academic historical simulation
+2025-01-31,Random Forest,933.6045171957672,2024-12-31,Academic historical simulation
+2025-02-01,Random Forest,1374.4636111111113,2024-12-31,Academic historical simulation
+2025-02-02,Random Forest,1360.0873637566133,2024-12-31,Academic historical simulation
+2025-02-03,Random Forest,971.0694444444446,2024-12-31,Academic historical simulation
+2025-02-04,Random Forest,954.1462037037041,2024-12-31,Academic historical simulation
+2025-02-05,Random Forest,940.5347896825398,2024-12-31,Academic historical simulation
+2025-02-06,Random Forest,925.9354563492063,2024-12-31,Academic historical simulation
+2025-02-07,Random Forest,948.8003809523809,2024-12-31,Academic historical simulation
+2025-02-08,Random Forest,1351.6030992063493,2024-12-31,Academic historical simulation
+2025-02-09,Random Forest,1339.14630026455,2024-12-31,Academic historical simulation
+2025-02-10,Random Forest,966.5449775132276,2024-12-31,Academic historical simulation
+2025-02-11,Random Forest,962.4190952380952,2024-12-31,Academic historical simulation
+2025-02-12,Random Forest,955.363966931217,2024-12-31,Academic historical simulation
+2025-02-13,Random Forest,944.788547619048,2024-12-31,Academic historical simulation
+2025-02-14,Random Forest,963.4713716931218,2024-12-31,Academic historical simulation
+2025-02-15,Random Forest,1328.1803161375665,2024-12-31,Academic historical simulation
+2025-02-16,Random Forest,1346.8655383597886,2024-12-31,Academic historical simulation
+2025-02-17,Random Forest,947.0099060846562,2024-12-31,Academic historical simulation
+2025-02-18,Random Forest,927.7991341991344,2024-12-31,Academic historical simulation
+2025-02-19,Random Forest,957.9043299663294,2024-12-31,Academic historical simulation
+2025-02-20,Random Forest,943.3700436507937,2024-12-31,Academic historical simulation
+2025-02-21,Random Forest,932.5182341269845,2024-12-31,Academic historical simulation
+2025-02-22,Random Forest,1394.5462539682537,2024-12-31,Academic historical simulation
+2025-02-23,Random Forest,1336.9107685185188,2024-12-31,Academic historical simulation
+2025-02-24,Random Forest,956.7458267195772,2024-12-31,Academic historical simulation
+2025-02-25,Random Forest,957.2615000000001,2024-12-31,Academic historical simulation
+2025-02-26,Random Forest,931.1089920634923,2024-12-31,Academic historical simulation
+2025-02-27,Random Forest,938.6728227513231,2024-12-31,Academic historical simulation
+2025-02-28,Random Forest,931.1075119047622,2024-12-31,Academic historical simulation
+2025-03-01,Random Forest,1358.783436507937,2024-12-31,Academic historical simulation
+2025-03-02,Random Forest,1391.2625542328037,2024-12-31,Academic historical simulation
+2025-03-03,Random Forest,979.4243716931217,2024-12-31,Academic historical simulation
+2025-03-04,Random Forest,951.6786772486773,2024-12-31,Academic historical simulation
+2025-03-05,Random Forest,932.0285939153439,2024-12-31,Academic historical simulation
+2025-03-06,Random Forest,924.2846150793652,2024-12-31,Academic historical simulation
+2025-03-07,Random Forest,959.4160714285712,2024-12-31,Academic historical simulation
+2025-03-08,Random Forest,1333.7078716931223,2024-12-31,Academic historical simulation
+2025-03-09,Random Forest,1352.5997619047616,2024-12-31,Academic historical simulation
+2025-03-10,Random Forest,990.7049682539682,2024-12-31,Academic historical simulation
+2025-03-11,Random Forest,958.4336865079366,2024-12-31,Academic historical simulation
+2025-03-12,Random Forest,941.977960317461,2024-12-31,Academic historical simulation
+2025-03-13,Random Forest,934.648111111111,2024-12-31,Academic historical simulation
+2025-03-14,Random Forest,962.7723068783066,2024-12-31,Academic historical simulation
+2025-03-15,Random Forest,1338.4184166666666,2024-12-31,Academic historical simulation
+2025-03-16,Random Forest,1338.0469259259257,2024-12-31,Academic historical simulation
+2025-03-17,Random Forest,943.7283478835982,2024-12-31,Academic historical simulation
+2025-03-18,Random Forest,944.9274331409327,2024-12-31,Academic historical simulation
+2025-03-19,Random Forest,949.1401111111105,2024-12-31,Academic historical simulation
+2025-03-20,Random Forest,953.5904378306875,2024-12-31,Academic historical simulation
+2025-03-21,Random Forest,946.3205105820106,2024-12-31,Academic historical simulation
+2025-03-22,Random Forest,1384.499982804232,2024-12-31,Academic historical simulation
+2025-03-23,Random Forest,1361.886849206349,2024-12-31,Academic historical simulation
+2025-03-24,Random Forest,974.1463716931224,2024-12-31,Academic historical simulation
+2025-03-25,Random Forest,957.5722129629631,2024-12-31,Academic historical simulation
+2025-03-26,Random Forest,939.3714801587303,2024-12-31,Academic historical simulation
+2025-03-27,Random Forest,933.5468875661378,2024-12-31,Academic historical simulation
+2025-03-28,Random Forest,933.9098968253974,2024-12-31,Academic historical simulation
+2025-03-29,Random Forest,1362.5578597883596,2024-12-31,Academic historical simulation
+2025-03-30,Random Forest,1319.21655026455,2024-12-31,Academic historical simulation
+2025-03-31,Random Forest,962.7843730158729,2024-12-31,Academic historical simulation
