@@ -1361,11 +1361,11 @@ with approach_col2:
     style_figure(fig_approach_mae, 405)
     st.plotly_chart(fig_approach_mae, use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
- st.info(
-    "Interpretation: Models are ranked using 2023 validation WAPE. "
-    "The 2024 final-test metrics are reported separately and are not used "
-    "for model selection. All four models are compared using the same "
-    "evaluation period and demand target."
+     st.info(
+        "Interpretation: Models are ranked using 2023 validation WAPE. "
+        "The 2024 final-test metrics are reported separately and are not used "
+        "for model selection. All four models are compared using the same "
+        "evaluation period and demand target."
 )
 
 
