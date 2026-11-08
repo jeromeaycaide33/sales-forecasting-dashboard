@@ -1328,14 +1328,14 @@ approach_df = pd.DataFrame(
 
 approach_col1, approach_col2 = st.columns(2, gap="medium")
 with approach_col1:
-fig_approach_mape = px.bar(
-    approach_df,
-    x="Approach",
-    y="mape",
-    color="Approach",
-    text="mape",
-   title="2024 Final-Test MAPE by Forecasting Approach",
-    color_discrete_sequence=[theme["teal"], theme["blue"]],
+    fig_approach_mape = px.bar(
+        approach_df,
+        x="Approach",
+        y="mape",
+        color="Approach",
+        text="mape",
+       title="2024 Final-Test MAPE by Forecasting Approach",
+        color_discrete_sequence=[theme["teal"], theme["blue"]],
 )
 fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
 fig_approach_mape.update_layout(showlegend=False)
