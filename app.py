@@ -975,6 +975,7 @@ st.sidebar.markdown(
 selected_model = st.sidebar.selectbox(
     "Forecasting Model",
     model_options,
+    index=model_options.index("Random Forest"),
     key="forecast_model_selector",
 )
 
