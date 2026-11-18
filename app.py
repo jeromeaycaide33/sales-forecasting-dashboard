@@ -1,5 +1,9 @@
 import html
+import io
+import re
+from datetime import datetime, timezone
 from pathlib import Path
+from uuid import uuid4
 
 import pandas as pd
 import plotly.express as px
@@ -888,6 +892,90 @@ if not st.session_state.show_dashboard:
 DATA_DIR = Path("data")
 
 
+SUPABASE_BUCKET = "sales-datasets"
+MAX_UPLOAD_BYTES = 50 * 1024 * 1024  # Supabase bucket currently has a 50 MB default limit.
+
+
+@st.cache_resource
+def get_supabase_client():
+    """Create a server-side Supabase client using Streamlit Secrets."""
+    from supabase import create_client
+
+    supabase_url = st.secrets.get("SUPABASE_URL", "")
+    # Accept common secret-key names. A private bucket requires a privileged
+    # server-side key or an authenticated Storage policy.
+    supabase_key = (
+        st.secrets.get("SUPABASE_SECRET_KEY", "")
+        or st.secrets.get("SUPABASE_SERVICE_ROLE_KEY", "")
+        or st.secrets.get("SUPABASE_KEY", "")
+    )
+
+    if not supabase_url or not supabase_key:
+        raise RuntimeError(
+            "Supabase credentials are missing. Add SUPABASE_URL and "
+            "SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY) in "
+            "Streamlit App settings → Secrets."
+        )
+
+    return create_client(supabase_url, supabase_key)
+
+
+def safe_storage_filename(filename: str) -> str:
+    """Keep only a safe filename while preserving its extension."""
+    cleaned = Path(filename).name.strip()
+    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "_", cleaned)
+    return cleaned[:120] or "dataset"
+
+
+def parse_uploaded_dataset(uploaded_file):
+    """Read CSV/XLSX content for a basic preview before saving."""
+    file_bytes = uploaded_file.getvalue()
+    suffix = Path(uploaded_file.name).suffix.lower()
+
+    if suffix == ".csv":
+        preview_df = pd.read_csv(io.BytesIO(file_bytes), nrows=100)
+    elif suffix == ".xlsx":
+        preview_df = pd.read_excel(io.BytesIO(file_bytes), nrows=100)
+    else:
+        raise ValueError("Only CSV and XLSX files are supported.")
+
+    if preview_df.empty or len(preview_df.columns) == 0:
+        raise ValueError("The uploaded file appears to be empty or has no readable columns.")
+
+    return file_bytes, preview_df
+
+
+def upload_dataset_to_supabase(uploaded_file, file_bytes: bytes):
+    """Persist the original dataset in the private Supabase Storage bucket."""
+    client = get_supabase_client()
+    safe_name = safe_storage_filename(uploaded_file.name)
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    object_path = f"uploads/{timestamp}_{uuid4().hex[:8]}_{safe_name}"
+
+    content_type = uploaded_file.type or "application/octet-stream"
+    client.storage.from_(SUPABASE_BUCKET).upload(
+        path=object_path,
+        file=file_bytes,
+        file_options={
+            "content-type": content_type,
+            "upsert": "false",
+        },
+    )
+    return object_path
+
+
+def list_supabase_datasets():
+    """Return objects stored under the uploads/ folder."""
+    client = get_supabase_client()
+    return client.storage.from_(SUPABASE_BUCKET).list("uploads")
+
+
+def download_supabase_dataset(object_name: str):
+    """Download one object from the private Supabase bucket."""
+    client = get_supabase_client()
+    return client.storage.from_(SUPABASE_BUCKET).download(f"uploads/{object_name}")
+
+
 def read_required_csv(filename: str) -> pd.DataFrame:
     path = DATA_DIR / filename
     if not path.is_file():
@@ -1701,6 +1789,116 @@ with tab_analysis:
 # DOWNLOADS AND DATA
 # =========================================================
 with tab_downloads:
+    st.subheader("Upload Dataset to Cloud Storage")
+    st.caption(
+        "Upload a CSV or Excel dataset directly from this page. "
+        "The original file is saved in your private Supabase Storage bucket "
+        "so it remains available after the Streamlit app restarts."
+    )
+
+    uploaded_dataset = st.file_uploader(
+        "Choose a sales dataset",
+        type=["csv", "xlsx"],
+        help="Maximum file size: 50 MB. The original file is stored without changing it.",
+        key="supabase_dataset_uploader",
+    )
+
+    if uploaded_dataset is not None:
+        try:
+            uploaded_bytes, uploaded_preview = parse_uploaded_dataset(uploaded_dataset)
+            upload_info_cols = st.columns(3)
+            upload_info_cols[0].metric("File size", f"{len(uploaded_bytes) / 1024:.1f} KB")
+            upload_info_cols[1].metric("Preview rows", f"{len(uploaded_preview):,}")
+            upload_info_cols[2].metric("Columns", f"{len(uploaded_preview.columns):,}")
+
+            with st.expander("Preview uploaded dataset", expanded=True):
+                st.dataframe(uploaded_preview, use_container_width=True, hide_index=True)
+
+            if len(uploaded_bytes) > MAX_UPLOAD_BYTES:
+                st.error("This file exceeds the current 50 MB upload limit. Reduce the file size and try again.")
+            elif st.button(
+                "Save dataset to Supabase",
+                type="primary",
+                use_container_width=False,
+                key="save_dataset_to_supabase",
+            ):
+                try:
+                    with st.spinner("Saving dataset to Supabase Storage..."):
+                        saved_object_path = upload_dataset_to_supabase(
+                            uploaded_dataset, uploaded_bytes
+                        )
+                    st.success("Dataset saved successfully to Supabase Storage.")
+                    st.code(saved_object_path, language="text")
+                    st.caption(
+                        "Your original file is now stored persistently. "
+                        "This Phase 1 upload does not retrain forecasting models or replace "
+                        "the dashboard's existing standardized forecasting files."
+                    )
+                except Exception as upload_error:
+                    st.error(f"Upload failed: {upload_error}")
+                    st.info(
+                        "Check that the bucket name is exactly 'sales-datasets', "
+                        "the bucket is private, and Streamlit Secrets contains a valid "
+                        "server-side Supabase secret key."
+                    )
+        except Exception as preview_error:
+            st.error(f"Unable to read this dataset: {preview_error}")
+
+    st.divider()
+    st.subheader("Saved Datasets")
+    st.caption("Files saved in the private Supabase bucket are listed here.")
+
+    if st.button("Refresh saved datasets", key="refresh_supabase_datasets"):
+        st.cache_resource.clear()
+        st.rerun()
+
+    try:
+        stored_objects = list_supabase_datasets()
+        stored_objects = [
+            item for item in stored_objects
+            if item.get("name") and item.get("name") not in {".", ".."}
+        ]
+
+        if not stored_objects:
+            st.info("No uploaded datasets found yet. Upload a CSV or Excel file above.")
+        else:
+            for stored_item in sorted(
+                stored_objects,
+                key=lambda item: item.get("created_at") or item.get("updated_at") or "",
+                reverse=True,
+            ):
+                object_name = stored_item["name"]
+                object_path = f"uploads/{object_name}"
+                file_col, action_col = st.columns([4, 1])
+                with file_col:
+                    st.markdown(f"**{html.escape(object_name)}**")
+                    metadata = stored_item.get("metadata") or {}
+                    size_bytes = metadata.get("size")
+                    if size_bytes is not None:
+                        st.caption(f"{int(size_bytes) / 1024:.1f} KB · {object_path}")
+                    else:
+                        st.caption(object_path)
+                with action_col:
+                    try:
+                        file_content = download_supabase_dataset(object_name)
+                        st.download_button(
+                            "Download",
+                            data=file_content,
+                            file_name=object_name,
+                            mime="application/octet-stream",
+                            key=f"download_supabase_{object_name}",
+                            use_container_width=True,
+                        )
+                    except Exception as download_error:
+                        st.warning(f"Download unavailable: {download_error}")
+    except Exception as storage_error:
+        st.warning(f"Could not retrieve saved datasets: {storage_error}")
+        st.caption(
+            "Verify the Supabase URL, server-side secret key, bucket name, "
+            "and Storage permissions."
+        )
+
+    st.divider()
     st.subheader("Download Forecast Results")
     st.caption("Export the selected model, all forecast records, or the model-ranking report.")
 
