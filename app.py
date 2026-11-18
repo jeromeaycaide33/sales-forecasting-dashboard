@@ -1,6 +1,8 @@
 import html
 import io
+import json
 import re
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
@@ -976,6 +978,351 @@ def download_supabase_dataset(object_name: str):
     return client.storage.from_(SUPABASE_BUCKET).download(f"uploads/{object_name}")
 
 
+# =========================================================
+# PHASE 2: AUTOMATIC DUAL-TARGET FORECASTING
+# Methodology follows the project's original Colab notebook:
+# daily sum aggregation; ARIMA(5,1,2); SARIMA(5,1,2)x(1,1,1,7);
+# Prophet yearly + weekly seasonality; recursive Random Forest;
+# previous calendar year for validation and latest calendar year for test.
+# =========================================================
+ARIMA_ORDER = (5, 1, 2)
+SARIMA_ORDER = (5, 1, 2)
+SARIMA_SEASONAL_ORDER = (1, 1, 1, 7)
+RANDOM_STATE = 42
+RF_FEATURES = [
+    "Year", "Month", "Day", "Day_of_Week", "Is_Weekend",
+    "Lag_1", "Lag_7", "Rolling_7",
+]
+FORECAST_MODEL_NAMES = ["ARIMA", "SARIMA", "Prophet", "Random Forest"]
+
+
+def prepare_dual_target_series(raw_df: pd.DataFrame):
+    """Validate transaction data and aggregate quantity and revenue by day."""
+    required = {"Date", "Quantity_Sold", "Total_Sales"}
+    missing = required.difference(raw_df.columns)
+    if missing:
+        raise ValueError(
+            "The uploaded dataset is missing required columns: "
+            + ", ".join(sorted(missing))
+            + ". Both Quantity_Sold and Total_Sales are required for the selected Both option."
+        )
+
+    frame = raw_df.copy()
+    frame["Date"] = pd.to_datetime(frame["Date"], errors="coerce").dt.normalize()
+    frame["Quantity_Sold"] = pd.to_numeric(frame["Quantity_Sold"], errors="coerce")
+    frame["Total_Sales"] = pd.to_numeric(frame["Total_Sales"], errors="coerce")
+
+    if frame["Date"].isna().any():
+        raise ValueError("Some Date values are missing or invalid. Correct them before forecasting.")
+    for column in ["Quantity_Sold", "Total_Sales"]:
+        if frame[column].isna().any():
+            raise ValueError(f"{column} contains missing or non-numeric values.")
+        if (frame[column] < 0).any():
+            raise ValueError(f"Negative values were found in {column}. Verify returns or adjustments first.")
+
+    duplicate_rows = int(frame.duplicated().sum())
+    if duplicate_rows:
+        raise ValueError(
+            f"Found {duplicate_rows:,} duplicate full transaction rows. "
+            "Resolve duplicates before forecasting to avoid double-counting."
+        )
+    if "ID" in frame.columns:
+        duplicate_ids = int(frame["ID"].duplicated().sum())
+        if duplicate_ids:
+            raise ValueError(
+                f"Found {duplicate_ids:,} duplicate transaction IDs. "
+                "Resolve duplicate IDs before forecasting."
+            )
+
+    daily = (
+        frame.groupby("Date", as_index=True)[["Quantity_Sold", "Total_Sales"]]
+        .sum()
+        .sort_index()
+    )
+    expected_dates = pd.date_range(daily.index.min(), daily.index.max(), freq="D")
+    missing_dates = expected_dates.difference(daily.index)
+    if len(missing_dates):
+        examples = ", ".join(str(d.date()) for d in missing_dates[:5])
+        raise ValueError(
+            f"The dataset has {len(missing_dates):,} calendar dates without transactions "
+            f"(examples: {examples}). The original notebook does not silently fill missing "
+            "dates with zero demand. Confirm whether these are true zero-sales days or missing records."
+        )
+
+    daily = daily.asfreq("D")
+    if len(daily) < 400:
+        raise ValueError(
+            "At least 400 consecutive daily observations are required for this four-model "
+            "comparison and yearly validation approach."
+        )
+
+    latest_year = int(daily.index.max().year)
+    validation_year = latest_year - 1
+    test_year = latest_year
+    validation_actual = daily.loc[daily.index.year == validation_year]
+    test_actual = daily.loc[daily.index.year == test_year]
+    train_validation = daily.loc[daily.index < pd.Timestamp(f"{validation_year}-01-01")]
+    train_test = daily.loc[daily.index < pd.Timestamp(f"{test_year}-01-01")]
+
+    if validation_actual.empty or test_actual.empty or train_validation.empty or train_test.empty:
+        raise ValueError(
+            "The uploaded dataset must contain at least one full training period, "
+            "the previous calendar year for validation, and the latest calendar year for testing."
+        )
+    if validation_actual.index.min() != pd.Timestamp(f"{validation_year}-01-01"):
+        raise ValueError(f"Validation year {validation_year} is incomplete at the beginning of the year.")
+    if test_actual.index.min() != pd.Timestamp(f"{test_year}-01-01"):
+        raise ValueError(f"Test year {test_year} is incomplete at the beginning of the year.")
+
+    return {
+        "daily": daily,
+        "validation_year": validation_year,
+        "test_year": test_year,
+        "train_validation": train_validation,
+        "validation_actual": validation_actual,
+        "train_test": train_test,
+        "test_actual": test_actual,
+    }
+
+
+def calculate_forecast_metrics(actual, predicted):
+    import numpy as np
+    from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+    actual = np.asarray(actual, dtype=float)
+    predicted = np.asarray(predicted, dtype=float)
+    errors = actual - predicted
+    absolute_errors = np.abs(errors)
+    nonzero = actual != 0
+    mape = (
+        float(np.mean(absolute_errors[nonzero] / np.abs(actual[nonzero])) * 100)
+        if nonzero.any() else float("nan")
+    )
+    denominator = float(np.sum(np.abs(actual)))
+    wape = float(np.sum(absolute_errors) / denominator * 100) if denominator else float("nan")
+    return {
+        "MAE": float(mean_absolute_error(actual, predicted)),
+        "RMSE": float(np.sqrt(mean_squared_error(actual, predicted))),
+        "MAPE (%)": mape,
+        "WAPE (%)": wape,
+    }
+
+
+def make_rf_training_frame(train_series: pd.Series):
+    import pandas as pd
+
+    frame = pd.DataFrame({"Daily_Target": train_series.astype(float).copy()})
+    dates = frame.index
+    frame["Year"] = dates.year
+    frame["Month"] = dates.month
+    frame["Day"] = dates.day
+    frame["Day_of_Week"] = dates.dayofweek
+    frame["Is_Weekend"] = (dates.dayofweek >= 5).astype(int)
+    frame["Lag_1"] = frame["Daily_Target"].shift(1)
+    frame["Lag_7"] = frame["Daily_Target"].shift(7)
+    # Shift before rolling so the current target never leaks into its features.
+    frame["Rolling_7"] = frame["Daily_Target"].shift(1).rolling(window=7).mean()
+    return frame.dropna()
+
+
+def forecast_one_model(model_name: str, train_series: pd.Series, future_dates: pd.DatetimeIndex):
+    import numpy as np
+
+    if model_name == "ARIMA":
+        from statsmodels.tsa.arima.model import ARIMA
+        fitted = ARIMA(train_series.astype(float), order=ARIMA_ORDER).fit()
+        values = np.asarray(fitted.forecast(steps=len(future_dates)), dtype=float)
+
+    elif model_name == "SARIMA":
+        from statsmodels.tsa.statespace.sarimax import SARIMAX
+        model = SARIMAX(
+            train_series.astype(float),
+            order=SARIMA_ORDER,
+            seasonal_order=SARIMA_SEASONAL_ORDER,
+            enforce_stationarity=False,
+            enforce_invertibility=False,
+        )
+        fitted = model.fit(disp=False, maxiter=150)
+        values = np.asarray(fitted.forecast(steps=len(future_dates)), dtype=float)
+
+    elif model_name == "Prophet":
+        from prophet import Prophet
+        prophet_train = pd.DataFrame({"ds": train_series.index, "y": train_series.values})
+        model = Prophet(
+            yearly_seasonality=True,
+            weekly_seasonality=True,
+            daily_seasonality=False,
+        )
+        model.fit(prophet_train)
+        future_frame = pd.DataFrame({"ds": future_dates})
+        values = model.predict(future_frame)["yhat"].to_numpy(dtype=float)
+
+    elif model_name == "Random Forest":
+        from sklearn.ensemble import RandomForestRegressor
+        training_frame = make_rf_training_frame(train_series)
+        if training_frame.empty:
+            raise ValueError("Insufficient training history for Random Forest lag features.")
+        model = RandomForestRegressor(
+            n_estimators=300,
+            min_samples_leaf=2,
+            random_state=RANDOM_STATE,
+            n_jobs=-1,
+        )
+        model.fit(training_frame[RF_FEATURES], training_frame["Daily_Target"])
+        history = list(train_series.astype(float).values)
+        predictions = []
+        for forecast_date in future_dates:
+            row = {
+                "Year": forecast_date.year,
+                "Month": forecast_date.month,
+                "Day": forecast_date.day,
+                "Day_of_Week": forecast_date.dayofweek,
+                "Is_Weekend": int(forecast_date.dayofweek >= 5),
+                "Lag_1": history[-1],
+                "Lag_7": history[-7],
+                "Rolling_7": float(np.mean(history[-7:])),
+            }
+            prediction = max(float(model.predict(pd.DataFrame([row], columns=RF_FEATURES))[0]), 0.0)
+            predictions.append(prediction)
+            history.append(prediction)
+        values = np.asarray(predictions, dtype=float)
+    else:
+        raise ValueError(f"Unsupported forecasting model: {model_name}")
+
+    # Preserve the notebook's non-negative forecast constraint.
+    values = np.maximum(values, 0.0)
+    return pd.Series(values, index=future_dates, name=model_name)
+
+
+def run_dual_target_forecasting(raw_df: pd.DataFrame, horizon: int, progress_callback=None):
+    """Run the notebook's four models for quantity and revenue targets."""
+    import numpy as np
+
+    prepared = prepare_dual_target_series(raw_df)
+    daily = prepared["daily"]
+    validation_dates = prepared["validation_actual"].index
+    test_dates = prepared["test_actual"].index
+    future_dates = pd.date_range(
+        start=daily.index.max() + pd.Timedelta(days=1),
+        periods=int(horizon),
+        freq="D",
+    )
+
+    validation_frames = []
+    test_frames = []
+    future_frames = []
+    validation_metric_rows = []
+    test_metric_rows = []
+    total_runs = 2 * len(FORECAST_MODEL_NAMES) * 3
+    completed = 0
+
+    for target in ["Quantity_Sold", "Total_Sales"]:
+        series = daily[target].astype(float)
+        target_label = "Quantity Sold (units)" if target == "Quantity_Sold" else "Total Sales (currency units)"
+        runs = [
+            ("Validation", prepared["train_validation"][target].astype(float), validation_dates, prepared["validation_actual"][target]),
+            ("Final Test", prepared["train_test"][target].astype(float), test_dates, prepared["test_actual"][target]),
+            ("Future", series, future_dates, None),
+        ]
+
+        for period, train_series, dates, actual_series in runs:
+            for model_name in FORECAST_MODEL_NAMES:
+                prediction = forecast_one_model(model_name, train_series, dates)
+                if period == "Validation":
+                    validation_frames.append(pd.DataFrame({
+                        "Date": dates, "Target": target, "Target_Label": target_label,
+                        "Model": model_name, "Actual": actual_series.to_numpy(dtype=float),
+                        "Predicted": prediction.to_numpy(dtype=float),
+                    }))
+                    metrics = calculate_forecast_metrics(actual_series, prediction)
+                    validation_metric_rows.append({"Target": target, "Target_Label": target_label, "Model": model_name, **metrics})
+                elif period == "Final Test":
+                    test_frames.append(pd.DataFrame({
+                        "Date": dates, "Target": target, "Target_Label": target_label,
+                        "Model": model_name, "Actual": actual_series.to_numpy(dtype=float),
+                        "Predicted": prediction.to_numpy(dtype=float),
+                    }))
+                    metrics = calculate_forecast_metrics(actual_series, prediction)
+                    test_metric_rows.append({"Target": target, "Target_Label": target_label, "Model": model_name, **metrics})
+                else:
+                    future_frames.append(pd.DataFrame({
+                        "Forecast_Date": dates, "Target": target, "Target_Label": target_label,
+                        "Model": model_name, "Predicted_Value": prediction.to_numpy(dtype=float),
+                        "Forecast_Origin": daily.index.max().date(),
+                    }))
+
+                completed += 1
+                if progress_callback:
+                    progress_callback(completed, total_runs, f"{target_label}: {period} · {model_name}")
+
+    validation_metrics = pd.DataFrame(validation_metric_rows)
+    test_metrics = pd.DataFrame(test_metric_rows)
+    future_forecasts = pd.concat(future_frames, ignore_index=True)
+    validation_predictions = pd.concat(validation_frames, ignore_index=True)
+    test_predictions = pd.concat(test_frames, ignore_index=True)
+
+    best_models = (
+        validation_metrics.sort_values("WAPE (%)")
+        .groupby("Target", as_index=False)
+        .first()[["Target", "Model", "WAPE (%)"]]
+        .rename(columns={"Model": "Selected_Model", "WAPE (%)": "Validation_WAPE_Percent"})
+    )
+
+    return {
+        "daily": daily.reset_index().rename(columns={"Date": "Date"}),
+        "validation_metrics": validation_metrics,
+        "test_metrics": test_metrics,
+        "validation_predictions": validation_predictions,
+        "test_predictions": test_predictions,
+        "future_forecasts": future_forecasts,
+        "best_models": best_models,
+        "validation_year": prepared["validation_year"],
+        "test_year": prepared["test_year"],
+        "forecast_origin": daily.index.max(),
+        "horizon": int(horizon),
+    }
+
+
+def build_forecast_run_zip(results: dict) -> bytes:
+    """Package all dual-target outputs for download and persistent storage."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        exports = {
+            "daily_quantity_and_sales.csv": results["daily"],
+            "validation_metrics.csv": results["validation_metrics"],
+            "final_test_metrics.csv": results["test_metrics"],
+            "validation_predictions.csv": results["validation_predictions"],
+            "final_test_predictions.csv": results["test_predictions"],
+            "future_forecasts.csv": results["future_forecasts"],
+            "selected_models.csv": results["best_models"],
+        }
+        for filename, frame in exports.items():
+            archive.writestr(filename, frame.to_csv(index=False).encode("utf-8"))
+        metadata = {
+            "validation_year": int(results["validation_year"]),
+            "final_test_year": int(results["test_year"]),
+            "forecast_origin": str(pd.Timestamp(results["forecast_origin"]).date()),
+            "forecast_horizon_days": int(results["horizon"]),
+            "targets": ["Quantity_Sold", "Total_Sales"],
+            "models": FORECAST_MODEL_NAMES,
+            "selection_rule": "Lowest validation WAPE per target",
+        }
+        archive.writestr("run_metadata.json", json.dumps(metadata, indent=2))
+    return buffer.getvalue()
+
+
+def save_forecast_run_to_supabase(zip_bytes: bytes, run_id: str):
+    """Persist a completed forecast run under forecast_runs/ in Supabase."""
+    client = get_supabase_client()
+    object_path = f"forecast_runs/{run_id}/dual_target_forecast_results.zip"
+    client.storage.from_(SUPABASE_BUCKET).upload(
+        path=object_path,
+        file=zip_bytes,
+        file_options={"content-type": "application/zip", "upsert": "false"},
+    )
+    return object_path
+
+
 def read_required_csv(filename: str) -> pd.DataFrame:
     path = DATA_DIR / filename
     if not path.is_file():
@@ -1363,11 +1710,12 @@ comparison["absolute_error"] = comparison["error"].abs()
 # =========================================================
 # NAVIGATION TABS
 # =========================================================
-tab_overview, tab_evaluation, tab_analysis, tab_downloads = st.tabs(
+tab_overview, tab_evaluation, tab_analysis, tab_auto_forecast, tab_downloads = st.tabs(
     [
         "Overview",
         "Model Evaluation",
         "Forecast Analysis",
+        "Automatic Forecasting",
         "Downloads & Data",
     ]
 )
@@ -1786,6 +2134,200 @@ with tab_analysis:
 
 
 # =========================================================
+# PHASE 2: AUTOMATIC FORECASTING WORKSPACE
+# =========================================================
+with tab_auto_forecast:
+    st.subheader("Automatic Forecasting · Quantity and Revenue")
+    st.caption(
+        "Select a dataset already saved in Supabase, then run all four forecasting models "
+        "for both daily Quantity_Sold and daily Total_Sales."
+    )
+    st.info(
+        "The workflow follows the original forecasting notebook: transaction-level values "
+        "are summed by date; the previous calendar year is used for validation; the latest "
+        "calendar year is held out for final testing; and the best model for each target is "
+        "selected using validation WAPE. Future forecasts are refitted using all available history."
+    )
+
+    try:
+        available_uploads = list_supabase_datasets()
+        upload_names = [
+            item.get("name") for item in available_uploads
+            if item.get("name") and not item.get("name", "").startswith(".")
+        ]
+    except Exception as list_error:
+        upload_names = []
+        st.error(f"Unable to retrieve saved datasets from Supabase: {list_error}")
+
+    if not upload_names:
+        st.warning("No saved upload was found. Save a CSV or XLSX file first in Downloads & Data.")
+    else:
+        selected_upload = st.selectbox(
+            "Select saved dataset",
+            options=sorted(upload_names, reverse=True),
+            key="phase2_selected_dataset",
+        )
+        horizon = st.selectbox(
+            "Future forecast horizon",
+            options=[30, 60, 90],
+            index=2,
+            format_func=lambda days: f"{days} days",
+            key="phase2_forecast_horizon",
+        )
+        st.caption(
+            "Targets: Quantity Sold (units) and Total Sales (currency units) · "
+            "Models: ARIMA, SARIMA, Prophet, and Random Forest."
+        )
+
+        if st.button(
+            "Run Automatic Forecasting",
+            type="primary",
+            use_container_width=True,
+            key="run_dual_target_forecasting",
+        ):
+            try:
+                with st.status("Preparing dataset and training forecasting models...", expanded=True) as run_status:
+                    file_bytes = download_supabase_dataset(selected_upload)
+                    file_stream = io.BytesIO(file_bytes)
+                    if selected_upload.lower().endswith(".csv"):
+                        source_df = pd.read_csv(file_stream)
+                    elif selected_upload.lower().endswith(".xlsx"):
+                        source_df = pd.read_excel(file_stream)
+                    else:
+                        raise ValueError("Only saved CSV and XLSX datasets can be forecast.")
+
+                    run_status.write(f"Loaded {len(source_df):,} transaction rows from {selected_upload}.")
+                    progress_bar = st.progress(0, text="Starting 24 model runs...")
+
+                    def update_forecast_progress(done, total, label):
+                        progress_bar.progress(done / total, text=f"{done}/{total} model runs · {label}")
+                        run_status.write(f"Completed {done}/{total}: {label}")
+
+                    phase2_results = run_dual_target_forecasting(
+                        source_df,
+                        horizon,
+                        progress_callback=update_forecast_progress,
+                    )
+                    run_zip = build_forecast_run_zip(phase2_results)
+                    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "_" + uuid4().hex[:8]
+                    stored_run_path = save_forecast_run_to_supabase(run_zip, run_id)
+                    run_status.update(
+                        label="Forecasting completed and results saved to Supabase.",
+                        state="complete",
+                        expanded=False,
+                    )
+
+                st.session_state["phase2_results"] = phase2_results
+                st.session_state["phase2_archive"] = run_zip
+                st.session_state["phase2_archive_name"] = f"dual_target_forecast_{run_id}.zip"
+                st.session_state["phase2_storage_path"] = stored_run_path
+                st.session_state["phase2_source_name"] = selected_upload
+            except Exception as forecast_error:
+                st.error(f"Automatic forecasting could not be completed: {forecast_error}")
+                st.warning(
+                    "No results were marked as complete. Review the dataset requirements and "
+                    "the model error before rerunning. The original saved dataset is unchanged."
+                )
+
+    phase2_results = st.session_state.get("phase2_results")
+    if phase2_results:
+        st.divider()
+        st.subheader("Forecasting Results")
+        st.success(
+            f"Completed for {st.session_state.get('phase2_source_name', 'selected dataset')}. "
+            f"Validation: {phase2_results['validation_year']} · "
+            f"Final holdout: {phase2_results['test_year']} · "
+            f"Forecast origin: {pd.Timestamp(phase2_results['forecast_origin']).date()}"
+        )
+        st.caption(
+            "Model selection is performed separately for each target using the lowest validation WAPE. "
+            "Final-test metrics are reported independently and do not determine model selection."
+        )
+
+        best_display = phase2_results["best_models"].copy()
+        best_cols = st.columns(2, gap="medium")
+        for col, target in zip(best_cols, ["Quantity_Sold", "Total_Sales"]):
+            row = best_display[best_display["Target"] == target]
+            if not row.empty:
+                with col:
+                    label = "Best Quantity Model" if target == "Quantity_Sold" else "Best Revenue Model"
+                    st.metric(label, row.iloc[0]["Selected_Model"], f"Validation WAPE: {row.iloc[0]['Validation_WAPE_Percent']:.2f}%")
+
+        target_choice = st.radio(
+            "View target",
+            options=["Quantity_Sold", "Total_Sales"],
+            format_func=lambda value: "Quantity Sold (units)" if value == "Quantity_Sold" else "Total Sales (currency units)",
+            horizontal=True,
+            key="phase2_result_target",
+        )
+        validation_view = phase2_results["validation_metrics"].query("Target == @target_choice").copy()
+        test_view = phase2_results["test_metrics"].query("Target == @target_choice").copy()
+        future_view = phase2_results["future_forecasts"].query("Target == @target_choice").copy()
+        test_predictions_view = phase2_results["test_predictions"].query("Target == @target_choice").copy()
+
+        metric_cols = st.columns(2, gap="medium")
+        with metric_cols[0]:
+            st.markdown(f"**{phase2_results['validation_year']} Validation Performance**")
+            st.dataframe(
+                validation_view[["Model", "MAE", "RMSE", "MAPE (%)", "WAPE (%)"]].round(3),
+                use_container_width=True,
+                hide_index=True,
+            )
+        with metric_cols[1]:
+            st.markdown(f"**{phase2_results['test_year']} Final Holdout Performance**")
+            st.dataframe(
+                test_view[["Model", "MAE", "RMSE", "MAPE (%)", "WAPE (%)"]].round(3),
+                use_container_width=True,
+                hide_index=True,
+            )
+
+        st.subheader("Final Holdout · Actual vs Predicted")
+        test_chart_data = test_predictions_view.melt(
+            id_vars=["Date", "Model"],
+            value_vars=["Actual", "Predicted"],
+            var_name="Series",
+            value_name="Value",
+        )
+        fig_test = px.line(
+            test_chart_data,
+            x="Date",
+            y="Value",
+            color="Series",
+            line_dash="Model",
+            title=f"{target_choice} · {phase2_results['test_year']} holdout",
+            labels={"Value": "Daily value", "Date": "Date"},
+        )
+        fig_test.update_layout(legend_title_text="Series / Model")
+        st.plotly_chart(fig_test, use_container_width=True)
+
+        st.subheader(f"Next {phase2_results['horizon']} Days · Forecast by Model")
+        fig_future = px.line(
+            future_view,
+            x="Forecast_Date",
+            y="Predicted_Value",
+            color="Model",
+            title=f"Future {target_choice} forecast",
+            labels={"Forecast_Date": "Forecast date", "Predicted_Value": "Predicted value"},
+        )
+        st.plotly_chart(fig_future, use_container_width=True)
+        st.dataframe(
+            future_view[["Forecast_Date", "Model", "Predicted_Value"]].round(2),
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.download_button(
+            "Download complete forecasting results (ZIP)",
+            data=st.session_state["phase2_archive"],
+            file_name=st.session_state["phase2_archive_name"],
+            mime="application/zip",
+            type="primary",
+            key="download_phase2_results_zip",
+        )
+        st.caption(f"Persistent results location: {st.session_state['phase2_storage_path']}")
+
+
+# =========================================================
 # DOWNLOADS AND DATA
 # =========================================================
 with tab_downloads:
@@ -1831,8 +2373,8 @@ with tab_downloads:
                     st.code(saved_object_path, language="text")
                     st.caption(
                         "Your original file is now stored persistently. "
-                        "This Phase 1 upload does not retrain forecasting models or replace "
-                        "the dashboard's existing standardized forecasting files."
+                        "To generate forecasts from this uploaded dataset, open the "
+                        "Automatic Forecasting tab and run the dual-target workflow."
                     )
                 except Exception as upload_error:
                     st.error(f"Upload failed: {upload_error}")
