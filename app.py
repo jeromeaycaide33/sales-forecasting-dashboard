@@ -50,58 +50,58 @@ def toggle_theme():
 
 DARK_THEME = {
     "name": "dark",
-    "page": "#071B2A",
-    "page_grad_1": "#0A2C3B",
-    "page_grad_2": "#061622",
-    "sidebar": "#062B38",
-    "hero": "#104456",
-    "hero2": "#176174",
-    "panel": "#D7EEF2",
-    "panel_alt": "#C7E5EB",
-    "panel_soft": "#E6F4F6",
-    "border": "#75B8C5",
-    "tab_bg": "#0D3442",
-    "tab_active": "#15586A",
-    "tab_text": "#D9F1F4",
-    "tab_active_border": "#39C6C5",
-    "text": "#153642",
-    "muted": "#4E707A",
-    "blue": "#16A6BD",
-    "blue_light": "#69D5E0",
-    "teal": "#2DBD9D",
-    "gold": "#E8AD45",
-    "success_bg": "#DDF4EC",
-    "success_border": "#78C9B0",
-    "success_text": "#205B4D",
-    "table_header": "#B9DDE5",
+    "page": "#101820",
+    "page_grad_1": "#121F29",
+    "page_grad_2": "#0B1219",
+    "sidebar": "#111D26",
+    "hero": "#172B35",
+    "hero2": "#1C3940",
+    "panel": "#17242D",
+    "panel_alt": "#1D3038",
+    "panel_soft": "#192A32",
+    "border": "#304A50",
+    "tab_bg": "#17262E",
+    "tab_active": "#24464A",
+    "tab_text": "#C4D4D3",
+    "tab_active_border": "#43C6A5",
+    "text": "#F1F6F4",
+    "muted": "#9EB4B1",
+    "blue": "#31B89A",
+    "blue_light": "#70DFC0",
+    "teal": "#48C9B0",
+    "gold": "#E7B967",
+    "success_bg": "#173A34",
+    "success_border": "#347A68",
+    "success_text": "#D5F5E9",
+    "table_header": "#20363C",
 }
 
 LIGHT_THEME = {
     "name": "light",
-    "page": "#EAF4F6",
-    "page_grad_1": "#F4FAFB",
-    "page_grad_2": "#DCEEF1",
-    "sidebar": "#D8E9EC",
+    "page": "#F2F5F2",
+    "page_grad_1": "#F7F9F6",
+    "page_grad_2": "#E9EFEB",
+    "sidebar": "#E8EFEB",
     "hero": "#FFFFFF",
-    "hero2": "#E4F3F5",
+    "hero2": "#F0F7F3",
     "panel": "#FFFFFF",
-    "panel_alt": "#F2FAFB",
-    "panel_soft": "#EAF5F7",
-    "border": "#C4DDE2",
-    "tab_bg": "#F7FBFC",
-    "tab_active": "#D7EEF1",
-    "tab_text": "#355B65",
-    "tab_active_border": "#2CA9B7",
-    "text": "#173944",
-    "muted": "#66828A",
-    "blue": "#159DB1",
-    "blue_light": "#4ABFCB",
-    "teal": "#22A98A",
-    "gold": "#D49B37",
-    "success_bg": "#E5F6EF",
-    "success_border": "#B9E1D2",
-    "success_text": "#315F51",
-    "table_header": "#E2F0F2",
+    "panel_alt": "#F8FBF8",
+    "panel_soft": "#EEF4F0",
+    "border": "#D3E0D9",
+    "tab_bg": "#FFFFFF",
+    "tab_active": "#E2F2EB",
+    "tab_text": "#405A50",
+    "tab_active_border": "#42A98C",
+    "text": "#233A32",
+    "muted": "#71857C",
+    "blue": "#218F75",
+    "blue_light": "#43B99A",
+    "teal": "#369E8A",
+    "gold": "#C89A3D",
+    "success_bg": "#E8F6EF",
+    "success_border": "#B8DFCC",
+    "success_text": "#315E4B",
+    "table_header": "#EAF1EC",
 }
 
 theme = DARK_THEME if st.session_state.theme_mode == "dark" else LIGHT_THEME
@@ -701,251 +701,160 @@ if not st.session_state.show_dashboard:
 
 
     /* =====================================================
-       ADMIN DASHBOARD V2 — FROSTED AQUA / TEAL GLASS
-       Visual styling only; app logic and widget behavior stay intact.
+       MODERN ANALYTICS REDESIGN — MATTE SURFACES
+       Presentation-only CSS. Forecasting logic and widgets
+       remain unchanged.
        ===================================================== */
     .stApp {{
         background:
-          radial-gradient(ellipse at 8% 4%, rgba(40, 196, 205, .23), transparent 34%),
-          radial-gradient(ellipse at 92% 20%, rgba(34, 166, 190, .20), transparent 32%),
-          linear-gradient(135deg, var(--page) 0%, var(--page-grad-1) 52%, var(--page-grad-2) 100%) !important;
+          linear-gradient(135deg, var(--page) 0%, var(--page-grad-1) 58%, var(--page-grad-2) 100%) !important;
         background-attachment: fixed !important;
     }}
-    [data-testid="stAppViewContainer"] {{ background: transparent !important; }}
-    [data-testid="stHeader"] {{
-        background: rgba(4, 28, 41, .72) !important;
-        backdrop-filter: blur(18px) saturate(150%);
-        border-bottom: 1px solid rgba(128, 213, 221, .16);
-    }}
-    .block-container {{
-        max-width: 1700px !important;
-        padding-top: 1.5rem !important;
-        padding-bottom: 2.5rem !important;
-    }}
-    section[data-testid="stSidebar"] {{
+    [data-testid="stAppViewContainer"] {{
         background: transparent !important;
-        border-right: 1px solid rgba(116, 203, 213, .22) !important;
-        min-width: 265px;
+    }}
+    [data-testid="stHeader"] {{
+        background: var(--page) !important;
+        border-bottom: 1px solid var(--border);
     }}
     [data-testid="stSidebar"] > div:first-child {{
-        background:
-          linear-gradient(180deg, rgba(5, 48, 62, .97), rgba(4, 34, 48, .98)) !important;
-        border-right: 1px solid rgba(120, 214, 222, .20) !important;
-        box-shadow: 12px 0 36px rgba(0, 10, 20, .14);
+        background: var(--sidebar) !important;
+        border-right: 1px solid var(--border) !important;
     }}
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label {{
-        color: #E7F7F8 !important;
-    }}
-    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p {{
-        color: #A6C9CE !important;
-    }}
-
-    /* Frosted content surfaces */
     [data-testid="stVerticalBlockBorderWrapper"],
     [data-testid="stMetric"],
     [data-testid="stExpander"],
     [data-testid="stAlert"],
-    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
-    .sf-metric-row {{
-        background: linear-gradient(145deg,
-            color-mix(in srgb, var(--panel) 91%, white 9%),
-            color-mix(in srgb, var(--panel-alt) 88%, white 12%)) !important;
-        border: 1px solid rgba(157, 216, 225, .72) !important;
-        border-radius: 17px !important;
-        box-shadow: 0 13px 34px rgba(0, 19, 31, .16),
-                    inset 0 1px 0 rgba(255,255,255,.68) !important;
-        backdrop-filter: blur(18px) saturate(145%) !important;
-        -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
-        color: #173B47 !important;
+    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature {{
+        background: var(--panel) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 7px 20px rgba(0, 0, 0, .08) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
     }}
     [data-testid="stVerticalBlockBorderWrapper"] {{
-        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        border-top: 3px solid var(--blue) !important;
+        transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
     }}
     [data-testid="stVerticalBlockBorderWrapper"]:hover {{
-        transform: translateY(-2px);
-        border-color: rgba(50, 190, 201, .88) !important;
-        box-shadow: 0 18px 40px rgba(0, 20, 32, .20),
-                    inset 0 1px 0 rgba(255,255,255,.72) !important;
-    }}
-    [data-testid="stVerticalBlockBorderWrapper"] h1,
-    [data-testid="stVerticalBlockBorderWrapper"] h2,
-    [data-testid="stVerticalBlockBorderWrapper"] h3,
-    [data-testid="stVerticalBlockBorderWrapper"] p,
-    [data-testid="stVerticalBlockBorderWrapper"] label,
-    [data-testid="stVerticalBlockBorderWrapper"] span,
-    [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stCaptionContainer"] {{
-        color: #173B47;
+        border-color: var(--blue) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .12) !important;
+        transform: translateY(-1px);
     }}
     [data-testid="stMetric"] {{
-        min-height: 112px;
-        padding: 16px 18px !important;
-        border-radius: 15px !important;
-        border-top: 3px solid #36BFC7 !important;
-        background: linear-gradient(145deg, #E4F5F7, #CBE8ED) !important;
+        padding: 16px !important;
+        border-left: 4px solid var(--blue) !important;
+        border-radius: 10px !important;
+        background: var(--panel-alt) !important;
     }}
-    [data-testid="stMetricLabel"] p {{
-        color: #547680 !important;
-        font-size: .76rem !important;
-        font-weight: 700 !important;
-    }}
-    [data-testid="stMetricValue"] {{
-        color: #123744 !important;
-        font-size: clamp(1.3rem, 2vw, 1.85rem) !important;
-        font-weight: 850 !important;
-        letter-spacing: -.035em;
-    }}
-    [data-testid="stMetricDelta"] {{
-        color: #168A78 !important;
-    }}
-
-    /* Navigation and controls */
     [data-testid="stTabs"] [role="tablist"] {{
-        gap: 7px !important;
-        padding: 7px !important;
-        border: 1px solid rgba(117, 201, 211, .30) !important;
-        border-radius: 15px !important;
-        background: rgba(5, 45, 60, .48) !important;
-        backdrop-filter: blur(15px) !important;
+        gap: 5px !important;
+        padding: 0 0 8px 0 !important;
+        border-bottom: 2px solid var(--border) !important;
+        background: transparent !important;
     }}
     [data-testid="stTabs"] button[role="tab"] {{
-        border: 1px solid transparent !important;
-        border-radius: 10px !important;
+        border: 0 !important;
+        border-radius: 7px 7px 0 0 !important;
         background: transparent !important;
-        color: #D9F1F4 !important;
-        padding: 10px 14px !important;
+        color: var(--tab-text) !important;
+        padding: 11px 15px !important;
         transition: all .18s ease;
     }}
     [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
-        color: #103B48 !important;
-        background: linear-gradient(135deg, #BDEBF0, #8ED8E1) !important;
-        border: 1px solid rgba(255,255,255,.72) !important;
-        box-shadow: 0 5px 16px rgba(0, 15, 25, .18) !important;
+        color: var(--text) !important;
+        background: var(--tab-active) !important;
+        border-bottom: 3px solid var(--blue) !important;
         font-weight: 800 !important;
+        box-shadow: none !important;
     }}
     [data-baseweb="select"] > div,
     [data-baseweb="input"] > div,
     [data-baseweb="textarea"] > div,
     [data-testid="stFileUploader"] section {{
-        background: rgba(222, 243, 246, .94) !important;
-        color: #173B47 !important;
-        border: 1px solid rgba(116, 192, 203, .70) !important;
-        border-radius: 11px !important;
-        backdrop-filter: blur(12px) !important;
-    }}
-    [data-baseweb="select"] *,
-    [data-baseweb="input"] input,
-    [data-baseweb="textarea"] textarea {{
-        color: #173B47 !important;
+        background: var(--panel-soft) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        backdrop-filter: none !important;
     }}
     .stButton button,
     [data-testid="stDownloadButton"] button,
     [data-testid="stFormSubmitButton"] button {{
-        border: 1px solid rgba(130, 226, 231, .68) !important;
-        border-radius: 11px !important;
-        background: linear-gradient(135deg, #159EB5, #177D91) !important;
+        border: 1px solid var(--blue) !important;
+        border-radius: 8px !important;
+        background: var(--blue) !important;
         color: #FFFFFF !important;
-        font-weight: 800 !important;
-        box-shadow: 0 7px 18px rgba(0, 34, 48, .20),
-                    inset 0 1px 0 rgba(255,255,255,.22) !important;
-        transition: transform .18s ease, filter .18s ease !important;
+        font-weight: 750 !important;
+        box-shadow: none !important;
+        transition: transform .16s ease, filter .16s ease !important;
     }}
     .stButton button:hover,
     [data-testid="stDownloadButton"] button:hover {{
-        filter: brightness(1.12) !important;
-        transform: translateY(-2px) !important;
+        filter: brightness(1.08) !important;
+        transform: translateY(-1px) !important;
     }}
-    [data-testid="stSidebar"] .stButton button {{
-        background: linear-gradient(135deg, #167D91, #116176) !important;
-        border-color: rgba(114, 211, 220, .52) !important;
-    }}
-
-    /* Charts, tables and headings */
     [data-testid="stDataFrame"],
     [data-testid="stTable"],
     [data-testid="stPlotlyChart"] {{
-        border: 1px solid rgba(129, 194, 204, .55) !important;
-        border-radius: 15px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
         overflow: hidden !important;
-        box-shadow: 0 9px 24px rgba(0, 20, 32, .12) !important;
+        box-shadow: none !important;
     }}
-    [data-testid="stDataFrame"] *,
-    [data-testid="stTable"] * {{
-        color: #183C47;
-    }}
-    [data-testid="stDataFrame"] thead tr th {{
-        background: #B9E0E6 !important;
-        color: #173B47 !important;
+    .sf-hero {{
+        border-left: 5px solid var(--blue) !important;
+        border-radius: 12px !important;
     }}
     .sf-landing-hero {{
-        background:
-          radial-gradient(circle at 92% 5%, rgba(88, 211, 220, .23), transparent 30%),
-          linear-gradient(120deg, rgba(12, 66, 83, .96), rgba(15, 91, 105, .91)) !important;
-        border: 1px solid rgba(119, 215, 222, .38) !important;
-        border-radius: 22px !important;
-        box-shadow: 0 22px 52px rgba(0, 15, 25, .23) !important;
-    }}
-    .sf-landing-title, .sf-landing-copy, .sf-landing-points {{
-        color: #E8F8F9 !important;
-    }}
-    .sf-landing-title span, .sf-landing-kicker, .sf-brand {{
-        color: #72E0E2 !important;
+        background: linear-gradient(115deg, var(--hero), var(--hero2)) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 15px 36px rgba(0,0,0,.12) !important;
     }}
     .sf-preview-card {{
-        background: linear-gradient(145deg, rgba(221, 243, 246, .97), rgba(190, 225, 232, .96)) !important;
-        border: 1px solid rgba(255,255,255,.76) !important;
-        box-shadow: 0 18px 44px rgba(0, 17, 29, .20) !important;
-    }}
-    .sf-preview-card *,
-    .sf-feature *,
-    .sf-metric-row * {{
-        color: #173B47 !important;
-    }}
-    .sf-chart-shell {{
-        background: rgba(239, 250, 251, .76) !important;
-        border: 1px solid rgba(126, 190, 201, .62) !important;
-    }}
-    .sf-chart span {{
-        background: linear-gradient(180deg, #65D5E0, #159EB5) !important;
-        box-shadow: 0 0 13px rgba(37, 178, 193, .20) !important;
-    }}
-    .sf-live-pill {{
-        color: #087B72 !important;
-        background: rgba(43, 190, 159, .15) !important;
-        border-color: rgba(43, 190, 159, .42) !important;
+        border-top: 4px solid var(--blue) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 12px 28px rgba(0,0,0,.12) !important;
     }}
     .sf-feature {{
-        background: linear-gradient(145deg, rgba(222, 243, 246, .95), rgba(194, 226, 233, .94)) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 5px 16px rgba(0,0,0,.06) !important;
     }}
-    .sf-section-heading, .sf-section-copy, .sf-landing-cta-note {{
-        color: {"#E5F5F6" if t["name"] == "dark" else t["text"]} !important;
+    .sf-chart-shell {{
+        background: var(--panel-soft) !important;
+        border-color: var(--border) !important;
+    }}
+    .sf-chart span {{
+        background: linear-gradient(180deg, var(--blue-light), var(--blue)) !important;
+        box-shadow: none !important;
+    }}
+    .sf-kicker-dot {{
+        background: var(--blue) !important;
+        box-shadow: none !important;
+    }}
+    .sf-landing-title span,
+    .sf-landing-kicker,
+    .sf-brand {{
+        color: var(--blue-light) !important;
+    }}
+    .sf-landing-points span:before {{
+        color: var(--teal) !important;
+    }}
+    .sf-live-pill {{
+        color: var(--teal) !important;
+        background: var(--success-bg) !important;
+        border-color: var(--success-border) !important;
     }}
     .theme-label {{
-        color: #9FCBD0 !important;
+        color: var(--muted) !important;
         font-size: .72rem !important;
         font-weight: 800 !important;
-        letter-spacing: .13em !important;
+        letter-spacing: .12em !important;
         text-transform: uppercase;
         margin: .85rem 0 .35rem 0;
     }}
-    [data-testid="stCaptionContainer"] p,
-    .stCaption {{
-        color: {"#B5D2D6" if t["name"] == "dark" else t["muted"]} !important;
-    }}
-    .stApp, .main {{
-        color: {"#E5F5F6" if t["name"] == "dark" else t["text"]};
-    }}
-    hr {{ border-color: rgba(122, 197, 207, .28) !important; }}
-    h1, h2, h3 {{ letter-spacing: -.03em; }}
-    @media (max-width: 768px) {{
-        .block-container {{ padding-left: .85rem !important; padding-right: .85rem !important; }}
-        [data-testid="stMetric"] {{ min-height: 94px; }}
-        [data-testid="stTabs"] [role="tablist"] {{ overflow-x: auto; flex-wrap: nowrap; }}
-    }}
+    hr {{ border-color: var(--border) !important; }}
+    h1, h2, h3 {{ letter-spacing: -.025em; }}
     @media (prefers-reduced-motion: reduce) {{
         *, *::before, *::after {{
             transition-duration: .01ms !important;
@@ -991,7 +900,7 @@ def dashboard_metric(label: str, value: str, note: str = "") -> None:
 
 def style_figure(fig, height: int = 340):
     fig.update_layout(
-        template="plotly_white",
+        template="plotly_dark" if theme["name"] == "dark" else "plotly_white",
         height=height,
         autosize=True,
         paper_bgcolor="rgba(0,0,0,0)",
