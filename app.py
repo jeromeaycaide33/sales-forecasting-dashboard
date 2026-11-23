@@ -1030,6 +1030,62 @@ st.markdown(
         padding: 8px 11px !important;
     }
 
+
+    /* Automatic, infinite chart motion. This is presentation-only:
+       it does not change any underlying sales, forecast, or metric values. */
+    @keyframes sf-line-flow {
+        from { stroke-dashoffset: 0; }
+        to   { stroke-dashoffset: -30; }
+    }
+    @keyframes sf-bar-breathe {
+        0%, 100% { transform: scaleY(0.985); }
+        50%      { transform: scaleY(1); }
+    }
+    @keyframes sf-point-glow {
+        0%, 100% { opacity: .82; }
+        50%      { opacity: 1; }
+    }
+    @keyframes sf-heatmap-breathe {
+        0%, 100% { opacity: .92; }
+        50%      { opacity: 1; }
+    }
+
+    /* Moving line traces — retain the original trace colors. */
+    .js-plotly-plot .scatterlayer .trace.scatter path.js-line,
+    .js-plotly-plot .scatterlayer .trace.scattergl path.js-line {
+        stroke-dasharray: 28 2 !important;
+        animation: sf-line-flow 2.4s linear infinite;
+    }
+
+    /* Gentle, continuous movement for bar charts. */
+    .js-plotly-plot .barlayer .trace.bars path,
+    .js-plotly-plot .barlayer .trace.bars rect {
+        transform-box: fill-box;
+        transform-origin: center bottom;
+        animation: sf-bar-breathe 2.2s ease-in-out infinite;
+    }
+
+    /* Subtle movement for points and heatmap cells. */
+    .js-plotly-plot .scatterlayer .trace.scatter .points path {
+        animation: sf-point-glow 2s ease-in-out infinite;
+    }
+    .js-plotly-plot .hm .hm-layer image,
+    .js-plotly-plot .hm .hm-layer rect {
+        animation: sf-heatmap-breathe 3s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .js-plotly-plot .scatterlayer .trace.scatter path.js-line,
+        .js-plotly-plot .scatterlayer .trace.scattergl path.js-line,
+        .js-plotly-plot .barlayer .trace.bars path,
+        .js-plotly-plot .barlayer .trace.bars rect,
+        .js-plotly-plot .scatterlayer .trace.scatter .points path,
+        .js-plotly-plot .hm .hm-layer image,
+        .js-plotly-plot .hm .hm-layer rect {
+            animation: none !important;
+        }
+    }
+
     /* Workspace proportions and visual rhythm */
     .block-container {
         max-width: 1720px !important;
