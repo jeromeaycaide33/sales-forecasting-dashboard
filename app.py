@@ -1742,6 +1742,16 @@ def download_supabase_dataset(object_name: str):
     return client.storage.from_(SUPABASE_BUCKET).download(f"uploads/{object_name}")
 
 
+def delete_supabase_dataset(object_name: str):
+    """Permanently delete one uploaded dataset from the uploads/ folder."""
+    safe_name = Path(str(object_name)).name
+    if not safe_name or safe_name in {".", ".."} or safe_name != str(object_name):
+        raise ValueError("Invalid dataset filename. Only files inside uploads/ can be deleted.")
+
+    client = get_supabase_client()
+    return client.storage.from_(SUPABASE_BUCKET).remove([f"uploads/{safe_name}"])
+
+
 # =========================================================
 # PHASE 2: AUTOMATIC DUAL-TARGET FORECASTING
 # Methodology follows the project's original Colab notebook:
@@ -2588,498 +2598,495 @@ tab_overview, tab_evaluation, tab_analysis, tab_auto_forecast, tab_live_dataset,
 )
 
 
+def render_no_active_dataset_state():
+    """Show a consistent empty state instead of repository baseline metrics."""
+    st.info(
+        "No active dataset. Upload a CSV/XLSX file in **Downloads & Data**, "
+        "then run **Automatic Forecasting**. KPIs, tables, and charts will "
+        "appear here only after a successful forecasting run."
+    )
+
+
 # =========================================================
 # OVERVIEW
 # =========================================================
 
-# Do not display repository baseline charts as if they belonged to an uploaded
-# dataset. Charts become visible only after a dataset has completed forecasting.
-if not st.session_state.get("phase2_results"):
-    st.markdown(
-        """
-        <style>
-        /* Hide every Plotly chart panel while there is no completed uploaded run. */
-        div[data-testid="stElementContainer"]:has(.js-plotly-plot) {
-            display: none !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.info(
-        "No active uploaded dataset yet. Upload a CSV/XLSX file in "
-        "**Downloads & Data**, then run **Automatic Forecasting**. "
-        "Charts and animated graphs will appear only after a successful run, "
-        "using values from that dataset."
-    )
-
 with tab_overview:
-    total_demand = actual_df["daily_demand"].sum()
-    average_demand = actual_df["daily_demand"].mean()
-    highest_demand = actual_df["daily_demand"].max()
-    highest_demand_date = actual_df.loc[
-        actual_df["daily_demand"].idxmax(), "date"
-    ].date()
+    if not phase2_active_results:
+        render_no_active_dataset_state()
+    else:
+        total_demand = actual_df["daily_demand"].sum()
+        average_demand = actual_df["daily_demand"].mean()
+        highest_demand = actual_df["daily_demand"].max()
+        highest_demand_date = actual_df.loc[
+            actual_df["daily_demand"].idxmax(), "date"
+        ].date()
 
-    # Compact KPI strip, matching the reference dashboard proportions.
-    kpi_cols = st.columns(4, gap="small")
-    with kpi_cols[0]:
-        st.metric("Total Historical Demand", f"{total_demand:,.0f}")
-    with kpi_cols[1]:
-        st.metric("Average Daily Demand", f"{average_demand:,.2f}")
-    with kpi_cols[2]:
-        st.metric(
-            "Peak Daily Demand",
-            f"{highest_demand:,.0f}",
-            help=f"Recorded on {highest_demand_date}",
+        # Compact KPI strip, matching the reference dashboard proportions.
+        kpi_cols = st.columns(4, gap="small")
+        with kpi_cols[0]:
+            st.metric("Total Historical Demand", f"{total_demand:,.0f}")
+        with kpi_cols[1]:
+            st.metric("Average Daily Demand", f"{average_demand:,.2f}")
+        with kpi_cols[2]:
+            st.metric(
+                "Peak Daily Demand",
+                f"{highest_demand:,.0f}",
+                help=f"Recorded on {highest_demand_date}",
+            )
+        with kpi_cols[3]:
+            st.metric(
+                "Best Model · Validation WAPE",
+                f"{lowest_wape:.2f}%",
+                help=f"Selected using validation WAPE: {best_model}",
+            )
+
+        # Three compact analytical panels on one row, like the supplied UI reference.
+        chart_left, chart_middle, chart_right = st.columns([1.55, 1.05, 1.0], gap="small")
+
+        with chart_left:
+            with st.container(border=True):
+                panel_heading(
+                    "Actual vs Forecast",
+                    f"{selected_model} · Historical actuals and saved predictions",
+                )
+                fig_overview_actual_forecast = px.line(
+                    comparison,
+                    x="forecast_date",
+                    y=["daily_demand", "predicted_demand"],
+                    color_discrete_map={
+                        "daily_demand": theme["blue"],
+                        "predicted_demand": theme["gold"],
+                    },
+                    labels={
+                        "forecast_date": "",
+                        "value": "Demand",
+                        "variable": "Series",
+                    },
+                )
+                fig_overview_actual_forecast.update_traces(line=dict(width=2))
+                fig_overview_actual_forecast.update_layout(showlegend=True)
+                style_figure(fig_overview_actual_forecast, 245)
+                st.plotly_chart(
+                    add_chart_motion(fig_overview_actual_forecast),
+                    use_container_width=True,
+                    config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
+                )
+
+        with chart_middle:
+            with st.container(border=True):
+                panel_heading("Monthly Demand", "Historical demand by month")
+                fig_monthly_overview = px.bar(
+                    monthly_sales,
+                    x="month",
+                    y="daily_demand",
+                    color_discrete_sequence=[theme["blue"]],
+                    labels={"month": "", "daily_demand": "Demand"},
+                )
+                fig_monthly_overview.update_traces(marker_line_width=0, opacity=0.92)
+                fig_monthly_overview.update_xaxes(dtick="M3", tickformat="%b", title_text="")
+                fig_monthly_overview.update_yaxes(title_text="")
+                style_figure(fig_monthly_overview, 245)
+                st.plotly_chart(
+                    add_chart_motion(fig_monthly_overview),
+                    use_container_width=True,
+                    config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
+                )
+
+        with chart_right:
+            with st.container(border=True):
+                panel_heading(
+                    "Model Performance",
+                    "Validation WAPE · lower is better",
+                )
+                model_chart_data = ranking.sort_values("wape", ascending=True)
+                fig_overview_models = px.bar(
+                    model_chart_data,
+                    x="wape",
+                    y="model_name",
+                    orientation="h",
+                    text="wape",
+                    color="model_name",
+                    color_discrete_map={
+                        "ARIMA": theme["blue"],
+                        "SARIMA": theme["blue_light"],
+                        "Prophet": theme["teal"],
+                        "Random Forest": theme["gold"],
+                    },
+                    labels={"wape": "WAPE (%)", "model_name": ""},
+                )
+                fig_overview_models.update_traces(
+                    texttemplate="%{text:.2f}%",
+                    textposition="outside",
+                    cliponaxis=False,
+                )
+                fig_overview_models.update_layout(
+                    showlegend=False,
+                    xaxis_title="WAPE (%)",
+                    yaxis_title="",
+                )
+                style_figure(fig_overview_models, 245)
+                st.plotly_chart(
+                    add_chart_motion(fig_overview_models),
+                    use_container_width=True,
+                    config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
+                )
+
+        # Secondary row: demand pattern and the selected model's future forecast.
+        secondary_left, secondary_right = st.columns([1, 1.55], gap="small")
+
+        with secondary_left:
+            with st.container(border=True):
+                panel_heading("Demand Pattern", "Average demand by month and weekday")
+                fig_heatmap = px.imshow(
+                    heatmap_values,
+                    x=weekday_labels,
+                    y=month_labels,
+                    aspect="auto",
+                    color_continuous_scale=[
+                        theme["panel_soft"],
+                        theme["blue"],
+                        theme["blue_light"],
+                        theme["gold"],
+                    ],
+                    labels={"x": "", "y": "", "color": "Avg. demand"},
+                )
+                fig_heatmap.update_layout(
+                    coloraxis_colorbar=dict(
+                        thickness=8,
+                        len=0.76,
+                        tickfont=dict(size=8, color=theme["muted"]),
+                        title=dict(text="", font=dict(size=8)),
+                    )
+                )
+                fig_heatmap.update_xaxes(tickfont=dict(size=8), side="bottom")
+                fig_heatmap.update_yaxes(tickfont=dict(size=8))
+                style_figure(fig_heatmap, 255)
+                st.plotly_chart(
+                    add_chart_motion(fig_heatmap),
+                    use_container_width=True,
+                    config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
+                )
+
+        with secondary_right:
+            with st.container(border=True):
+                panel_heading(
+                    f"Forecast Trend · {selected_model}",
+                    "Saved predicted demand values for the selected model",
+                )
+                fig_forecast_overview = px.line(
+                    model_data,
+                    x="forecast_date",
+                    y="predicted_demand",
+                    color_discrete_sequence=[theme["gold"]],
+                    labels={"forecast_date": "", "predicted_demand": "Predicted demand"},
+                )
+                fig_forecast_overview.update_traces(
+                    line=dict(width=2.2, color=theme["gold"]),
+                    mode="lines",
+                )
+                fig_forecast_overview.update_yaxes(title_text="")
+                fig_forecast_overview.update_xaxes(title_text="")
+                style_figure(fig_forecast_overview, 205)
+                st.plotly_chart(
+                    add_chart_motion(fig_forecast_overview),
+                    use_container_width=True,
+                    config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
+                )
+
+                forecast_kpis = st.columns(3, gap="small")
+                with forecast_kpis[0]:
+                    st.metric("Average Forecast", f"{model_data['predicted_demand'].mean():,.1f}")
+                with forecast_kpis[1]:
+                    st.metric("Peak Forecast", f"{model_data['predicted_demand'].max():,.1f}")
+                with forecast_kpis[2]:
+                    st.metric("Forecast Records", f"{len(model_data):,}")
+
+        # Slim dataset-status strip, with the currently active source clearly identified.
+        if phase2_active_results:
+            active_dataset_label = phase2_active_source
+            active_target_label = active_target
+        else:
+            active_dataset_label = "Standardized baseline dataset"
+            active_target_label = "Daily demand"
+
+        st.markdown(
+            f"""
+            <div class="sf-dataset-strip">
+              <div class="sf-dataset-heading">▤ &nbsp; Active Dataset</div>
+              <div><span>DATA SOURCE</span><strong>{html.escape(str(active_dataset_label))}</strong></div>
+              <div><span>DATE RANGE</span><strong>{actual_df['date'].min():%b %d, %Y} – {actual_df['date'].max():%b %d, %Y}</strong></div>
+              <div><span>RECORDS</span><strong>{len(actual_df):,}</strong></div>
+              <div><span>TARGET</span><strong>{html.escape(str(active_target_label))}</strong></div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-    with kpi_cols[3]:
-        st.metric(
-            "Best Model · Validation WAPE",
-            f"{lowest_wape:.2f}%",
-            help=f"Selected using validation WAPE: {best_model}",
-        )
 
-    # Three compact analytical panels on one row, like the supplied UI reference.
-    chart_left, chart_middle, chart_right = st.columns([1.55, 1.05, 1.0], gap="small")
+# =========================================================
+# MODEL EVALUATION
+# =========================================================
+with tab_evaluation:
+    if not phase2_active_results:
+        render_no_active_dataset_state()
+    else:
+        st.subheader("Forecast Model Evaluation")
+        st.caption("Compare all available models using metrics calculated from the active dataset.")
 
-    with chart_left:
-        with st.container(border=True):
-            panel_heading(
-                "Actual vs Forecast",
-                f"{selected_model} · Historical actuals and saved predictions",
-            )
-            fig_overview_actual_forecast = px.line(
-                comparison,
-                x="forecast_date",
-                y=["daily_demand", "predicted_demand"],
-                color_discrete_map={
-                    "daily_demand": theme["blue"],
-                    "predicted_demand": theme["gold"],
-                },
-                labels={
-                    "forecast_date": "",
-                    "value": "Demand",
-                    "variable": "Series",
-                },
-            )
-            fig_overview_actual_forecast.update_traces(line=dict(width=2))
-            fig_overview_actual_forecast.update_layout(showlegend=True)
-            style_figure(fig_overview_actual_forecast, 245)
-            st.plotly_chart(
-                add_chart_motion(fig_overview_actual_forecast),
-                use_container_width=True,
-                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
-            )
+        metric_col1, metric_col2 = st.columns(2, gap="medium")
 
-    with chart_middle:
-        with st.container(border=True):
-            panel_heading("Monthly Demand", "Historical demand by month")
-            fig_monthly_overview = px.bar(
-                monthly_sales,
-                x="month",
-                y="daily_demand",
-                color_discrete_sequence=[theme["blue"]],
-                labels={"month": "", "daily_demand": "Demand"},
-            )
-            fig_monthly_overview.update_traces(marker_line_width=0, opacity=0.92)
-            fig_monthly_overview.update_xaxes(dtick="M3", tickformat="%b", title_text="")
-            fig_monthly_overview.update_yaxes(title_text="")
-            style_figure(fig_monthly_overview, 245)
-            st.plotly_chart(
-                add_chart_motion(fig_monthly_overview),
-                use_container_width=True,
-                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
-            )
-
-    with chart_right:
-        with st.container(border=True):
-            panel_heading(
-                "Model Performance",
-                "Validation WAPE · lower is better",
-            )
-            model_chart_data = ranking.sort_values("wape", ascending=True)
-            fig_overview_models = px.bar(
-                model_chart_data,
-                x="wape",
-                y="model_name",
-                orientation="h",
-                text="wape",
+        with metric_col1:
+            fig_mape = px.bar(
+                ranking.sort_values("mape", ascending=True),
+                x="model_name",
+                y="mape",
                 color="model_name",
+                text="mape",
+                title="Mean Absolute Percentage Error (MAPE)",
+                labels={"model_name": "Forecasting Model", "mape": "MAPE (%)"},
                 color_discrete_map={
                     "ARIMA": theme["blue"],
                     "SARIMA": theme["blue_light"],
                     "Prophet": theme["teal"],
                     "Random Forest": theme["gold"],
                 },
-                labels={"wape": "WAPE (%)", "model_name": ""},
             )
-            fig_overview_models.update_traces(
-                texttemplate="%{text:.2f}%",
-                textposition="outside",
-                cliponaxis=False,
-            )
-            fig_overview_models.update_layout(
-                showlegend=False,
-                xaxis_title="WAPE (%)",
-                yaxis_title="",
-            )
-            style_figure(fig_overview_models, 245)
-            st.plotly_chart(
-                add_chart_motion(fig_overview_models),
-                use_container_width=True,
-                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
-            )
+            fig_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
+            fig_mape.update_layout(showlegend=False)
+            style_figure(fig_mape, 270)
+            st.plotly_chart(add_chart_motion(fig_mape), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
-    # Secondary row: demand pattern and the selected model's future forecast.
-    secondary_left, secondary_right = st.columns([1, 1.55], gap="small")
+        with metric_col2:
+            fig_mae = px.bar(
+                ranking.sort_values("mae", ascending=True),
+                x="model_name",
+                y="mae",
+                color="model_name",
+                text="mae",
+                title="Mean Absolute Error (MAE)",
+                labels={"model_name": "Forecasting Model", "mae": "MAE"},
+                color_discrete_map={
+                    "ARIMA": theme["blue"],
+                    "SARIMA": theme["blue_light"],
+                    "Prophet": theme["teal"],
+                    "Random Forest": theme["gold"],
+                },
+            )
+            fig_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
+            fig_mae.update_layout(showlegend=False)
+            style_figure(fig_mae, 270)
+            st.plotly_chart(add_chart_motion(fig_mae), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
-    with secondary_left:
-        with st.container(border=True):
-            panel_heading("Demand Pattern", "Average demand by month and weekday")
-            fig_heatmap = px.imshow(
-                heatmap_values,
-                x=weekday_labels,
-                y=month_labels,
-                aspect="auto",
-                color_continuous_scale=[
-                    theme["panel_soft"],
-                    theme["blue"],
-                    theme["blue_light"],
-                    theme["gold"],
-                ],
-                labels={"x": "", "y": "", "color": "Avg. demand"},
-            )
-            fig_heatmap.update_layout(
-                coloraxis_colorbar=dict(
-                    thickness=8,
-                    len=0.76,
-                    tickfont=dict(size=8, color=theme["muted"]),
-                    title=dict(text="", font=dict(size=8)),
-                )
-            )
-            fig_heatmap.update_xaxes(tickfont=dict(size=8), side="bottom")
-            fig_heatmap.update_yaxes(tickfont=dict(size=8))
-            style_figure(fig_heatmap, 255)
-            st.plotly_chart(
-                add_chart_motion(fig_heatmap),
-                use_container_width=True,
-                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
-            )
+        st.subheader("Model Performance Summary")
+        performance_display = performance.copy()
+        performance_display["mae"] = performance_display["mae"].round(2)
+        performance_display["mape"] = performance_display["mape"].round(2)
+        st.dataframe(performance_display, use_container_width=True, hide_index=True)
 
-    with secondary_right:
-        with st.container(border=True):
-            panel_heading(
-                f"Forecast Trend · {selected_model}",
-                "Saved predicted demand values for the selected model",
-            )
-            fig_forecast_overview = px.line(
-                model_data,
-                x="forecast_date",
-                y="predicted_demand",
-                color_discrete_sequence=[theme["gold"]],
-                labels={"forecast_date": "", "predicted_demand": "Predicted demand"},
-            )
-            fig_forecast_overview.update_traces(
-                line=dict(width=2.2, color=theme["gold"]),
-                mode="lines",
-            )
-            fig_forecast_overview.update_yaxes(title_text="")
-            fig_forecast_overview.update_xaxes(title_text="")
-            style_figure(fig_forecast_overview, 205)
-            st.plotly_chart(
-                add_chart_motion(fig_forecast_overview),
-                use_container_width=True,
-                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
-            )
-
-            forecast_kpis = st.columns(3, gap="small")
-            with forecast_kpis[0]:
-                st.metric("Average Forecast", f"{model_data['predicted_demand'].mean():,.1f}")
-            with forecast_kpis[1]:
-                st.metric("Peak Forecast", f"{model_data['predicted_demand'].max():,.1f}")
-            with forecast_kpis[2]:
-                st.metric("Forecast Records", f"{len(model_data):,}")
-
-    # Slim dataset-status strip, with the currently active source clearly identified.
-    if phase2_active_results:
-        active_dataset_label = phase2_active_source
-        active_target_label = active_target
-    else:
-        active_dataset_label = "Standardized baseline dataset"
-        active_target_label = "Daily demand"
-
-    st.markdown(
-        f"""
-        <div class="sf-dataset-strip">
-          <div class="sf-dataset-heading">▤ &nbsp; Active Dataset</div>
-          <div><span>DATA SOURCE</span><strong>{html.escape(str(active_dataset_label))}</strong></div>
-          <div><span>DATE RANGE</span><strong>{actual_df['date'].min():%b %d, %Y} – {actual_df['date'].max():%b %d, %Y}</strong></div>
-          <div><span>RECORDS</span><strong>{len(actual_df):,}</strong></div>
-          <div><span>TARGET</span><strong>{html.escape(str(active_target_label))}</strong></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+       # 2023 VALIDATION PERFORMANCE
+    st.subheader(
+        f"Model Performance Ranking ({phase2_active_results['validation_year']} Validation)"
+        if phase2_active_results else "Model Performance Ranking (2023 Validation)"
     )
 
-# =========================================================
-# MODEL EVALUATION
-# =========================================================
-with tab_evaluation:
-    st.subheader("Forecast Model Evaluation")
-    st.caption("Compare all available models using metrics calculated from the active dataset.")
+    ranking_display = ranking.copy()
 
-    metric_col1, metric_col2 = st.columns(2, gap="medium")
+    for col in ["mae", "rmse", "mape", "wape"]:
+        ranking_display[col] = ranking_display[col].round(3)
 
-    with metric_col1:
-        fig_mape = px.bar(
-            ranking.sort_values("mape", ascending=True),
-            x="model_name",
+    st.dataframe(
+        ranking_display,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # 2024 FINAL HOLDOUT PERFORMANCE
+    st.subheader(
+        f"{phase2_active_results['test_year']} Final Holdout Performance"
+        if phase2_active_results else "2024 Final Holdout Performance"
+    )
+
+    st.caption(
+        "Final test results are reported separately. "
+        "These results are not used for model selection."
+    )
+
+    test_display = test_performance.copy()
+
+    for col in ["mae", "rmse", "mape", "wape"]:
+        test_display[col] = test_display[col].round(3)
+
+    st.dataframe(
+        test_display,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # FORECASTING APPROACH COMPARISON
+    st.subheader("Forecasting Approach Comparison")
+
+    st.caption(
+        "Statistical and machine-learning approaches are compared "
+        "using final-test performance metrics from the active dataset."
+    )
+
+       # 2024 FINAL TEST: FORECASTING APPROACH COMPARISON
+
+    machine_learning_models = ["Random Forest"]
+    time_series_models = ["ARIMA", "SARIMA", "Prophet"]
+
+    machine_learning_results = test_performance[
+        test_performance["model_name"].isin(machine_learning_models)
+    ]
+
+    time_series_results = test_performance[
+        test_performance["model_name"].isin(time_series_models)
+    ]
+
+    approach_df = pd.DataFrame(
+        {
+            "Approach": [
+                "Machine Learning Model",
+                "Time Series Models",
+            ],
+            "mae": [
+                machine_learning_results["mae"].mean(),
+                time_series_results["mae"].mean(),
+            ],
+            "rmse": [
+                machine_learning_results["rmse"].mean(),
+                time_series_results["rmse"].mean(),
+            ],
+            "mape": [
+                machine_learning_results["mape"].mean(),
+                time_series_results["mape"].mean(),
+            ],
+            "wape": [
+                machine_learning_results["wape"].mean(),
+                time_series_results["wape"].mean(),
+            ],
+        }
+    )
+
+    approach_col1, approach_col2 = st.columns(2, gap="medium")
+    with approach_col1:
+        fig_approach_mape = px.bar(
+            approach_df,
+            x="Approach",
             y="mape",
-            color="model_name",
+            color="Approach",
             text="mape",
-            title="Mean Absolute Percentage Error (MAPE)",
-            labels={"model_name": "Forecasting Model", "mape": "MAPE (%)"},
-            color_discrete_map={
-                "ARIMA": theme["blue"],
-                "SARIMA": theme["blue_light"],
-                "Prophet": theme["teal"],
-                "Random Forest": theme["gold"],
-            },
-        )
-        fig_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
-        fig_mape.update_layout(showlegend=False)
-        style_figure(fig_mape, 270)
-        st.plotly_chart(add_chart_motion(fig_mape), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
+           title="Final-Test MAPE by Forecasting Approach",
+            color_discrete_sequence=[theme["teal"], theme["blue"]],
+    )
+    fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
+    fig_approach_mape.update_layout(showlegend=False)
+    fig_approach_mape.update_xaxes(title_text="", tickfont=dict(size=10))
+    fig_approach_mape.update_yaxes(title_text="MAPE (%)")
+    style_figure(fig_approach_mape, 270)
+    st.plotly_chart(add_chart_motion(fig_approach_mape), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
-    with metric_col2:
-        fig_mae = px.bar(
-            ranking.sort_values("mae", ascending=True),
-            x="model_name",
+    with approach_col2:
+        fig_approach_mae = px.bar(
+            approach_df,
+            x="Approach",
             y="mae",
-            color="model_name",
+            color="Approach",
             text="mae",
-            title="Mean Absolute Error (MAE)",
-            labels={"model_name": "Forecasting Model", "mae": "MAE"},
-            color_discrete_map={
-                "ARIMA": theme["blue"],
-                "SARIMA": theme["blue_light"],
-                "Prophet": theme["teal"],
-                "Random Forest": theme["gold"],
-            },
+            title="Final-Test MAE by Forecasting Approach",
+            color_discrete_sequence=[theme["teal"], theme["blue"]],
         )
-        fig_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
-        fig_mae.update_layout(showlegend=False)
-        style_figure(fig_mae, 270)
-        st.plotly_chart(add_chart_motion(fig_mae), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
+        fig_approach_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
+        fig_approach_mae.update_layout(showlegend=False)
+        fig_approach_mae.update_xaxes(title_text="", tickfont=dict(size=10))
+        fig_approach_mae.update_yaxes(title_text="MAE")
+        style_figure(fig_approach_mae, 270)
+        st.plotly_chart(add_chart_motion(fig_approach_mae), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
-    st.subheader("Model Performance Summary")
-    performance_display = performance.copy()
-    performance_display["mae"] = performance_display["mae"].round(2)
-    performance_display["mape"] = performance_display["mape"].round(2)
-    st.dataframe(performance_display, use_container_width=True, hide_index=True)
-
-   # 2023 VALIDATION PERFORMANCE
-st.subheader(
-    f"Model Performance Ranking ({phase2_active_results['validation_year']} Validation)"
-    if phase2_active_results else "Model Performance Ranking (2023 Validation)"
-)
-
-ranking_display = ranking.copy()
-
-for col in ["mae", "rmse", "mape", "wape"]:
-    ranking_display[col] = ranking_display[col].round(3)
-
-st.dataframe(
-    ranking_display,
-    use_container_width=True,
-    hide_index=True
-)
-
-# 2024 FINAL HOLDOUT PERFORMANCE
-st.subheader(
-    f"{phase2_active_results['test_year']} Final Holdout Performance"
-    if phase2_active_results else "2024 Final Holdout Performance"
-)
-
-st.caption(
-    "Final test results are reported separately. "
-    "These results are not used for model selection."
-)
-
-test_display = test_performance.copy()
-
-for col in ["mae", "rmse", "mape", "wape"]:
-    test_display[col] = test_display[col].round(3)
-
-st.dataframe(
-    test_display,
-    use_container_width=True,
-    hide_index=True
-)
-
-# FORECASTING APPROACH COMPARISON
-st.subheader("Forecasting Approach Comparison")
-
-st.caption(
-    "Statistical and machine-learning approaches are compared "
-    "using final-test performance metrics from the active dataset."
-)
-
-   # 2024 FINAL TEST: FORECASTING APPROACH COMPARISON
-
-machine_learning_models = ["Random Forest"]
-time_series_models = ["ARIMA", "SARIMA", "Prophet"]
-
-machine_learning_results = test_performance[
-    test_performance["model_name"].isin(machine_learning_models)
-]
-
-time_series_results = test_performance[
-    test_performance["model_name"].isin(time_series_models)
-]
-
-approach_df = pd.DataFrame(
-    {
-        "Approach": [
-            "Machine Learning Model",
-            "Time Series Models",
-        ],
-        "mae": [
-            machine_learning_results["mae"].mean(),
-            time_series_results["mae"].mean(),
-        ],
-        "rmse": [
-            machine_learning_results["rmse"].mean(),
-            time_series_results["rmse"].mean(),
-        ],
-        "mape": [
-            machine_learning_results["mape"].mean(),
-            time_series_results["mape"].mean(),
-        ],
-        "wape": [
-            machine_learning_results["wape"].mean(),
-            time_series_results["wape"].mean(),
-        ],
-    }
-)
-
-approach_col1, approach_col2 = st.columns(2, gap="medium")
-with approach_col1:
-    fig_approach_mape = px.bar(
-        approach_df,
-        x="Approach",
-        y="mape",
-        color="Approach",
-        text="mape",
-       title="Final-Test MAPE by Forecasting Approach",
-        color_discrete_sequence=[theme["teal"], theme["blue"]],
-)
-fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
-fig_approach_mape.update_layout(showlegend=False)
-fig_approach_mape.update_xaxes(title_text="", tickfont=dict(size=10))
-fig_approach_mape.update_yaxes(title_text="MAPE (%)")
-style_figure(fig_approach_mape, 270)
-st.plotly_chart(add_chart_motion(fig_approach_mape), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
-
-with approach_col2:
-    fig_approach_mae = px.bar(
-        approach_df,
-        x="Approach",
-        y="mae",
-        color="Approach",
-        text="mae",
-        title="Final-Test MAE by Forecasting Approach",
-        color_discrete_sequence=[theme["teal"], theme["blue"]],
-    )
-    fig_approach_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
-    fig_approach_mae.update_layout(showlegend=False)
-    fig_approach_mae.update_xaxes(title_text="", tickfont=dict(size=10))
-    fig_approach_mae.update_yaxes(title_text="MAE")
-    style_figure(fig_approach_mae, 270)
-    st.plotly_chart(add_chart_motion(fig_approach_mae), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
-
-st.info(
-        "Interpretation: Models are ranked using validation WAPE. "
-        "The final-test metrics are reported separately and are not used "
-        "for model selection. All four models are compared using the same "
-        "evaluation period and demand target."
-    )
+    st.info(
+            "Interpretation: Models are ranked using validation WAPE. "
+            "The final-test metrics are reported separately and are not used "
+            "for model selection. All four models are compared using the same "
+            "evaluation period and demand target."
+        )
 
 # =========================================================
 # FORECAST ANALYSIS
 # =========================================================
 with tab_analysis:
-    st.subheader(f"{selected_model} Forecast Analysis")
-    st.caption("The selected model controls the forecast charts and forecast summary below." + (f" Active dataset: {phase2_active_source} · {active_target}." if phase2_active_results else " Showing standardized baseline results."))
+    if not phase2_active_results:
+        render_no_active_dataset_state()
+    else:
+        st.subheader(f"{selected_model} Forecast Analysis")
+        st.caption("The selected model controls the forecast charts and forecast summary below." + (f" Active dataset: {phase2_active_source} · {active_target}." if phase2_active_results else " Showing standardized baseline results."))
 
-    forecast_summary_cols = st.columns(3, gap="medium")
-    with forecast_summary_cols[0]:
-        st.metric("Average Forecast", f"{model_data['predicted_demand'].mean():,.2f}")
-    with forecast_summary_cols[1]:
-        st.metric("Highest Forecast", f"{model_data['predicted_demand'].max():,.2f}")
-    with forecast_summary_cols[2]:
-        st.metric("Lowest Forecast", f"{model_data['predicted_demand'].min():,.2f}")
+        forecast_summary_cols = st.columns(3, gap="medium")
+        with forecast_summary_cols[0]:
+            st.metric("Average Forecast", f"{model_data['predicted_demand'].mean():,.2f}")
+        with forecast_summary_cols[1]:
+            st.metric("Highest Forecast", f"{model_data['predicted_demand'].max():,.2f}")
+        with forecast_summary_cols[2]:
+            st.metric("Lowest Forecast", f"{model_data['predicted_demand'].min():,.2f}")
 
-    st.subheader("Actual Demand vs. Forecasted Demand")
-    fig_compare = px.line(
-        comparison,
-        x="forecast_date",
-        y=["daily_demand", "predicted_demand"],
-        labels={"forecast_date": "Date", "value": "Demand", "variable": "Series"},
-        title=f"{selected_model}: Actual vs. Forecast",
-        color_discrete_map={
-            "daily_demand": theme["blue"],
-            "predicted_demand": theme["gold"],
-        },
-    )
-    fig_compare.update_traces(line=dict(width=2))
-    style_figure(fig_compare, 285)
-    fig_compare.update_layout(showlegend=True)
-    st.plotly_chart(add_chart_motion(fig_compare), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
+        st.subheader("Actual Demand vs. Forecasted Demand")
+        fig_compare = px.line(
+            comparison,
+            x="forecast_date",
+            y=["daily_demand", "predicted_demand"],
+            labels={"forecast_date": "Date", "value": "Demand", "variable": "Series"},
+            title=f"{selected_model}: Actual vs. Forecast",
+            color_discrete_map={
+                "daily_demand": theme["blue"],
+                "predicted_demand": theme["gold"],
+            },
+        )
+        fig_compare.update_traces(line=dict(width=2))
+        style_figure(fig_compare, 285)
+        fig_compare.update_layout(showlegend=True)
+        st.plotly_chart(add_chart_motion(fig_compare), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
-    st.subheader("Monthly Historical Sales Trend")
-    fig_month_analysis = px.line(
-        monthly_sales,
-        x="month",
-        y="daily_demand",
-        markers=True,
-        title="Monthly Sales Demand",
-        color_discrete_sequence=[theme["blue"]],
-        labels={"month": "Month", "daily_demand": "Total Demand"},
-    )
-    style_figure(fig_month_analysis, 265)
-    st.plotly_chart(add_chart_motion(fig_month_analysis), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
+        st.subheader("Monthly Historical Sales Trend")
+        fig_month_analysis = px.line(
+            monthly_sales,
+            x="month",
+            y="daily_demand",
+            markers=True,
+            title="Monthly Sales Demand",
+            color_discrete_sequence=[theme["blue"]],
+            labels={"month": "Month", "daily_demand": "Total Demand"},
+        )
+        style_figure(fig_month_analysis, 265)
+        st.plotly_chart(add_chart_motion(fig_month_analysis), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
-    st.subheader("Forecast Error Analysis")
-    error_data = comparison.dropna(subset=["error"]).copy()
-    fig_error = px.line(
-        error_data,
-        x="forecast_date",
-        y="error",
-        title=f"{selected_model}: Forecast Error (Actual − Predicted)",
-        color_discrete_sequence=[theme["teal"]],
-        labels={"forecast_date": "Date", "error": "Forecast Error"},
-    )
-    fig_error.add_hline(y=0, line_dash="dash", line_color=theme["muted"])
-    style_figure(fig_error, 265)
-    st.plotly_chart(add_chart_motion(fig_error), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
+        st.subheader("Forecast Error Analysis")
+        error_data = comparison.dropna(subset=["error"]).copy()
+        fig_error = px.line(
+            error_data,
+            x="forecast_date",
+            y="error",
+            title=f"{selected_model}: Forecast Error (Actual − Predicted)",
+            color_discrete_sequence=[theme["teal"]],
+            labels={"forecast_date": "Date", "error": "Forecast Error"},
+        )
+        fig_error.add_hline(y=0, line_dash="dash", line_color=theme["muted"])
+        style_figure(fig_error, 265)
+        st.plotly_chart(add_chart_motion(fig_error), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
-    st.subheader(f"{selected_model} Forecast Trend")
-    fig_forecast = px.line(
-        model_data,
-        x="forecast_date",
-        y="predicted_demand",
-        title=f"{selected_model} Predicted Demand",
-        color_discrete_sequence=[theme["gold"]],
-        labels={"forecast_date": "Forecast Date", "predicted_demand": "Predicted Demand"},
-    )
-    fig_forecast.update_traces(line=dict(width=2.5))
-    style_figure(fig_forecast, 265)
-    st.plotly_chart(add_chart_motion(fig_forecast), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
+        st.subheader(f"{selected_model} Forecast Trend")
+        fig_forecast = px.line(
+            model_data,
+            x="forecast_date",
+            y="predicted_demand",
+            title=f"{selected_model} Predicted Demand",
+            color_discrete_sequence=[theme["gold"]],
+            labels={"forecast_date": "Forecast Date", "predicted_demand": "Predicted Demand"},
+        )
+        fig_forecast.update_traces(line=dict(width=2.5))
+        style_figure(fig_forecast, 265)
+        st.plotly_chart(add_chart_motion(fig_forecast), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
 
-# =========================================================
+    # =========================================================
 # PHASE 2: AUTOMATIC FORECASTING WORKSPACE
 # =========================================================
 with tab_auto_forecast:
@@ -3530,6 +3537,60 @@ with tab_downloads:
                         )
                     except Exception as download_error:
                         st.warning(f"Download unavailable: {download_error}")
+
+                    if st.button(
+                        "Delete",
+                        key=f"request_delete_supabase_{object_name}",
+                        use_container_width=True,
+                        type="secondary",
+                    ):
+                        st.session_state["pending_dataset_delete"] = object_name
+                        st.rerun()
+
+                if st.session_state.get("pending_dataset_delete") == object_name:
+                    st.warning(
+                        f"Are you sure you want to permanently delete **{object_name}** "
+                        "from Supabase Storage? This cannot be undone."
+                    )
+                    confirm_col, cancel_col = st.columns(2, gap="small")
+                    with confirm_col:
+                        if st.button(
+                            "Yes, delete permanently",
+                            key=f"confirm_delete_supabase_{object_name}",
+                            type="primary",
+                            use_container_width=True,
+                        ):
+                            try:
+                                delete_supabase_dataset(object_name)
+
+                                # If this file powers the active dashboard, clear its
+                                # in-memory results so charts disappear immediately.
+                                if st.session_state.get("phase2_source_name") == object_name:
+                                    for state_key in (
+                                        "phase2_results",
+                                        "phase2_archive",
+                                        "phase2_archive_name",
+                                        "phase2_storage_path",
+                                        "phase2_source_name",
+                                        "phase2_run_id",
+                                    ):
+                                        st.session_state.pop(state_key, None)
+                                    st.session_state.pop("unified_dashboard_target", None)
+                                    st.session_state.pop("phase2_result_target", None)
+
+                                st.session_state.pop("pending_dataset_delete", None)
+                                st.success(f"Deleted {object_name} from Supabase Storage.")
+                                st.rerun()
+                            except Exception as delete_error:
+                                st.error(f"Could not delete dataset: {delete_error}")
+                    with cancel_col:
+                        if st.button(
+                            "Cancel",
+                            key=f"cancel_delete_supabase_{object_name}",
+                            use_container_width=True,
+                        ):
+                            st.session_state.pop("pending_dataset_delete", None)
+                            st.rerun()
     except Exception as storage_error:
         st.warning(f"Could not retrieve saved datasets: {storage_error}")
         st.caption(
