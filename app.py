@@ -26,6 +26,9 @@ st.set_page_config(
 # =========================================================
 # THEME STATE
 # =========================================================
+if "theme_mode" not in st.session_state:
+    st.session_state.theme_mode = "dark"
+
 # Landing page is shown first. The existing dashboard remains intact.
 if "show_dashboard" not in st.session_state:
     st.session_state.show_dashboard = False
@@ -39,187 +42,69 @@ def go_home():
     st.session_state.show_dashboard = False
 
 
+def toggle_theme():
+    st.session_state.theme_mode = (
+        "light" if st.session_state.theme_mode == "dark" else "dark"
+    )
+
+
 DARK_THEME = {
     "name": "dark",
-    "page": "#071326",
-    "page_grad_1": "#08172D",
-    "page_grad_2": "#050E1D",
-    "sidebar": "#09182C",
-    "hero": "#102442",
-    "hero2": "#142E52",
-    "panel": "#0B1B31",
-    "panel_alt": "#102541",
-    "panel_soft": "#0D2039",
-    "border": "#29466B",
-    "tab_bg": "#0D2038",
-    "tab_active": "#12396A",
-    "tab_text": "#c8d4e3",
-    "tab_active_border": "#398BFF",
-    "text": "#edf3fb",
-    "muted": "#9db0c5",
-    "blue": "#398BFF",
-    "blue_light": "#75B5FF",
-    "teal": "#55b8a5",
-    "gold": "#e0b85c",
-    "success_bg": "#0B2938",
-    "success_border": "#1C7895",
-    "success_text": "#d4eff0",
-    "table_header": "#132B49",
+    "page": "#101820",
+    "page_grad_1": "#121F29",
+    "page_grad_2": "#0B1219",
+    "sidebar": "#111D26",
+    "hero": "#172B35",
+    "hero2": "#1C3940",
+    "panel": "#17242D",
+    "panel_alt": "#1D3038",
+    "panel_soft": "#192A32",
+    "border": "#304A50",
+    "tab_bg": "#17262E",
+    "tab_active": "#24464A",
+    "tab_text": "#C4D4D3",
+    "tab_active_border": "#43C6A5",
+    "text": "#F1F6F4",
+    "muted": "#9EB4B1",
+    "blue": "#31B89A",
+    "blue_light": "#70DFC0",
+    "teal": "#48C9B0",
+    "gold": "#E7B967",
+    "success_bg": "#173A34",
+    "success_border": "#347A68",
+    "success_text": "#D5F5E9",
+    "table_header": "#20363C",
 }
 
 LIGHT_THEME = {
     "name": "light",
-    "page": "#eef3f8",
-    "page_grad_1": "#eef3f8",
-    "page_grad_2": "#e6edf5",
-    "sidebar": "#e7eef6",
-    "hero": "#ffffff",
-    "hero2": "#f6f9fc",
-    "panel": "#ffffff",
-    "panel_alt": "#f7fafd",
-    "panel_soft": "#f3f7fb",
-    "border": "#d7e1ec",
-    "tab_bg": "#ffffff",
-    "tab_active": "#dfeaf7",
-    "tab_text": "#42566f",
-    "tab_active_border": "#6f93bb",
-    "text": "#32465d",
-    "muted": "#6b7e93",
-    "blue": "#6f93bb",
-    "blue_light": "#87a9cf",
-    "teal": "#5db39f",
-    "gold": "#d8aa4f",
-    "success_bg": "#ecf7f4",
-    "success_border": "#b7ded4",
-    "success_text": "#355f59",
-    "table_header": "#edf3f8",
+    "page": "#F2F5F2",
+    "page_grad_1": "#F7F9F6",
+    "page_grad_2": "#E9EFEB",
+    "sidebar": "#E8EFEB",
+    "hero": "#FFFFFF",
+    "hero2": "#F0F7F3",
+    "panel": "#FFFFFF",
+    "panel_alt": "#F8FBF8",
+    "panel_soft": "#EEF4F0",
+    "border": "#D3E0D9",
+    "tab_bg": "#FFFFFF",
+    "tab_active": "#E2F2EB",
+    "tab_text": "#405A50",
+    "tab_active_border": "#42A98C",
+    "text": "#233A32",
+    "muted": "#71857C",
+    "blue": "#218F75",
+    "blue_light": "#43B99A",
+    "teal": "#369E8A",
+    "gold": "#C89A3D",
+    "success_bg": "#E8F6EF",
+    "success_border": "#B8DFCC",
+    "success_text": "#315E4B",
+    "table_header": "#EAF1EC",
 }
 
-# Every visual color is user-editable. Presets are starting points only;
-# changing any color picker immediately applies that color on the next rerun.
-THEME_COLOR_FIELDS = {
-    "page": "Page background",
-    "sidebar": "Sidebar background",
-    "hero": "Header / hero base",
-    "hero2": "Header / hero highlight",
-    "panel": "Glass card base",
-    "panel_alt": "Metric card background",
-    "panel_soft": "Input / soft surface",
-    "border": "Borders",
-    "text": "Main text",
-    "muted": "Secondary text",
-    "blue": "Primary accent",
-    "blue_light": "Secondary accent",
-    "teal": "Chart color 3 / teal",
-    "gold": "Chart color 4 / gold",
-    "table_header": "Table header",
-    "success_bg": "Success message background",
-    "success_border": "Success message border",
-    "success_text": "Success message text",
-    "tab_bg": "Navigation background",
-    "tab_active": "Active navigation background",
-    "tab_text": "Navigation text",
-    "tab_active_border": "Active navigation border",
-}
-
-PALETTE_PRESETS = {
-    "Midnight Glass": DARK_THEME,
-    "Arctic Pearl": LIGHT_THEME,
-    "Ocean Teal": {
-        **DARK_THEME, "page": "#071B24", "page_grad_1": "#09232D",
-        "page_grad_2": "#06151D", "sidebar": "#08232B",
-        "hero": "#103743", "hero2": "#14505A", "panel": "#0B2932",
-        "panel_alt": "#103640", "panel_soft": "#0D303A",
-        "border": "#28606A", "text": "#E9FAF8", "muted": "#9BC5C4",
-        "blue": "#20B8C5", "blue_light": "#75E0D5",
-        "teal": "#5CC9A7", "gold": "#E8B968",
-        "table_header": "#123D46",
-    },
-    "Amethyst Night": {
-        **DARK_THEME, "page": "#100D22", "page_grad_1": "#17112E",
-        "page_grad_2": "#0B0A18", "sidebar": "#17132B",
-        "hero": "#282047", "hero2": "#35285B", "panel": "#1A1732",
-        "panel_alt": "#242044", "panel_soft": "#201B3C",
-        "border": "#514477", "text": "#F5F0FF", "muted": "#B8ACD3",
-        "blue": "#A78BFA", "blue_light": "#D0BFFF",
-        "teal": "#5ED6C1", "gold": "#F2C879",
-        "table_header": "#2C254B",
-    },
-    "Graphite Lime": {
-        **DARK_THEME, "page": "#14191C", "page_grad_1": "#1A2225",
-        "page_grad_2": "#101517", "sidebar": "#171F22",
-        "hero": "#263237", "hero2": "#304248", "panel": "#1B272B",
-        "panel_alt": "#243237", "panel_soft": "#202D31",
-        "border": "#40575B", "text": "#F1F7F4", "muted": "#A9BBB5",
-        "blue": "#A3D65C", "blue_light": "#D0F08A",
-        "teal": "#54C6A5", "gold": "#E7B85E",
-        "table_header": "#293A3D",
-    },
-}
-
-if "theme_preset" not in st.session_state:
-    st.session_state.theme_preset = "Midnight Glass"
-
-for color_key in THEME_COLOR_FIELDS:
-    state_key = f"theme_color_{color_key}"
-    if state_key not in st.session_state:
-        st.session_state[state_key] = DARK_THEME.get(color_key, "#398BFF")
-
-
-def apply_theme_preset():
-    chosen = PALETTE_PRESETS.get(st.session_state.theme_preset, DARK_THEME)
-    for color_key in THEME_COLOR_FIELDS:
-        st.session_state[f"theme_color_{color_key}"] = chosen.get(
-            color_key, DARK_THEME.get(color_key, "#398BFF")
-        )
-
-
-def reset_theme_colors():
-    st.session_state.theme_preset = "Midnight Glass"
-    apply_theme_preset()
-
-
-def render_theme_controls(container):
-    with container.expander("🎨 Customize colors", expanded=False):
-        st.selectbox(
-            "Starting palette",
-            options=list(PALETTE_PRESETS.keys()),
-            key="theme_preset",
-            on_change=apply_theme_preset,
-        )
-        st.caption("Choose a preset, then adjust any color below. Changes apply across the dashboard and charts.")
-        color_columns = st.columns(2)
-        for index, (color_key, label) in enumerate(THEME_COLOR_FIELDS.items()):
-            with color_columns[index % 2]:
-                st.color_picker(
-                    label,
-                    key=f"theme_color_{color_key}",
-                )
-        st.button(
-            "Reset to Midnight Glass",
-            use_container_width=True,
-            key="reset_theme_colors",
-            on_click=reset_theme_colors,
-        )
-
-
-theme = DARK_THEME.copy()
-for color_key in THEME_COLOR_FIELDS:
-    theme[color_key] = st.session_state[f"theme_color_{color_key}"]
-
-# Pick the Plotly light/dark template from the selected page background luminance.
-def _hex_is_light(value):
-    value = str(value).lstrip("#")
-    try:
-        r, g, b = (int(value[i:i + 2], 16) for i in (0, 2, 4))
-        luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
-        return luminance > 0.58
-    except (TypeError, ValueError):
-        return False
-
-theme["name"] = "light" if _hex_is_light(theme["page"]) else "dark"
-theme["page_grad_1"] = theme["page"]
-theme["page_grad_2"] = theme["panel_soft"]
+theme = DARK_THEME if st.session_state.theme_mode == "dark" else LIGHT_THEME
 
 
 # =========================================================
@@ -735,7 +620,7 @@ if not st.session_state.show_dashboard:
             box-shadow:0 22px 60px rgba(0,0,0,.28);
         }
         .sf-landing-hero:before {content:"";position:absolute;width:390px;height:390px;
-            right:-185px;top:-235px;border:1px solid rgba(105,173,255,.34);
+            right:-185px;top:-235px;border:1px solid color-mix(in srgb,var(--blue-light) 38%,transparent);
             border-radius:50%;box-shadow:0 0 0 28px rgba(57,139,255,.055),
             0 0 0 62px rgba(57,139,255,.035);pointer-events:none;}
         .sf-landing-copy-wrap {position:relative;z-index:1;}
@@ -816,103 +701,166 @@ if not st.session_state.show_dashboard:
 
 
     /* =====================================================
-       GLASSMORPHISM REDESIGN — CSS ONLY
-       No Python functions, calculations, model logic, storage,
-       widget keys, navigation, or callbacks are changed.
+       MODERN ANALYTICS REDESIGN — MATTE SURFACES
+       Presentation-only CSS. Forecasting logic and widgets
+       remain unchanged.
        ===================================================== */
-    :root {{
-        --glass-border: color-mix(in srgb, var(--border) 78%, transparent);
-        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .20);
-        --glass-bg: color-mix(in srgb, var(--panel) 78%, transparent);
-    }}
     .stApp {{
         background:
-          radial-gradient(ellipse at 12% 7%, color-mix(in srgb, var(--blue) 24%, transparent), transparent 36%),
-          radial-gradient(ellipse at 88% 18%, color-mix(in srgb, var(--teal) 15%, transparent), transparent 32%),
-          linear-gradient(135deg, var(--page) 0%, var(--page-grad-1) 52%, var(--page-grad-2) 100%) !important;
+          linear-gradient(135deg, var(--page) 0%, var(--page-grad-1) 58%, var(--page-grad-2) 100%) !important;
         background-attachment: fixed !important;
     }}
     [data-testid="stAppViewContainer"] {{
         background: transparent !important;
     }}
     [data-testid="stHeader"] {{
-        background: rgba(5, 15, 30, .48) !important;
-        backdrop-filter: blur(18px);
+        background: var(--page) !important;
+        border-bottom: 1px solid var(--border);
     }}
     [data-testid="stSidebar"] > div:first-child {{
-        background: linear-gradient(180deg, color-mix(in srgb, var(--sidebar) 96%, transparent), color-mix(in srgb, var(--sidebar) 88%, transparent)) !important;
-        border-right: 1px solid var(--glass-border) !important;
-        backdrop-filter: blur(24px) saturate(150%) !important;
+        background: var(--sidebar) !important;
+        border-right: 1px solid var(--border) !important;
     }}
     [data-testid="stVerticalBlockBorderWrapper"],
     [data-testid="stMetric"],
     [data-testid="stExpander"],
     [data-testid="stAlert"],
-    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
-    .sf-metric-row {{
-        background: linear-gradient(145deg, color-mix(in srgb, var(--panel-alt) 82%, transparent), color-mix(in srgb, var(--panel) 76%, transparent)) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 20px !important;
-        box-shadow: var(--glass-shadow) !important;
-        backdrop-filter: blur(20px) saturate(145%) !important;
-        -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
+    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature {{
+        background: var(--panel) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 7px 20px rgba(0, 0, 0, .08) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
     }}
     [data-testid="stVerticalBlockBorderWrapper"] {{
+        border-top: 3px solid var(--blue) !important;
         transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
     }}
     [data-testid="stVerticalBlockBorderWrapper"]:hover {{
-        border-color: rgba(99, 174, 255, .52) !important;
-        box-shadow: 0 22px 54px rgba(0, 0, 0, .34) !important;
+        border-color: var(--blue) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .12) !important;
+        transform: translateY(-1px);
     }}
-    [data-testid="stMetric"] {{ padding: 17px !important; }}
+    [data-testid="stMetric"] {{
+        padding: 16px !important;
+        border-left: 4px solid var(--blue) !important;
+        border-radius: 10px !important;
+        background: var(--panel-alt) !important;
+    }}
     [data-testid="stTabs"] [role="tablist"] {{
-        gap: 8px !important; padding: 7px !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 17px !important;
-        background: color-mix(in srgb, var(--panel) 78%, transparent) !important;
-        backdrop-filter: blur(16px) !important;
+        gap: 5px !important;
+        padding: 0 0 8px 0 !important;
+        border-bottom: 2px solid var(--border) !important;
+        background: transparent !important;
     }}
     [data-testid="stTabs"] button[role="tab"] {{
-        border: 1px solid transparent !important; border-radius: 12px !important;
-        background: transparent !important; transition: all .18s ease;
+        border: 0 !important;
+        border-radius: 7px 7px 0 0 !important;
+        background: transparent !important;
+        color: var(--tab-text) !important;
+        padding: 11px 15px !important;
+        transition: all .18s ease;
     }}
     [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
-        background: linear-gradient(135deg, color-mix(in srgb, var(--blue) 42%, transparent), color-mix(in srgb, var(--blue-light) 24%, transparent)) !important;
-        border: 1px solid color-mix(in srgb, var(--blue-light) 62%, var(--border)) !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 7px 22px rgba(0,0,0,.18) !important;
+        color: var(--text) !important;
+        background: var(--tab-active) !important;
+        border-bottom: 3px solid var(--blue) !important;
+        font-weight: 800 !important;
+        box-shadow: none !important;
     }}
-    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
-    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {{
-        background: color-mix(in srgb, var(--panel-soft) 84%, transparent) !important;
-        border: 1px solid color-mix(in srgb, var(--border) 85%, transparent) !important;
-        border-radius: 13px !important;
-        backdrop-filter: blur(12px) !important;
+    [data-baseweb="select"] > div,
+    [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div,
+    [data-testid="stFileUploader"] section {{
+        background: var(--panel-soft) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        backdrop-filter: none !important;
     }}
-    .stButton button, [data-testid="stDownloadButton"] button,
+    .stButton button,
+    [data-testid="stDownloadButton"] button,
     [data-testid="stFormSubmitButton"] button {{
-        border: 1px solid color-mix(in srgb, var(--blue-light) 60%, var(--border)) !important;
-        border-radius: 13px !important;
-        background: linear-gradient(135deg, var(--blue), color-mix(in srgb, var(--blue) 65%, var(--panel))) !important;
-        color: #F4F8FF !important;
-        box-shadow: 0 9px 24px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.13) !important;
-        transition: transform .18s ease, filter .18s ease !important;
+        border: 1px solid var(--blue) !important;
+        border-radius: 8px !important;
+        background: var(--blue) !important;
+        color: #FFFFFF !important;
+        font-weight: 750 !important;
+        box-shadow: none !important;
+        transition: transform .16s ease, filter .16s ease !important;
     }}
-    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {{
-        filter: brightness(1.16) !important; transform: translateY(-2px) !important;
+    .stButton button:hover,
+    [data-testid="stDownloadButton"] button:hover {{
+        filter: brightness(1.08) !important;
+        transform: translateY(-1px) !important;
     }}
-    [data-testid="stDataFrame"], [data-testid="stTable"],
+    [data-testid="stDataFrame"],
+    [data-testid="stTable"],
     [data-testid="stPlotlyChart"] {{
-        border: 1px solid color-mix(in srgb, var(--border) 72%, transparent) !important;
-        border-radius: 16px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
         overflow: hidden !important;
-        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
+        box-shadow: none !important;
     }}
-    hr {{ border-color: color-mix(in srgb, var(--border) 78%, transparent) !important; }}
+    .sf-hero {{
+        border-left: 5px solid var(--blue) !important;
+        border-radius: 12px !important;
+    }}
+    .sf-landing-hero {{
+        background: linear-gradient(115deg, var(--hero), var(--hero2)) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 15px 36px rgba(0,0,0,.12) !important;
+    }}
+    .sf-preview-card {{
+        border-top: 4px solid var(--blue) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 12px 28px rgba(0,0,0,.12) !important;
+    }}
+    .sf-feature {{
+        border-radius: 10px !important;
+        box-shadow: 0 5px 16px rgba(0,0,0,.06) !important;
+    }}
+    .sf-chart-shell {{
+        background: var(--panel-soft) !important;
+        border-color: var(--border) !important;
+    }}
+    .sf-chart span {{
+        background: linear-gradient(180deg, var(--blue-light), var(--blue)) !important;
+        box-shadow: none !important;
+    }}
+    .sf-kicker-dot {{
+        background: var(--blue) !important;
+        box-shadow: none !important;
+    }}
+    .sf-landing-title span,
+    .sf-landing-kicker,
+    .sf-brand {{
+        color: var(--blue-light) !important;
+    }}
+    .sf-landing-points span:before {{
+        color: var(--teal) !important;
+    }}
+    .sf-live-pill {{
+        color: var(--teal) !important;
+        background: var(--success-bg) !important;
+        border-color: var(--success-border) !important;
+    }}
+    .theme-label {{
+        color: var(--muted) !important;
+        font-size: .72rem !important;
+        font-weight: 800 !important;
+        letter-spacing: .12em !important;
+        text-transform: uppercase;
+        margin: .85rem 0 .35rem 0;
+    }}
+    hr {{ border-color: var(--border) !important; }}
     h1, h2, h3 {{ letter-spacing: -.025em; }}
     @media (prefers-reduced-motion: reduce) {{
-        *, *::before, *::after {{ transition-duration: .01ms !important; animation-duration: .01ms !important; }}
+        *, *::before, *::after {{
+            transition-duration: .01ms !important;
+            animation-duration: .01ms !important;
+        }}
     }}
-
         </style>
         """,
         unsafe_allow_html=True,
@@ -1000,7 +948,13 @@ if not st.session_state.show_dashboard:
             unsafe_allow_html=True,
         )
     with top_right:
-        render_theme_controls(st)
+        landing_theme_label = "☀️ Light Mode" if st.session_state.theme_mode == "dark" else "🌙 Dark Mode"
+        st.button(
+            landing_theme_label,
+            key="landing_theme_toggle",
+            on_click=toggle_theme,
+            use_container_width=True,
+        )
 
     st.markdown(
         """
@@ -1916,9 +1870,14 @@ MAE · RMSE · MAPE · WAPE
         """
     )
 
-# User-controlled color palette replaces the old Light/Dark toggle.
-st.sidebar.markdown('<div class="theme-label">PERSONALIZE WORKSPACE</div>', unsafe_allow_html=True)
-render_theme_controls(st.sidebar)
+# Simple, functional Light/Dark mode switch.
+st.sidebar.markdown('<div class="theme-label">APPEARANCE</div>', unsafe_allow_html=True)
+theme_button_label = "Switch to Light Mode" if st.session_state.theme_mode == "dark" else "Switch to Dark Mode"
+st.sidebar.button(
+    theme_button_label,
+    on_click=toggle_theme,
+    use_container_width=True,
+)
 
 model_data = df[df["model_name"] == selected_model].copy()
 comparison = model_data.merge(
