@@ -579,6 +579,185 @@ def build_css(t):
 
 st.markdown(build_css(theme), unsafe_allow_html=True)
 
+# =========================================================
+# GLOBAL GLASSMORPHISM UI — PRESENTATION ONLY
+# Applied on both landing page and dashboard.
+# =========================================================
+st.markdown(
+    """
+    <style>
+    /* =====================================================
+       GLASSMORPHISM REDESIGN — CSS ONLY
+       No Python functions, calculations, model logic, storage,
+       widget keys, navigation, or callbacks are changed.
+       ===================================================== */
+    :root {
+        --glass-border: rgba(151, 194, 245, .24);
+        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .28);
+        --glass-bg: rgba(13, 31, 55, .68);
+    }
+    .stApp {
+        background:
+          radial-gradient(ellipse at 12% 7%, rgba(37, 112, 220, .28), transparent 34%),
+          radial-gradient(ellipse at 88% 18%, rgba(24, 170, 190, .15), transparent 30%),
+          linear-gradient(135deg, #050D1B 0%, #0A1C34 52%, #071326 100%) !important;
+        background-attachment: fixed !important;
+    }
+    [data-testid="stAppViewContainer"] {
+        background: transparent !important;
+    }
+    [data-testid="stHeader"] {
+        background: rgba(5, 15, 30, .48) !important;
+        backdrop-filter: blur(18px);
+    }
+    [data-testid="stSidebar"] > div:first-child {
+        background: linear-gradient(180deg, rgba(10, 28, 51, .94), rgba(5, 16, 31, .88)) !important;
+        border-right: 1px solid var(--glass-border) !important;
+        backdrop-filter: blur(24px) saturate(150%) !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stMetric"],
+    [data-testid="stExpander"],
+    [data-testid="stAlert"],
+    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
+    .sf-metric-row {
+        background: linear-gradient(145deg, rgba(27, 54, 85, .76), rgba(9, 25, 46, .70)) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 20px !important;
+        box-shadow: var(--glass-shadow) !important;
+        backdrop-filter: blur(20px) saturate(145%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        border-color: rgba(99, 174, 255, .52) !important;
+        box-shadow: 0 22px 54px rgba(0, 0, 0, .34) !important;
+    }
+    [data-testid="stMetric"] { padding: 17px !important; }
+    [data-testid="stTabs"] [role="tablist"] {
+        gap: 8px !important; padding: 7px !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 17px !important;
+        background: rgba(7, 22, 41, .68) !important;
+        backdrop-filter: blur(16px) !important;
+    }
+    [data-testid="stTabs"] button[role="tab"] {
+        border: 1px solid transparent !important; border-radius: 12px !important;
+        background: transparent !important; transition: all .18s ease;
+    }
+    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(44, 126, 230, .42), rgba(25, 76, 139, .34)) !important;
+        border: 1px solid rgba(112, 183, 255, .48) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 7px 22px rgba(0,0,0,.18) !important;
+    }
+    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {
+        background: rgba(9, 27, 49, .78) !important;
+        border: 1px solid rgba(143, 187, 239, .30) !important;
+        border-radius: 13px !important;
+        backdrop-filter: blur(12px) !important;
+    }
+    .stButton button, [data-testid="stDownloadButton"] button,
+    [data-testid="stFormSubmitButton"] button {
+        border: 1px solid rgba(117, 181, 250, .48) !important;
+        border-radius: 13px !important;
+        background: linear-gradient(135deg, rgba(43, 119, 213, .88), rgba(24, 73, 135, .88)) !important;
+        color: #F4F8FF !important;
+        box-shadow: 0 9px 24px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.13) !important;
+        transition: transform .18s ease, filter .18s ease !important;
+    }
+    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {
+        filter: brightness(1.16) !important; transform: translateY(-2px) !important;
+    }
+    [data-testid="stDataFrame"], [data-testid="stTable"],
+    [data-testid="stPlotlyChart"] {
+        border: 1px solid rgba(143, 187, 239, .20) !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
+    }
+    hr { border-color: rgba(143, 187, 239, .20) !important; }
+    h1, h2, h3 { letter-spacing: -.025em; }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+
+
+    /* Ensure the dashboard's main content surfaces read as frosted glass. */
+    [data-testid="stMain"] .block-container {
+        position: relative;
+        z-index: 1;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stMetric"],
+    [data-testid="stExpander"] details,
+    [data-testid="stAlert"] {
+        background: rgba(15, 35, 61, .66) !important;
+        border: 1px solid rgba(151, 194, 245, .28) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 14px 38px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.05) !important;
+        backdrop-filter: blur(18px) saturate(145%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+    }
+    [data-testid="stPlotlyChart"] > div {
+        background: rgba(12, 29, 51, .52) !important;
+        border: 1px solid rgba(143, 187, 239, .24) !important;
+        border-radius: 17px !important;
+        padding: 8px !important;
+        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
+        backdrop-filter: blur(14px) !important;
+    }
+    [data-testid="stDataFrame"], [data-testid="stTable"] {
+        background: rgba(12, 29, 51, .55) !important;
+        border: 1px solid rgba(143, 187, 239, .26) !important;
+        border-radius: 15px !important;
+        overflow: hidden !important;
+        box-shadow: 0 12px 30px rgba(0,0,0,.17) !important;
+    }
+    [data-testid="stTabs"] [role="tablist"] {
+        background: rgba(9, 26, 47, .62) !important;
+        border: 1px solid rgba(151, 194, 245, .24) !important;
+        border-radius: 16px !important;
+        padding: 7px !important;
+        backdrop-filter: blur(16px) !important;
+    }
+    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+        background: rgba(47, 121, 213, .35) !important;
+        border: 1px solid rgba(112, 183, 255, .52) !important;
+        border-radius: 11px !important;
+    }
+    [data-testid="stSidebar"] > div:first-child {
+        background: linear-gradient(180deg, rgba(10, 28, 51, .92), rgba(5, 16, 31, .90)) !important;
+        border-right: 1px solid rgba(151, 194, 245, .24) !important;
+        backdrop-filter: blur(22px) saturate(150%) !important;
+    }
+    [data-baseweb="select"] > div,
+    [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div {
+        background: rgba(9, 27, 49, .78) !important;
+        border: 1px solid rgba(143, 187, 239, .32) !important;
+        border-radius: 12px !important;
+    }
+    .stButton button, [data-testid="stDownloadButton"] button,
+    [data-testid="stFormSubmitButton"] button {
+        border: 1px solid rgba(117, 181, 250, .50) !important;
+        border-radius: 12px !important;
+        background: linear-gradient(135deg, rgba(43, 119, 213, .90), rgba(24, 73, 135, .90)) !important;
+        color: #F4F8FF !important;
+        box-shadow: 0 8px 22px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.12) !important;
+    }
+    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {
+        filter: brightness(1.12) !important;
+        transform: translateY(-1px) !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 # Landing-page-only visual styling.
 if not st.session_state.show_dashboard:
     st.markdown(
@@ -679,104 +858,6 @@ if not st.session_state.show_dashboard:
             .sf-chart {height:90px;gap:4px;}
         }
 
-
-    /* =====================================================
-       GLASSMORPHISM REDESIGN — CSS ONLY
-       No Python functions, calculations, model logic, storage,
-       widget keys, navigation, or callbacks are changed.
-       ===================================================== */
-    :root {{
-        --glass-border: rgba(151, 194, 245, .24);
-        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .28);
-        --glass-bg: rgba(13, 31, 55, .68);
-    }}
-    .stApp {{
-        background:
-          radial-gradient(ellipse at 12% 7%, rgba(37, 112, 220, .28), transparent 34%),
-          radial-gradient(ellipse at 88% 18%, rgba(24, 170, 190, .15), transparent 30%),
-          linear-gradient(135deg, #050D1B 0%, #0A1C34 52%, #071326 100%) !important;
-        background-attachment: fixed !important;
-    }}
-    [data-testid="stAppViewContainer"] {{
-        background: transparent !important;
-    }}
-    [data-testid="stHeader"] {{
-        background: rgba(5, 15, 30, .48) !important;
-        backdrop-filter: blur(18px);
-    }}
-    [data-testid="stSidebar"] > div:first-child {{
-        background: linear-gradient(180deg, rgba(10, 28, 51, .94), rgba(5, 16, 31, .88)) !important;
-        border-right: 1px solid var(--glass-border) !important;
-        backdrop-filter: blur(24px) saturate(150%) !important;
-    }}
-    [data-testid="stVerticalBlockBorderWrapper"],
-    [data-testid="stMetric"],
-    [data-testid="stExpander"],
-    [data-testid="stAlert"],
-    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
-    .sf-metric-row {{
-        background: linear-gradient(145deg, rgba(27, 54, 85, .76), rgba(9, 25, 46, .70)) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 20px !important;
-        box-shadow: var(--glass-shadow) !important;
-        backdrop-filter: blur(20px) saturate(145%) !important;
-        -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
-    }}
-    [data-testid="stVerticalBlockBorderWrapper"] {{
-        transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
-    }}
-    [data-testid="stVerticalBlockBorderWrapper"]:hover {{
-        border-color: rgba(99, 174, 255, .52) !important;
-        box-shadow: 0 22px 54px rgba(0, 0, 0, .34) !important;
-    }}
-    [data-testid="stMetric"] {{ padding: 17px !important; }}
-    [data-testid="stTabs"] [role="tablist"] {{
-        gap: 8px !important; padding: 7px !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 17px !important;
-        background: rgba(7, 22, 41, .68) !important;
-        backdrop-filter: blur(16px) !important;
-    }}
-    [data-testid="stTabs"] button[role="tab"] {{
-        border: 1px solid transparent !important; border-radius: 12px !important;
-        background: transparent !important; transition: all .18s ease;
-    }}
-    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
-        background: linear-gradient(135deg, rgba(44, 126, 230, .42), rgba(25, 76, 139, .34)) !important;
-        border: 1px solid rgba(112, 183, 255, .48) !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 7px 22px rgba(0,0,0,.18) !important;
-    }}
-    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
-    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {{
-        background: rgba(9, 27, 49, .78) !important;
-        border: 1px solid rgba(143, 187, 239, .30) !important;
-        border-radius: 13px !important;
-        backdrop-filter: blur(12px) !important;
-    }}
-    .stButton button, [data-testid="stDownloadButton"] button,
-    [data-testid="stFormSubmitButton"] button {{
-        border: 1px solid rgba(117, 181, 250, .48) !important;
-        border-radius: 13px !important;
-        background: linear-gradient(135deg, rgba(43, 119, 213, .88), rgba(24, 73, 135, .88)) !important;
-        color: #F4F8FF !important;
-        box-shadow: 0 9px 24px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.13) !important;
-        transition: transform .18s ease, filter .18s ease !important;
-    }}
-    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {{
-        filter: brightness(1.16) !important; transform: translateY(-2px) !important;
-    }}
-    [data-testid="stDataFrame"], [data-testid="stTable"],
-    [data-testid="stPlotlyChart"] {{
-        border: 1px solid rgba(143, 187, 239, .20) !important;
-        border-radius: 16px !important;
-        overflow: hidden !important;
-        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
-    }}
-    hr {{ border-color: rgba(143, 187, 239, .20) !important; }}
-    h1, h2, h3 {{ letter-spacing: -.025em; }}
-    @media (prefers-reduced-motion: reduce) {{
-        *, *::before, *::after {{ transition-duration: .01ms !important; animation-duration: .01ms !important; }}
-    }}
 
         </style>
         """,
