@@ -50,58 +50,58 @@ def toggle_theme():
 
 DARK_THEME = {
     "name": "dark",
-    "page": "#101B17",
-    "page_grad_1": "#172820",
-    "page_grad_2": "#0B1411",
-    "sidebar": "#111F19",
-    "hero": "#1B342A",
-    "hero2": "#294B3B",
-    "panel": "#172A21",
-    "panel_alt": "#20382C",
-    "panel_soft": "#1A3025",
-    "border": "#3B5D49",
-    "tab_bg": "#172A21",
-    "tab_active": "#28513E",
-    "tab_text": "#D8E5D9",
-    "tab_active_border": "#55C49A",
-    "text": "#F1F4EA",
-    "muted": "#B0C0B3",
-    "blue": "#4FC49A",
-    "blue_light": "#A4E2C5",
-    "teal": "#D18B5D",
-    "gold": "#E5BE72",
-    "success_bg": "#18392D",
-    "success_border": "#438D6D",
-    "success_text": "#DDF4E7",
-    "table_header": "#294336",
+    "page": "#090D1C",
+    "page_grad_1": "#10162B",
+    "page_grad_2": "#070B17",
+    "sidebar": "#0C1225",
+    "hero": "#151F3D",
+    "hero2": "#202C50",
+    "panel": "#121B33",
+    "panel_alt": "#1A2745",
+    "panel_soft": "#111A31",
+    "border": "#394B78",
+    "tab_bg": "#101A32",
+    "tab_active": "#263B68",
+    "tab_text": "#D1D9F0",
+    "tab_active_border": "#55D6E8",
+    "text": "#F2F5FF",
+    "muted": "#A9B5D0",
+    "blue": "#55D6E8",
+    "blue_light": "#A5F0F4",
+    "teal": "#9B8CFF",
+    "gold": "#F2B879",
+    "success_bg": "#12343A",
+    "success_border": "#278A91",
+    "success_text": "#D7FBF6",
+    "table_header": "#202D4C",
 }
 
 LIGHT_THEME = {
     "name": "light",
-    "page": "#F3F0E7",
-    "page_grad_1": "#F8F6EF",
-    "page_grad_2": "#EAE7DC",
-    "sidebar": "#E4E6D9",
-    "hero": "#FFFEF8",
-    "hero2": "#E8F0E7",
-    "panel": "#FFFEF9",
-    "panel_alt": "#F4F5EC",
-    "panel_soft": "#EAF0E8",
-    "border": "#D0D9CB",
-    "tab_bg": "#FFFEF9",
-    "tab_active": "#DCECE1",
-    "tab_text": "#40564A",
-    "tab_active_border": "#218A67",
-    "text": "#26382E",
-    "muted": "#68796D",
-    "blue": "#178765",
-    "blue_light": "#55A989",
-    "teal": "#B96F49",
-    "gold": "#C69A4B",
-    "success_bg": "#E7F3E9",
-    "success_border": "#B8D8C0",
-    "success_text": "#315D42",
-    "table_header": "#E6EDE3",
+    "page": "#EEF1F8",
+    "page_grad_1": "#F7F8FC",
+    "page_grad_2": "#E8ECF6",
+    "sidebar": "#E5EAF5",
+    "hero": "#FFFFFF",
+    "hero2": "#E8EEFA",
+    "panel": "#FFFFFF",
+    "panel_alt": "#F3F5FC",
+    "panel_soft": "#EDF1FA",
+    "border": "#D2D9EA",
+    "tab_bg": "#FFFFFF",
+    "tab_active": "#E2F5F8",
+    "tab_text": "#45516D",
+    "tab_active_border": "#229FB2",
+    "text": "#202A43",
+    "muted": "#68748F",
+    "blue": "#159DB2",
+    "blue_light": "#4BC4D1",
+    "teal": "#7866D8",
+    "gold": "#C47A3C",
+    "success_bg": "#E6F6F3",
+    "success_border": "#A8DCD4",
+    "success_text": "#235B57",
+    "table_header": "#E8EDF7",
 }
 
 theme = DARK_THEME if st.session_state.theme_mode == "dark" else LIGHT_THEME
@@ -1018,7 +1018,7 @@ def dashboard_metric(label: str, value: str, note: str = "") -> None:
 def style_figure(fig, height: int = 340):
     fig.update_layout(
         template="plotly_dark" if theme["name"] == "dark" else "plotly_white",
-        colorway=[theme["blue"], theme["teal"], theme["gold"], theme["blue_light"], "#8D9B65", "#C47B62"],
+        colorway=[theme["blue"], theme["teal"], theme["gold"], theme["blue_light"], "#F2B879", "#E879A8"],
         height=height,
         autosize=True,
         paper_bgcolor="rgba(0,0,0,0)",
@@ -1188,6 +1188,153 @@ if not st.session_state.show_dashboard:
         unsafe_allow_html=True,
     )
     st.stop()
+
+# =========================================================
+# FINAL GLASS LAYOUT OVERRIDES — PRESENTATION ONLY
+# =========================================================
+st.markdown(
+    """
+    <style>
+    :root {
+      --glass-edge: rgba(170, 199, 255, .20);
+      --glass-fill: rgba(19, 29, 56, .58);
+      --glass-highlight: rgba(255,255,255,.075);
+    }
+    .stApp {
+      background:
+        radial-gradient(ellipse at 8% 0%, rgba(85,214,232,.14), transparent 34%),
+        radial-gradient(ellipse at 92% 8%, rgba(155,140,255,.16), transparent 32%),
+        radial-gradient(ellipse at 52% 100%, rgba(242,184,121,.07), transparent 38%),
+        linear-gradient(135deg, #090D1C 0%, #111A32 48%, #080D1B 100%) !important;
+      background-attachment: fixed !important;
+    }
+    [data-testid="stSidebar"] { display:none !important; }
+    [data-testid="stAppViewContainer"], [data-testid="stMain"] { background:transparent !important; }
+    [data-testid="stHeader"] {
+      background:rgba(8,13,28,.54) !important;
+      backdrop-filter:blur(22px) saturate(155%) !important;
+      border-bottom:1px solid rgba(170,199,255,.10);
+    }
+    .block-container, section[data-testid="stMain"] .block-container {
+      max-width:1540px !important;
+      padding-top:2.0rem !important;
+      padding-bottom:3rem !important;
+      padding-left:clamp(1.1rem,3vw,3.2rem) !important;
+      padding-right:clamp(1.1rem,3vw,3.2rem) !important;
+    }
+    .sf-hero {
+      position:relative; overflow:hidden;
+      padding:27px 32px !important;
+      margin:0 0 18px 0 !important;
+      border-radius:22px !important;
+      background:
+        radial-gradient(circle at 88% 12%, rgba(85,214,232,.19), transparent 28%),
+        radial-gradient(circle at 100% 100%, rgba(155,140,255,.17), transparent 35%),
+        linear-gradient(125deg, rgba(22,32,63,.78), rgba(26,38,72,.58)) !important;
+      border:1px solid rgba(170,199,255,.24) !important;
+      box-shadow:0 22px 60px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.11) !important;
+      backdrop-filter:blur(24px) saturate(155%) !important;
+    }
+    .sf-hero:after {
+      content:""; position:absolute; width:270px; height:270px; right:-115px; top:-170px;
+      border:1px solid rgba(165,240,244,.28); border-radius:50%;
+      box-shadow:0 0 0 25px rgba(85,214,232,.045), 0 0 0 55px rgba(155,140,255,.04);
+      pointer-events:none;
+    }
+    .sf-eyebrow, .sf-brand, .sf-landing-kicker { color:#A5F0F4 !important; }
+    .sf-title, .sf-landing-title, .sf-preview-heading { color:#F2F5FF !important; }
+    .sf-landing-title span { color:#55D6E8 !important; }
+    .sf-subtitle, .sf-landing-copy, .sf-preview-sub { color:#B8C4DF !important; }
+    .sf-accent { background:linear-gradient(90deg,#55D6E8,#9B8CFF) !important; border-radius:20px; }
+    div[data-testid="stHorizontalBlock"] { gap: .9rem !important; align-items:stretch; }
+    /* Floating control dock replaces the old left sidebar. */
+    div[data-testid="stMain"] div[data-testid="stHorizontalBlock"]:has(button[key="top_back_home"]) {
+      padding:13px 15px 10px; margin:0 0 20px 0;
+      border:1px solid var(--glass-edge); border-radius:18px;
+      background:rgba(16,25,49,.58);
+      box-shadow:0 14px 38px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.07);
+      backdrop-filter:blur(22px) saturate(150%);
+    }
+    [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stExpander"], [data-testid="stPopover"],
+    [data-testid="stDataFrame"], [data-testid="stTable"],
+    [data-testid="stFileUploader"], [data-testid="stAlert"],
+    [data-testid="stForm"], [data-testid="stPlotlyChart"],
+    [data-testid="stVegaLiteChart"], [data-testid="stAltairChart"] {
+      background:rgba(17,27,53,.55) !important;
+      border:1px solid rgba(170,199,255,.19) !important;
+      border-radius:18px !important;
+      box-shadow:0 14px 38px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.055) !important;
+      backdrop-filter:blur(18px) saturate(145%) !important;
+    }
+    [data-testid="stMetric"] { padding:17px 19px !important; }
+    [data-testid="stMetricLabel"], [data-testid="stCaptionContainer"] { color:#A9B5D0 !important; }
+    [data-testid="stMetricValue"] { color:#F4F7FF !important; font-weight:800 !important; }
+    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div, [data-testid="stNumberInput"] input {
+      background:rgba(9,16,34,.78) !important;
+      border:1px solid rgba(170,199,255,.22) !important;
+      border-radius:11px !important; color:#F2F5FF !important;
+    }
+    input, textarea { color:#F2F5FF !important; }
+    .stButton > button, .stDownloadButton > button,
+    [data-testid="stFormSubmitButton"] > button {
+      color:#081322 !important;
+      background:linear-gradient(110deg,#6CE2EA 0%,#8DB8FF 55%,#B19CFF 100%) !important;
+      border:1px solid rgba(202,238,255,.52) !important;
+      border-radius:12px !important; font-weight:750 !important;
+      min-height:2.55rem; box-shadow:0 8px 24px rgba(85,214,232,.16) !important;
+      transition:transform .18s ease, filter .18s ease, box-shadow .18s ease;
+    }
+    .stButton > button:hover, .stDownloadButton > button:hover {
+      transform:translateY(-2px); filter:brightness(1.07);
+      box-shadow:0 12px 30px rgba(85,214,232,.24) !important;
+    }
+    [data-testid="stTabs"] [data-baseweb="tab-list"] {
+      display:flex; flex-wrap:wrap; gap:8px;
+      background:rgba(14,23,46,.62) !important;
+      border:1px solid rgba(170,199,255,.19) !important;
+      border-radius:16px !important; padding:7px !important;
+      box-shadow:0 12px 30px rgba(0,0,0,.14);
+      backdrop-filter:blur(20px);
+    }
+    [data-testid="stTabs"] button[role="tab"] {
+      color:#AEBBD6 !important; border-radius:10px !important;
+      padding:10px 15px !important; font-weight:650 !important;
+    }
+    [data-testid="stTabs"] button[aria-selected="true"] {
+      color:#F7FCFF !important;
+      background:linear-gradient(110deg,rgba(85,214,232,.20),rgba(155,140,255,.22)) !important;
+      border:1px solid rgba(165,240,244,.24) !important;
+    }
+    [data-testid="stPlotlyChart"] { padding:9px !important; }
+    [data-testid="stDataFrame"], [data-testid="stTable"] { padding:7px !important; }
+    hr { border-color:rgba(170,199,255,.16) !important; }
+    .sf-landing-hero {
+      background:radial-gradient(circle at 90% 8%,rgba(85,214,232,.20),transparent 30%),
+        radial-gradient(circle at 5% 100%,rgba(155,140,255,.14),transparent 34%),
+        linear-gradient(125deg,rgba(20,30,59,.80),rgba(26,39,73,.60)) !important;
+      border:1px solid rgba(170,199,255,.23) !important;
+      border-radius:26px !important; box-shadow:0 24px 65px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.10) !important;
+      backdrop-filter:blur(24px) saturate(155%) !important;
+    }
+    .sf-preview-card, .sf-preview-kpi, .sf-chart-shell, .sf-feature, .sf-model-tags span {
+      background:rgba(15,25,49,.62) !important;
+      border:1px solid rgba(170,199,255,.19) !important;
+      border-radius:17px !important;
+      box-shadow:0 14px 38px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.06) !important;
+      backdrop-filter:blur(20px) saturate(150%) !important;
+    }
+    .sf-chart span { background:linear-gradient(180deg,#A5F0F4,#55D6E8 55%,#8B83F5) !important; }
+    .sf-live-pill { color:#A5F0F4 !important; background:rgba(85,214,232,.12) !important; border-color:rgba(85,214,232,.25) !important; }
+    @media(max-width:900px) {
+      .block-container {padding-left:1rem !important;padding-right:1rem !important;}
+      [data-testid="stTabs"] [data-baseweb="tab-list"] {overflow-x:auto;flex-wrap:nowrap;}
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # =========================================================
 # DATA LOADING
@@ -1941,61 +2088,30 @@ st.markdown(
 
 
 # =========================================================
-# SIDEBAR
+# TOP CONTROL BAR — relocated from the sidebar (same controls)
 # =========================================================
-st.sidebar.button(
-    "← Back to Home",
-    on_click=go_home,
-    use_container_width=True,
+control_home, control_model, control_info, control_theme = st.columns(
+    [0.95, 2.15, 1.25, 1.15], gap="small"
 )
-
-st.sidebar.markdown(
-    """
-    <div style="padding: 4px 0 8px 0;">
-        <div style="font-size:1.22rem;font-weight:800;">
-            Forecast Controls
-        </div>
-        <div style="font-size:0.76rem;margin-top:5px;line-height:1.45;">
-            Select a forecasting model to inspect its saved predictions.
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-selected_model = st.sidebar.selectbox(
-    "Forecasting Model",
-    model_options,
-    index=model_options.index("Random Forest"),
-    key="forecast_model_selector",
-)
-
-st.sidebar.divider()
-with st.sidebar.expander("System Information", expanded=False):
-    st.markdown(
-        """
-        **Dataset**  
-        Sta. Cruz Laguna Sales Dataset
-
-        **Forecasting Models**  
-        ARIMA · SARIMA · Prophet · Random Forest
-
-       **Evaluation Metrics**
-MAE · RMSE · MAPE · WAPE
-
-        **Platform**  
-        Python + Streamlit
-        """
+with control_home:
+    st.button("← Home", on_click=go_home, use_container_width=True, key="top_back_home")
+with control_model:
+    selected_model = st.selectbox(
+        "Forecasting Model", model_options,
+        index=model_options.index("Random Forest"),
+        key="forecast_model_selector",
     )
-
-# Theme control directly below System Information.
-st.sidebar.markdown('<div class="theme-label">Appearance</div>', unsafe_allow_html=True)
-theme_button_label = "Switch to Light Mode" if st.session_state.theme_mode == "dark" else "Switch to Dark Mode"
-st.sidebar.button(
-    theme_button_label,
-    on_click=toggle_theme,
-    use_container_width=True,
-)
+with control_info:
+    with st.expander("System Information", expanded=False):
+        st.markdown(
+            "**Dataset**  \nSta. Cruz Laguna Sales Dataset  \n\n**Forecasting Models**  \nARIMA · SARIMA · Prophet · Random Forest  \n\n**Evaluation Metrics**  \nMAE · RMSE · MAPE · WAPE  \n\n**Platform**  \nPython + Streamlit"
+        )
+with control_theme:
+    theme_button_label = "☀ Light Mode" if st.session_state.theme_mode == "dark" else "☾ Dark Mode"
+    st.button(
+        theme_button_label, on_click=toggle_theme,
+        use_container_width=True, key="top_theme_toggle",
+    )
 
 model_data = df[df["model_name"] == selected_model].copy()
 comparison = model_data.merge(
