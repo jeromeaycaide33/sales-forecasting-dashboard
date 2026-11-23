@@ -899,6 +899,364 @@ if not st.session_state.show_dashboard:
         unsafe_allow_html=True,
     )
 
+
+# =========================================================
+# PRESENTATION UI POLISH — CSS ONLY
+# Keeps the existing theme palette and all Streamlit controls,
+# callbacks, data bindings, calculations, and forecasting logic.
+# =========================================================
+st.markdown(
+    """
+    <style>
+
+    /* Compact executive dashboard layout inspired by the supplied reference.
+       Existing theme variables are reused; no palette values are changed. */
+    .sf-dataset-strip {
+        display: grid;
+        grid-template-columns: 1.05fr 2.1fr 1.25fr .7fr .8fr;
+        align-items: center;
+        gap: 12px;
+        margin: .15rem 0 .45rem;
+        padding: 11px 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--panel-alt);
+        color: var(--text);
+    }
+    .sf-dataset-strip > div {
+        min-width: 0;
+        padding-left: 12px;
+        border-left: 1px solid var(--border);
+    }
+    .sf-dataset-strip > div:first-child {
+        padding-left: 0;
+        border-left: 0;
+    }
+    .sf-dataset-strip span {
+        display: block;
+        color: var(--muted);
+        font-size: .58rem;
+        font-weight: 750;
+        letter-spacing: .09em;
+        margin-bottom: 3px;
+    }
+    .sf-dataset-strip strong {
+        display: block;
+        color: var(--text);
+        font-size: .70rem;
+        font-weight: 700;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+    .sf-dataset-heading {
+        color: var(--text);
+        font-size: .82rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    div[data-testid="stMetric"] {
+        min-height: 78px !important;
+        padding: 10px 12px !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stMetricLabel"] p {
+        font-size: .68rem !important;
+    }
+    [data-testid="stMetricValue"] {
+        font-size: clamp(1.05rem, 1.45vw, 1.45rem) !important;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        padding: .72rem .78rem .58rem !important;
+        border-radius: 11px !important;
+    }
+    .sf-panel-title {
+        font-size: .86rem !important;
+        margin-bottom: .15rem !important;
+    }
+    .sf-panel-subtitle {
+        font-size: .65rem !important;
+        margin-bottom: .35rem !important;
+    }
+    div[data-testid="stPlotlyChart"] {
+        margin: 0 !important;
+    }
+    @media (max-width: 1100px) {
+        .sf-dataset-strip {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .sf-dataset-strip > div:nth-child(odd) {
+            border-left: 0;
+            padding-left: 0;
+        }
+    }
+    @media (max-width: 760px) {
+        .sf-dataset-strip {
+            grid-template-columns: 1fr;
+        }
+        .sf-dataset-strip > div {
+            border-left: 0;
+            border-top: 1px solid var(--border);
+            padding: 8px 0 0;
+        }
+        .sf-dataset-strip > div:first-child {
+            border-top: 0;
+            padding-top: 0;
+        }
+    }
+
+
+    .sf-hero {
+        padding: 15px 20px !important;
+        margin: 0 0 .7rem 0 !important;
+        border-radius: 12px !important;
+    }
+    .sf-hero .sf-title {
+        font-size: 1.45rem !important;
+    }
+    .sf-hero .sf-subtitle {
+        font-size: .72rem !important;
+        margin-top: .25rem !important;
+    }
+    .sf-hero .sf-accent {
+        margin-top: .45rem !important;
+        width: 42px !important;
+    }
+    div[data-testid="stTabs"] [role="tablist"] {
+        margin-bottom: .65rem !important;
+        padding: 4px !important;
+    }
+    div[data-testid="stTabs"] button[role="tab"] {
+        min-height: 37px !important;
+        padding: 8px 11px !important;
+    }
+
+    /* Workspace proportions and visual rhythm */
+    .block-container {
+        max-width: 1720px !important;
+        padding-top: 2.0rem !important;
+        padding-bottom: 3rem !important;
+    }
+    section[data-testid="stSidebar"] {
+        min-width: 285px !important;
+        border-right: 1px solid var(--border) !important;
+        box-shadow: 8px 0 28px rgba(0,0,0,.08);
+    }
+    section[data-testid="stSidebar"] > div:first-child {
+        padding-top: 1.1rem;
+    }
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: .9rem;
+    }
+
+    /* Executive header — same theme colors, more depth */
+    .sf-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 18px !important;
+        padding: 25px 30px !important;
+        margin-bottom: 1.35rem !important;
+        background:
+          linear-gradient(115deg,
+            color-mix(in srgb, var(--hero) 96%, transparent),
+            color-mix(in srgb, var(--hero2) 92%, transparent)) !important;
+        border: 1px solid var(--border) !important;
+        box-shadow: 0 14px 34px rgba(0,0,0,.12) !important;
+    }
+    .sf-hero:after {
+        content: "";
+        position: absolute;
+        width: 230px;
+        height: 230px;
+        right: -85px;
+        top: -135px;
+        border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--blue) 38%, transparent);
+        box-shadow: 0 0 0 22px color-mix(in srgb, var(--blue) 6%, transparent),
+                    0 0 0 48px color-mix(in srgb, var(--blue) 4%, transparent);
+        pointer-events: none;
+    }
+    .sf-title {
+        font-size: clamp(1.8rem, 2.8vw, 2.35rem) !important;
+        letter-spacing: -.04em !important;
+    }
+    .sf-subtitle {
+        max-width: 980px !important;
+        font-size: .9rem !important;
+    }
+
+    /* Navigation: clear, compact, presentation-friendly */
+    div[data-testid="stTabs"] [role="tablist"] {
+        display: flex !important;
+        gap: 7px !important;
+        padding: 7px !important;
+        margin: 0 0 1.1rem 0 !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 14px !important;
+        background: color-mix(in srgb, var(--panel) 88%, transparent) !important;
+        box-shadow: 0 7px 20px rgba(0,0,0,.07) !important;
+        overflow-x: auto !important;
+        scrollbar-width: thin;
+    }
+    div[data-testid="stTabs"] button[role="tab"] {
+        min-height: 43px !important;
+        padding: 10px 15px !important;
+        border: 1px solid transparent !important;
+        border-radius: 9px !important;
+        background: transparent !important;
+        color: var(--tab-text) !important;
+        white-space: nowrap !important;
+        transition: background .18s ease, border-color .18s ease, transform .18s ease !important;
+    }
+    div[data-testid="stTabs"] button[role="tab"] p {
+        font-size: .83rem !important;
+        font-weight: 720 !important;
+        margin: 0 !important;
+    }
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+        background: var(--tab-active) !important;
+        border-color: var(--tab-active-border) !important;
+        box-shadow: inset 0 -2px 0 var(--blue) !important;
+        color: var(--text) !important;
+    }
+    div[data-testid="stTabs"] button[role="tab"]:hover {
+        background: var(--tab-active) !important;
+        border-color: var(--border) !important;
+        transform: translateY(-1px);
+    }
+
+    /* Dashboard cards: glass-like depth without changing palette */
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        position: relative;
+        border: 1px solid color-mix(in srgb, var(--border) 92%, transparent) !important;
+        border-radius: 15px !important;
+        background: linear-gradient(145deg,
+          color-mix(in srgb, var(--panel-alt) 94%, transparent),
+          color-mix(in srgb, var(--panel) 96%, transparent)) !important;
+        box-shadow: 0 9px 25px rgba(0,0,0,.075) !important;
+        padding: 1rem 1.05rem .85rem !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: translateY(-2px);
+        border-color: color-mix(in srgb, var(--blue) 62%, var(--border)) !important;
+        box-shadow: 0 14px 30px rgba(0,0,0,.11) !important;
+    }
+
+    /* KPI cards */
+    div[data-testid="stMetric"] {
+        min-height: 112px !important;
+        padding: 15px 16px !important;
+        border: 1px solid var(--border) !important;
+        border-top: 3px solid var(--blue) !important;
+        border-radius: 13px !important;
+        background: linear-gradient(150deg, var(--panel-alt), var(--panel)) !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,.065) !important;
+        transition: transform .18s ease, box-shadow .18s ease !important;
+    }
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 13px 26px rgba(0,0,0,.11) !important;
+    }
+    [data-testid="stMetricLabel"] p {
+        font-size: .76rem !important;
+        font-weight: 650 !important;
+        color: var(--muted) !important;
+    }
+    [data-testid="stMetricValue"] {
+        font-size: clamp(1.3rem, 2vw, 1.75rem) !important;
+        font-weight: 850 !important;
+        letter-spacing: -.035em !important;
+        color: var(--text) !important;
+    }
+
+    /* Plotly charts: consistent spacing and clean chart canvas */
+    div[data-testid="stPlotlyChart"] {
+        width: 100% !important;
+        border-radius: 11px !important;
+        overflow: hidden !important;
+        margin-top: .2rem !important;
+    }
+    div[data-testid="stPlotlyChart"] > div {
+        width: 100% !important;
+    }
+    .sf-panel-title {
+        font-size: .98rem !important;
+        font-weight: 800 !important;
+        letter-spacing: -.015em;
+        margin-bottom: .28rem !important;
+    }
+    .sf-panel-subtitle {
+        font-size: .73rem !important;
+        line-height: 1.5 !important;
+        margin-bottom: .8rem !important;
+    }
+
+    /* Tables and expanders */
+    div[data-testid="stDataFrame"],
+    div[data-testid="stTable"] {
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: 0 7px 18px rgba(0,0,0,.055) !important;
+    }
+    div[data-testid="stExpander"] {
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        background: color-mix(in srgb, var(--panel) 92%, transparent) !important;
+    }
+
+    /* Buttons retain the existing theme-driven colors */
+    .stButton button,
+    div[data-testid="stDownloadButton"] button {
+        min-height: 42px !important;
+        border-radius: 9px !important;
+        font-weight: 700 !important;
+        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease !important;
+    }
+    .stButton button:hover,
+    div[data-testid="stDownloadButton"] button:hover {
+        transform: translateY(-1px);
+        border-color: var(--blue) !important;
+        box-shadow: 0 7px 16px rgba(0,0,0,.09) !important;
+    }
+
+    /* Sidebar controls */
+    section[data-testid="stSidebar"] [data-testid="stSelectbox"] > label,
+    section[data-testid="stSidebar"] [data-testid="stExpander"] summary {
+        font-weight: 720 !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+        min-height: 43px;
+        border-radius: 9px !important;
+        border-color: var(--border) !important;
+        background: var(--panel-soft) !important;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 900px) {
+        .block-container {
+            padding-left: .9rem !important;
+            padding-right: .9rem !important;
+        }
+        .sf-hero { padding: 21px 20px !important; }
+        div[data-testid="stTabs"] [role="tablist"] { gap: 4px !important; }
+        div[data-testid="stTabs"] button[role="tab"] { padding: 9px 11px !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        div[data-testid="stVerticalBlockBorderWrapper"],
+        div[data-testid="stMetric"],
+        .stButton button,
+        div[data-testid="stDownloadButton"] button {
+            transition: none !important;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # =========================================================
 # HELPER FUNCTIONS
 # =========================================================
@@ -2185,38 +2543,87 @@ with tab_overview:
         actual_df["daily_demand"].idxmax(), "date"
     ].date()
 
-    # High-level KPIs are placed first so users can understand the dataset quickly.
-    kpi_cols = st.columns(4, gap="medium")
+    # Compact KPI strip, matching the reference dashboard proportions.
+    kpi_cols = st.columns(4, gap="small")
     with kpi_cols[0]:
         st.metric("Total Historical Demand", f"{total_demand:,.0f}")
     with kpi_cols[1]:
         st.metric("Average Daily Demand", f"{average_demand:,.2f}")
     with kpi_cols[2]:
-        st.metric("Peak Daily Demand", f"{highest_demand:,.0f}", help=f"Recorded on {highest_demand_date}")
+        st.metric(
+            "Peak Daily Demand",
+            f"{highest_demand:,.0f}",
+            help=f"Recorded on {highest_demand_date}",
+        )
     with kpi_cols[3]:
-       st.metric(
-    "Best Model · Validation WAPE",
-    f"{lowest_wape:.2f}%",
-    help=f"Selected using validation WAPE: {best_model}",
-)
-    st.caption(
-        f"Historical coverage: {actual_df['date'].min():%b %d, %Y} – "
-        f"{actual_df['date'].max():%b %d, %Y}  ·  "
-        f"{len(actual_df):,} historical records  ·  {len(df):,} forecast records"
-    )
+        st.metric(
+            "Best Model · Validation WAPE",
+            f"{lowest_wape:.2f}%",
+            help=f"Selected using validation WAPE: {best_model}",
+        )
 
-    top_left, top_right = st.columns([1.15, 1], gap="medium")
+    # Three compact analytical panels on one row, like the supplied UI reference.
+    chart_left, chart_middle, chart_right = st.columns([1.55, 1.05, 1.0], gap="small")
 
-    with top_left:
+    with chart_left:
         with st.container(border=True):
             panel_heading(
-                "Forecast Model Performance",
-                "Model comparison using active-dataset validation WAPE · lower is better",
+                "Actual vs Forecast",
+                f"{selected_model} · Historical actuals and saved predictions",
+            )
+            fig_overview_actual_forecast = px.line(
+                comparison,
+                x="forecast_date",
+                y=["daily_demand", "predicted_demand"],
+                color_discrete_map={
+                    "daily_demand": theme["blue"],
+                    "predicted_demand": theme["gold"],
+                },
+                labels={
+                    "forecast_date": "",
+                    "value": "Demand",
+                    "variable": "Series",
+                },
+            )
+            fig_overview_actual_forecast.update_traces(line=dict(width=2))
+            fig_overview_actual_forecast.update_layout(showlegend=True)
+            style_figure(fig_overview_actual_forecast, 245)
+            st.plotly_chart(
+                add_chart_motion(fig_overview_actual_forecast),
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
+            )
+
+    with chart_middle:
+        with st.container(border=True):
+            panel_heading("Monthly Demand", "Historical demand by month")
+            fig_monthly_overview = px.bar(
+                monthly_sales,
+                x="month",
+                y="daily_demand",
+                color_discrete_sequence=[theme["blue"]],
+                labels={"month": "", "daily_demand": "Demand"},
+            )
+            fig_monthly_overview.update_traces(marker_line_width=0, opacity=0.92)
+            fig_monthly_overview.update_xaxes(dtick="M3", tickformat="%b", title_text="")
+            fig_monthly_overview.update_yaxes(title_text="")
+            style_figure(fig_monthly_overview, 245)
+            st.plotly_chart(
+                add_chart_motion(fig_monthly_overview),
+                use_container_width=True,
+                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
+            )
+
+    with chart_right:
+        with st.container(border=True):
+            panel_heading(
+                "Model Performance",
+                "Validation WAPE · lower is better",
             )
             model_chart_data = ranking.sort_values("wape", ascending=True)
             fig_overview_models = px.bar(
                 model_chart_data,
-               x="wape",
+                x="wape",
                 y="model_name",
                 orientation="h",
                 text="wape",
@@ -2227,44 +2634,29 @@ with tab_overview:
                     "Prophet": theme["teal"],
                     "Random Forest": theme["gold"],
                 },
-               labels={"wape": "WAPE (%)", "model_name": ""}
+                labels={"wape": "WAPE (%)", "model_name": ""},
             )
             fig_overview_models.update_traces(
                 texttemplate="%{text:.2f}%",
                 textposition="outside",
                 cliponaxis=False,
             )
-            fig_overview_models.update_layout(showlegend=False, xaxis_title="Validation WAPE (%)", yaxis_title="")
-            style_figure(fig_overview_models, 320)
+            fig_overview_models.update_layout(
+                showlegend=False,
+                xaxis_title="WAPE (%)",
+                yaxis_title="",
+            )
+            style_figure(fig_overview_models, 245)
             st.plotly_chart(
                 add_chart_motion(fig_overview_models),
                 use_container_width=True,
-                config={"responsive": True, "displayModeBar": False},
+                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
             )
 
-    with top_right:
-        with st.container(border=True):
-            panel_heading("Monthly Demand", "Total historical demand by month")
-            fig_monthly_overview = px.bar(
-                monthly_sales,
-                x="month",
-                y="daily_demand",
-                color_discrete_sequence=[theme["blue"]],
-                labels={"month": "", "daily_demand": "Demand"},
-            )
-            fig_monthly_overview.update_traces(marker_line_width=0, opacity=0.92)
-            fig_monthly_overview.update_xaxes(dtick="M6", tickformat="%b<br>%Y", title_text="")
-            fig_monthly_overview.update_yaxes(title_text="")
-            style_figure(fig_monthly_overview, 320)
-            st.plotly_chart(
-                add_chart_motion(fig_monthly_overview),
-                use_container_width=True,
-                config={"responsive": True, "displayModeBar": False},
-            )
+    # Secondary row: demand pattern and the selected model's future forecast.
+    secondary_left, secondary_right = st.columns([1, 1.55], gap="small")
 
-    bottom_left, bottom_right = st.columns([1, 1.7], gap="medium")
-
-    with bottom_left:
+    with secondary_left:
         with st.container(border=True):
             panel_heading("Demand Pattern", "Average demand by month and weekday")
             fig_heatmap = px.imshow(
@@ -2282,26 +2674,26 @@ with tab_overview:
             )
             fig_heatmap.update_layout(
                 coloraxis_colorbar=dict(
-                    thickness=9,
-                    len=0.78,
+                    thickness=8,
+                    len=0.76,
                     tickfont=dict(size=8, color=theme["muted"]),
                     title=dict(text="", font=dict(size=8)),
                 )
             )
             fig_heatmap.update_xaxes(tickfont=dict(size=8), side="bottom")
-            fig_heatmap.update_yaxes(tickfont=dict(size=9))
-            style_figure(fig_heatmap, 350)
+            fig_heatmap.update_yaxes(tickfont=dict(size=8))
+            style_figure(fig_heatmap, 255)
             st.plotly_chart(
                 add_chart_motion(fig_heatmap),
                 use_container_width=True,
-                config={"responsive": True, "displayModeBar": False},
+                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
             )
 
-    with bottom_right:
+    with secondary_right:
         with st.container(border=True):
             panel_heading(
-                f"Demand Forecast · {selected_model}",
-                "Saved predicted demand values for the selected forecasting model",
+                f"Forecast Trend · {selected_model}",
+                "Saved predicted demand values for the selected model",
             )
             fig_forecast_overview = px.line(
                 model_data,
@@ -2311,16 +2703,16 @@ with tab_overview:
                 labels={"forecast_date": "", "predicted_demand": "Predicted demand"},
             )
             fig_forecast_overview.update_traces(
-                line=dict(width=2.5, color=theme["gold"]),
+                line=dict(width=2.2, color=theme["gold"]),
                 mode="lines",
             )
             fig_forecast_overview.update_yaxes(title_text="")
             fig_forecast_overview.update_xaxes(title_text="")
-            style_figure(fig_forecast_overview, 275)
+            style_figure(fig_forecast_overview, 205)
             st.plotly_chart(
                 add_chart_motion(fig_forecast_overview),
                 use_container_width=True,
-                config={"responsive": True, "displayModeBar": False},
+                config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True},
             )
 
             forecast_kpis = st.columns(3, gap="small")
@@ -2331,16 +2723,26 @@ with tab_overview:
             with forecast_kpis[2]:
                 st.metric("Forecast Records", f"{len(model_data):,}")
 
+    # Slim dataset-status strip, with the currently active source clearly identified.
     if phase2_active_results:
-        st.caption(
-            f"All Overview charts and KPIs use the latest completed dataset: "
-            f"{phase2_active_source} · Target: {active_target}."
-        )
+        active_dataset_label = phase2_active_source
+        active_target_label = active_target
     else:
-        st.caption(
-            "Showing the repository's standardized baseline data. Upload and run a dataset "
-            "in Automatic Forecasting to switch the dashboard to that completed run."
-        )
+        active_dataset_label = "Standardized baseline dataset"
+        active_target_label = "Daily demand"
+
+    st.markdown(
+        f"""
+        <div class="sf-dataset-strip">
+          <div class="sf-dataset-heading">▤ &nbsp; Active Dataset</div>
+          <div><span>DATA SOURCE</span><strong>{html.escape(str(active_dataset_label))}</strong></div>
+          <div><span>DATE RANGE</span><strong>{actual_df['date'].min():%b %d, %Y} – {actual_df['date'].max():%b %d, %Y}</strong></div>
+          <div><span>RECORDS</span><strong>{len(actual_df):,}</strong></div>
+          <div><span>TARGET</span><strong>{html.escape(str(active_target_label))}</strong></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # =========================================================
 # MODEL EVALUATION
@@ -2369,8 +2771,8 @@ with tab_evaluation:
         )
         fig_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
         fig_mape.update_layout(showlegend=False)
-        style_figure(fig_mape, 410)
-        st.plotly_chart(add_chart_motion(fig_mape), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+        style_figure(fig_mape, 270)
+        st.plotly_chart(add_chart_motion(fig_mape), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
     with metric_col2:
         fig_mae = px.bar(
@@ -2390,8 +2792,8 @@ with tab_evaluation:
         )
         fig_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
         fig_mae.update_layout(showlegend=False)
-        style_figure(fig_mae, 410)
-        st.plotly_chart(add_chart_motion(fig_mae), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+        style_figure(fig_mae, 270)
+        st.plotly_chart(add_chart_motion(fig_mae), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
     st.subheader("Model Performance Summary")
     performance_display = performance.copy()
@@ -2499,8 +2901,8 @@ fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outsi
 fig_approach_mape.update_layout(showlegend=False)
 fig_approach_mape.update_xaxes(title_text="", tickfont=dict(size=10))
 fig_approach_mape.update_yaxes(title_text="MAPE (%)")
-style_figure(fig_approach_mape, 405)
-st.plotly_chart(add_chart_motion(fig_approach_mape), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+style_figure(fig_approach_mape, 270)
+st.plotly_chart(add_chart_motion(fig_approach_mape), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
 with approach_col2:
     fig_approach_mae = px.bar(
@@ -2516,8 +2918,8 @@ with approach_col2:
     fig_approach_mae.update_layout(showlegend=False)
     fig_approach_mae.update_xaxes(title_text="", tickfont=dict(size=10))
     fig_approach_mae.update_yaxes(title_text="MAE")
-    style_figure(fig_approach_mae, 405)
-    st.plotly_chart(add_chart_motion(fig_approach_mae), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    style_figure(fig_approach_mae, 270)
+    st.plotly_chart(add_chart_motion(fig_approach_mae), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
 st.info(
         "Interpretation: Models are ranked using validation WAPE. "
@@ -2554,9 +2956,9 @@ with tab_analysis:
         },
     )
     fig_compare.update_traces(line=dict(width=2))
-    style_figure(fig_compare, 430)
+    style_figure(fig_compare, 285)
     fig_compare.update_layout(showlegend=True)
-    st.plotly_chart(add_chart_motion(fig_compare), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    st.plotly_chart(add_chart_motion(fig_compare), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
     st.subheader("Monthly Historical Sales Trend")
     fig_month_analysis = px.line(
@@ -2568,8 +2970,8 @@ with tab_analysis:
         color_discrete_sequence=[theme["blue"]],
         labels={"month": "Month", "daily_demand": "Total Demand"},
     )
-    style_figure(fig_month_analysis, 410)
-    st.plotly_chart(add_chart_motion(fig_month_analysis), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    style_figure(fig_month_analysis, 265)
+    st.plotly_chart(add_chart_motion(fig_month_analysis), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
     st.subheader("Forecast Error Analysis")
     error_data = comparison.dropna(subset=["error"]).copy()
@@ -2582,8 +2984,8 @@ with tab_analysis:
         labels={"forecast_date": "Date", "error": "Forecast Error"},
     )
     fig_error.add_hline(y=0, line_dash="dash", line_color=theme["muted"])
-    style_figure(fig_error, 410)
-    st.plotly_chart(add_chart_motion(fig_error), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    style_figure(fig_error, 265)
+    st.plotly_chart(add_chart_motion(fig_error), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
     st.subheader(f"{selected_model} Forecast Trend")
     fig_forecast = px.line(
@@ -2595,8 +2997,8 @@ with tab_analysis:
         labels={"forecast_date": "Forecast Date", "predicted_demand": "Predicted Demand"},
     )
     fig_forecast.update_traces(line=dict(width=2.5))
-    style_figure(fig_forecast, 410)
-    st.plotly_chart(add_chart_motion(fig_forecast), use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    style_figure(fig_forecast, 265)
+    st.plotly_chart(add_chart_motion(fig_forecast), use_container_width=True, config={"responsive": True, "displayModeBar": "hover", "scrollZoom": True})
 
 
 # =========================================================
