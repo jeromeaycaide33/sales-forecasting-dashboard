@@ -1553,7 +1553,7 @@ if not st.session_state.show_dashboard:
             use_container_width=True,
         )
 
-    st.markdown(
+    st.html(
         textwrap.dedent(
             """
             <style>
@@ -1679,8 +1679,7 @@ if not st.session_state.show_dashboard:
               </section>
             </div>
             """
-        ),
-        unsafe_allow_html=True,
+        )
     )
 
     st.write("")
