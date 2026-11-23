@@ -2060,12 +2060,13 @@ comparison["absolute_error"] = comparison["error"].abs()
 # =========================================================
 # NAVIGATION TABS
 # =========================================================
-tab_overview, tab_evaluation, tab_analysis, tab_auto_forecast, tab_downloads = st.tabs(
+tab_overview, tab_evaluation, tab_analysis, tab_auto_forecast, tab_live_dataset, tab_downloads = st.tabs(
     [
         "Overview",
         "Model Evaluation",
         "Forecast Analysis",
         "Automatic Forecasting",
+        "Live Dataset Studio",
         "Downloads & Data",
     ]
 )
@@ -2675,6 +2676,152 @@ with tab_auto_forecast:
             key="download_phase2_results_zip",
         )
         st.caption(f"Persistent results location: {st.session_state['phase2_storage_path']}")
+
+
+# =========================================================
+# LIVE DATASET STUDIO — charts are driven by the latest completed upload run
+# =========================================================
+with tab_live_dataset:
+    st.markdown(
+        """
+        <div style="padding:26px 28px;border-radius:18px;background:linear-gradient(120deg,#102A43,#145B68);color:#F4FAFC;margin-bottom:18px;">
+          <div style="font-size:11px;letter-spacing:2.2px;font-weight:700;color:#8CE0D0;">DATASET-DRIVEN WORKSPACE</div>
+          <div style="font-size:28px;font-weight:800;line-height:1.2;margin-top:8px;">Live Dataset Studio</div>
+          <div style="font-size:13px;color:#D5E8ED;margin-top:7px;">A separate view built from the dataset used in your latest completed forecasting run.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    live_results = st.session_state.get("phase2_results")
+    live_source_name = st.session_state.get("phase2_source_name")
+
+    if not live_results:
+        st.info(
+            "Wala pang completed upload run. Pumunta sa Downloads & Data para mag-upload, "
+            "pagkatapos ay buksan ang Automatic Forecasting at patakbuhin ang forecast. "
+            "Dito lalabas ang charts mula mismo sa napiling dataset."
+        )
+    else:
+        live_daily = live_results["daily"].copy()
+        live_daily["Date"] = pd.to_datetime(live_daily["Date"], errors="coerce")
+        live_daily["Quantity_Sold"] = pd.to_numeric(live_daily["Quantity_Sold"], errors="coerce")
+        live_daily["Total_Sales"] = pd.to_numeric(live_daily["Total_Sales"], errors="coerce")
+        live_daily = live_daily.dropna(subset=["Date"]).sort_values("Date")
+
+        st.markdown(
+            f"""
+            <div style="padding:12px 16px;border-left:4px solid #19A7A1;background:rgba(25,167,161,.10);border-radius:8px;margin-bottom:16px;">
+              <div style="font-size:10px;letter-spacing:1.4px;font-weight:700;opacity:.75;">ACTIVE DATASET</div>
+              <div style="font-size:16px;font-weight:750;margin-top:3px;">{html.escape(str(live_source_name or "Uploaded dataset"))}</div>
+              <div style="font-size:11px;opacity:.75;margin-top:4px;">{len(live_daily):,} daily records · {live_daily['Date'].min():%b %d, %Y} – {live_daily['Date'].max():%b %d, %Y}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        live_total_qty = live_daily["Quantity_Sold"].sum()
+        live_total_sales = live_daily["Total_Sales"].sum()
+        live_avg_sales = live_daily["Total_Sales"].mean()
+        live_peak_day = live_daily.loc[live_daily["Total_Sales"].idxmax()]
+
+        live_kpis = st.columns(4, gap="medium")
+        live_kpis[0].metric("Total Units Sold", f"{live_total_qty:,.0f}")
+        live_kpis[1].metric("Total Revenue", f"{live_total_sales:,.2f}")
+        live_kpis[2].metric("Average Daily Revenue", f"{live_avg_sales:,.2f}")
+        live_kpis[3].metric("Highest Revenue Day", f"{live_peak_day['Total_Sales']:,.2f}", help=str(live_peak_day["Date"].date()))
+
+        live_left, live_right = st.columns([1.35, 1], gap="large")
+        with live_left:
+            st.markdown("#### Revenue movement")
+            live_revenue_fig = px.area(
+                live_daily,
+                x="Date",
+                y="Total_Sales",
+                title="Daily revenue from uploaded dataset",
+                color_discrete_sequence=["#13A89E"],
+            )
+            live_revenue_fig.update_traces(
+                line=dict(width=2.5, color="#087F8C"),
+                fillcolor="rgba(19,168,158,.18)",
+                mode="lines",
+            )
+            live_revenue_fig.update_layout(
+                template="plotly_white",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(247,250,252,1)",
+                margin=dict(l=12, r=12, t=55, b=12),
+                height=370,
+                hovermode="x unified",
+            )
+            st.plotly_chart(add_chart_motion(live_revenue_fig), use_container_width=True, key="live_dataset_revenue_chart")
+
+        with live_right:
+            st.markdown("#### Units sold")
+            live_qty_fig = px.bar(
+                live_daily,
+                x="Date",
+                y="Quantity_Sold",
+                title="Daily quantity sold",
+                color_discrete_sequence=["#3157A4"],
+            )
+            live_qty_fig.update_traces(marker_line_width=0, opacity=.88)
+            live_qty_fig.update_layout(
+                template="plotly_white",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(247,250,252,1)",
+                margin=dict(l=12, r=12, t=55, b=12),
+                height=370,
+                hovermode="x unified",
+            )
+            st.plotly_chart(add_chart_motion(live_qty_fig), use_container_width=True, key="live_dataset_quantity_chart")
+
+        st.markdown("#### Revenue and quantity by month")
+        live_monthly = (
+            live_daily.set_index("Date")[["Quantity_Sold", "Total_Sales"]]
+            .resample("MS").sum().reset_index()
+        )
+        monthly_qty_col, monthly_revenue_col = st.columns(2, gap="large")
+        with monthly_qty_col:
+            live_month_qty_fig = px.bar(
+                live_monthly,
+                x="Date",
+                y="Quantity_Sold",
+                title="Monthly quantity sold",
+                color_discrete_sequence=["#3157A4"],
+            )
+            live_month_qty_fig.update_layout(
+                template="plotly_white",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(247,250,252,1)",
+                margin=dict(l=12, r=12, t=55, b=12),
+                height=340,
+            )
+            st.plotly_chart(add_chart_motion(live_month_qty_fig), use_container_width=True, key="live_dataset_monthly_qty_chart")
+        with monthly_revenue_col:
+            live_month_revenue_fig = px.bar(
+                live_monthly,
+                x="Date",
+                y="Total_Sales",
+                title="Monthly revenue",
+                color_discrete_sequence=["#13A89E"],
+            )
+            live_month_revenue_fig.update_layout(
+                template="plotly_white",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(247,250,252,1)",
+                margin=dict(l=12, r=12, t=55, b=12),
+                height=340,
+            )
+            st.plotly_chart(add_chart_motion(live_month_revenue_fig), use_container_width=True, key="live_dataset_monthly_revenue_chart")
+
+        with st.expander("Inspect the exact daily data used by these graphs"):
+            st.dataframe(live_daily, use_container_width=True, hide_index=True)
+
+        st.caption(
+            "All figures above are calculated from the latest completed uploaded dataset run. "
+            "Upload another dataset and run forecasting again to replace this view with its values."
+        )
 
 
 # =========================================================
