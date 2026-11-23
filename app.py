@@ -404,6 +404,39 @@ def build_css(t):
         border-color: var(--border) !important;
     }}
 
+    /* Motion polish: subtle entrance and hover movement, without changing widgets. */
+    @keyframes sfFadeRise {{
+        from {{ opacity: 0; transform: translateY(9px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
+    [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stMetric"],
+    [data-testid="stPlotlyChart"] {{
+        animation: sfFadeRise .55s ease both;
+    }}
+    [data-testid="stMetric"] {{
+        transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }}
+    [data-testid="stMetric"]:hover {{
+        transform: translateY(-4px);
+        border-color: var(--blue) !important;
+        box-shadow: 0 12px 28px rgba(0, 170, 190, .16) !important;
+    }}
+    [data-testid="stPlotlyChart"] {{
+        transition: transform .22s ease, filter .22s ease;
+    }}
+    [data-testid="stPlotlyChart"]:hover {{
+        filter: drop-shadow(0 8px 15px rgba(0, 160, 185, .10));
+    }}
+    @media (prefers-reduced-motion: reduce) {{
+        [data-testid="stVerticalBlockBorderWrapper"],
+        [data-testid="stMetric"],
+        [data-testid="stPlotlyChart"] {{
+            animation: none !important;
+            transition: none !important;
+        }}
+    }}
+
     /* Refined dashboard styling */
     html, body, [class*="css"] {{
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -937,6 +970,146 @@ def style_figure(fig, height: int = 340):
     return fig
 
 
+def add_chart_motion(fig, frame_count: int = 16):
+    """
+    Add optional Play/Pause animation to an existing Plotly figure.
+    The animation uses the figure's existing x/y/z values only; it does not
+    generate, alter, or simulate sales observations.
+    """
+    import math
+    import plotly.graph_objects as go
+
+    if not fig.data:
+        return fig
+
+    animated_traces = []
+    for trace_index, trace in enumerate(fig.data):
+        trace_type = getattr(trace, "type", "")
+        if trace_type == "heatmap":
+            z_values = getattr(trace, "z", None)
+            if z_values is not None and len(z_values):
+                animated_traces.append((trace_index, "heatmap", z_values))
+            continue
+
+        x_values = getattr(trace, "x", None)
+        y_values = getattr(trace, "y", None)
+        if x_values is None or y_values is None:
+            continue
+        if len(x_values) == 0 or len(y_values) == 0:
+            continue
+        if trace_type not in ("scatter", "bar", "scattergl"):
+            continue
+        animated_traces.append((trace_index, trace_type, (x_values, y_values)))
+
+    if not animated_traces:
+        return fig
+
+    frames = []
+    for step in range(1, frame_count + 1):
+        progress = step / frame_count
+        frame_data = []
+        trace_indices = []
+
+        for trace_index, trace_type, values in animated_traces:
+            trace = fig.data[trace_index]
+
+            if trace_type == "heatmap":
+                z_rows = [list(row) for row in values]
+                visible_rows = max(1, math.ceil(len(z_rows) * progress))
+                revealed_z = [
+                    row if row_index < visible_rows else [None] * len(row)
+                    for row_index, row in enumerate(z_rows)
+                ]
+                frame_data.append(go.Heatmap(z=revealed_z))
+                trace_indices.append(trace_index)
+                continue
+
+            x_values, y_values = values
+            point_count = min(len(x_values), len(y_values))
+
+            if trace_type == "bar":
+                # Keep all category labels visible while bars grow from zero
+                # toward the exact values in the source dataset.
+                orientation = getattr(trace, "orientation", "v")
+                if orientation == "h":
+                    animated_x = [float(value) * progress for value in x_values]
+                    frame_data.append(go.Bar(x=animated_x, y=list(y_values)))
+                else:
+                    animated_y = [float(value) * progress for value in y_values]
+                    frame_data.append(go.Bar(x=list(x_values), y=animated_y))
+                trace_indices.append(trace_index)
+                continue
+
+            visible_points = max(1, math.ceil(point_count * progress))
+            frame_data.append(
+                go.Scatter(
+                    x=list(x_values[:visible_points]),
+                    y=list(y_values[:visible_points]),
+                )
+            )
+            trace_indices.append(trace_index)
+
+        frames.append(
+            go.Frame(
+                name=f"reveal-{step}",
+                data=frame_data,
+                traces=trace_indices,
+            )
+        )
+
+    fig.frames = tuple(frames)
+
+    existing_menus = list(fig.layout.updatemenus) if fig.layout.updatemenus else []
+    existing_menus.append(
+        dict(
+            type="buttons",
+            direction="right",
+            x=1,
+            xanchor="right",
+            y=1.16,
+            yanchor="top",
+            showactive=False,
+            bgcolor="rgba(35, 170, 184, 0.16)",
+            bordercolor="rgba(65, 190, 200, 0.55)",
+            borderwidth=1,
+            font=dict(size=10, color=theme["text"]),
+            buttons=[
+                dict(
+                    label="▶ Play",
+                    method="animate",
+                    args=[
+                        None,
+                        {
+                            "frame": {"duration": 55, "redraw": True},
+                            "transition": {"duration": 45, "easing": "cubic-in-out"},
+                            "fromcurrent": False,
+                            "mode": "immediate",
+                        },
+                    ],
+                ),
+                dict(
+                    label="Ⅱ Pause",
+                    method="animate",
+                    args=[
+                        [None],
+                        {
+                            "frame": {"duration": 0, "redraw": False},
+                            "transition": {"duration": 0},
+                            "mode": "immediate",
+                        },
+                    ],
+                ),
+            ],
+        )
+    )
+    fig.update_layout(
+        updatemenus=existing_menus,
+        transition={"duration": 300, "easing": "cubic-in-out"},
+        hovermode="x unified",
+    )
+    return fig
+
+
 # =========================================================
 # LANDING PAGE — CONCEPT A: EXECUTIVE ANALYTICS
 # =========================================================
@@ -986,18 +1159,12 @@ if not st.session_state.show_dashboard:
                 <div class="sf-preview-kpi"><div class="sf-preview-kpi-label">MODEL REVIEW</div><div class="sf-preview-kpi-value">4 approaches</div></div>
                 <div class="sf-preview-kpi"><div class="sf-preview-kpi-label">FORECAST OUTPUT</div><div class="sf-preview-kpi-value">Predictions</div></div>
               </div>
-              <div class="sf-chart-shell">
-                <div class="sf-chart-label"><span>DEMAND TREND PREVIEW</span><span>HISTORICAL + FORECAST</span></div>
-                <div class="sf-chart">
-                  <span style="height:38%"></span><span style="height:51%"></span>
-                  <span style="height:45%"></span><span style="height:62%"></span>
-                  <span style="height:55%"></span><span style="height:72%"></span>
-                  <span style="height:64%"></span><span style="height:83%"></span>
-                  <span style="height:72%"></span><span style="height:91%"></span>
-                  <span style="height:79%"></span><span style="height:98%"></span>
-                </div>
-                <div class="sf-chart-legend"><span>PAST DEMAND</span><span>FORECAST INSIGHTS</span></div>
-              </div>
+               <div class="sf-chart-shell">
+                 <div class="sf-chart-label"><span>LIVE DATA VISUALIZATION</span><span>DATASET-DRIVEN</span></div>
+                 <div style="padding:24px 8px;text-align:center;color:var(--muted);font-size:.78rem;line-height:1.7;">
+                   Open the dashboard to view animated charts generated from the loaded sales dataset.
+                 </div>
+               </div>
               <div class="sf-model-tags"><span>ARIMA</span><span>SARIMA</span><span>PROPHET</span><span>RANDOM FOREST</span></div>
             </div>
           </section>
@@ -1967,7 +2134,7 @@ with tab_overview:
             fig_overview_models.update_layout(showlegend=False, xaxis_title="Validation WAPE (%)", yaxis_title="")
             style_figure(fig_overview_models, 320)
             st.plotly_chart(
-                fig_overview_models,
+                add_chart_motion(fig_overview_models),
                 use_container_width=True,
                 config={"responsive": True, "displayModeBar": False},
             )
@@ -1987,7 +2154,7 @@ with tab_overview:
             fig_monthly_overview.update_yaxes(title_text="")
             style_figure(fig_monthly_overview, 320)
             st.plotly_chart(
-                fig_monthly_overview,
+                add_chart_motion(fig_monthly_overview),
                 use_container_width=True,
                 config={"responsive": True, "displayModeBar": False},
             )
@@ -2022,7 +2189,7 @@ with tab_overview:
             fig_heatmap.update_yaxes(tickfont=dict(size=9))
             style_figure(fig_heatmap, 350)
             st.plotly_chart(
-                fig_heatmap,
+                add_chart_motion(fig_heatmap),
                 use_container_width=True,
                 config={"responsive": True, "displayModeBar": False},
             )
@@ -2048,7 +2215,7 @@ with tab_overview:
             fig_forecast_overview.update_xaxes(title_text="")
             style_figure(fig_forecast_overview, 275)
             st.plotly_chart(
-                fig_forecast_overview,
+                add_chart_motion(fig_forecast_overview),
                 use_container_width=True,
                 config={"responsive": True, "displayModeBar": False},
             )
@@ -2093,7 +2260,7 @@ with tab_evaluation:
         fig_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
         fig_mape.update_layout(showlegend=False)
         style_figure(fig_mape, 410)
-        st.plotly_chart(fig_mape, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+        st.plotly_chart(add_chart_motion(fig_mape), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     with metric_col2:
         fig_mae = px.bar(
@@ -2114,7 +2281,7 @@ with tab_evaluation:
         fig_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
         fig_mae.update_layout(showlegend=False)
         style_figure(fig_mae, 410)
-        st.plotly_chart(fig_mae, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+        st.plotly_chart(add_chart_motion(fig_mae), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     st.subheader("Model Performance Summary")
     performance_display = performance.copy()
@@ -2217,7 +2384,7 @@ fig_approach_mape.update_layout(showlegend=False)
 fig_approach_mape.update_xaxes(title_text="", tickfont=dict(size=10))
 fig_approach_mape.update_yaxes(title_text="MAPE (%)")
 style_figure(fig_approach_mape, 405)
-st.plotly_chart(fig_approach_mape, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+st.plotly_chart(add_chart_motion(fig_approach_mape), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
 with approach_col2:
     fig_approach_mae = px.bar(
@@ -2234,7 +2401,7 @@ with approach_col2:
     fig_approach_mae.update_xaxes(title_text="", tickfont=dict(size=10))
     fig_approach_mae.update_yaxes(title_text="MAE")
     style_figure(fig_approach_mae, 405)
-    st.plotly_chart(fig_approach_mae, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    st.plotly_chart(add_chart_motion(fig_approach_mae), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
 st.info(
         "Interpretation: Models are ranked using 2023 validation WAPE. "
@@ -2273,7 +2440,7 @@ with tab_analysis:
     fig_compare.update_traces(line=dict(width=2))
     style_figure(fig_compare, 430)
     fig_compare.update_layout(showlegend=True)
-    st.plotly_chart(fig_compare, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    st.plotly_chart(add_chart_motion(fig_compare), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     st.subheader("Monthly Historical Sales Trend")
     fig_month_analysis = px.line(
@@ -2286,7 +2453,7 @@ with tab_analysis:
         labels={"month": "Month", "daily_demand": "Total Demand"},
     )
     style_figure(fig_month_analysis, 410)
-    st.plotly_chart(fig_month_analysis, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    st.plotly_chart(add_chart_motion(fig_month_analysis), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     st.subheader("Forecast Error Analysis")
     error_data = comparison.dropna(subset=["error"]).copy()
@@ -2300,7 +2467,7 @@ with tab_analysis:
     )
     fig_error.add_hline(y=0, line_dash="dash", line_color=theme["muted"])
     style_figure(fig_error, 410)
-    st.plotly_chart(fig_error, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    st.plotly_chart(add_chart_motion(fig_error), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
     st.subheader(f"{selected_model} Forecast Trend")
     fig_forecast = px.line(
@@ -2313,7 +2480,7 @@ with tab_analysis:
     )
     fig_forecast.update_traces(line=dict(width=2.5))
     style_figure(fig_forecast, 410)
-    st.plotly_chart(fig_forecast, use_container_width=True, config={"responsive": True, "displayModeBar": False})
+    st.plotly_chart(add_chart_motion(fig_forecast), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
 
 # =========================================================
@@ -2481,7 +2648,7 @@ with tab_auto_forecast:
             labels={"Value": "Daily value", "Date": "Date"},
         )
         fig_test.update_layout(legend_title_text="Series / Model")
-        st.plotly_chart(fig_test, use_container_width=True)
+        st.plotly_chart(add_chart_motion(fig_test), use_container_width=True)
 
         st.subheader(f"Next {phase2_results['horizon']} Days · Forecast by Model")
         fig_future = px.line(
@@ -2492,7 +2659,7 @@ with tab_auto_forecast:
             title=f"Future {target_choice} forecast",
             labels={"Forecast_Date": "Forecast date", "Predicted_Value": "Predicted value"},
         )
-        st.plotly_chart(fig_future, use_container_width=True)
+        st.plotly_chart(add_chart_motion(fig_future), use_container_width=True)
         st.dataframe(
             future_view[["Forecast_Date", "Model", "Predicted_Value"]].round(2),
             use_container_width=True,
