@@ -50,58 +50,58 @@ def toggle_theme():
 
 DARK_THEME = {
     "name": "dark",
-    "page": "#071326",
-    "page_grad_1": "#08172D",
-    "page_grad_2": "#050E1D",
-    "sidebar": "#09182C",
-    "hero": "#102442",
-    "hero2": "#142E52",
-    "panel": "#0B1B31",
-    "panel_alt": "#102541",
-    "panel_soft": "#0D2039",
-    "border": "#29466B",
-    "tab_bg": "#0D2038",
-    "tab_active": "#12396A",
-    "tab_text": "#c8d4e3",
-    "tab_active_border": "#398BFF",
-    "text": "#edf3fb",
-    "muted": "#9db0c5",
-    "blue": "#398BFF",
-    "blue_light": "#75B5FF",
-    "teal": "#55b8a5",
-    "gold": "#e0b85c",
-    "success_bg": "#0B2938",
-    "success_border": "#1C7895",
-    "success_text": "#d4eff0",
-    "table_header": "#132B49",
+    "page": "#101B17",
+    "page_grad_1": "#172820",
+    "page_grad_2": "#0B1411",
+    "sidebar": "#111F19",
+    "hero": "#1B342A",
+    "hero2": "#294B3B",
+    "panel": "#172A21",
+    "panel_alt": "#20382C",
+    "panel_soft": "#1A3025",
+    "border": "#3B5D49",
+    "tab_bg": "#172A21",
+    "tab_active": "#28513E",
+    "tab_text": "#D8E5D9",
+    "tab_active_border": "#55C49A",
+    "text": "#F1F4EA",
+    "muted": "#B0C0B3",
+    "blue": "#4FC49A",
+    "blue_light": "#A4E2C5",
+    "teal": "#D18B5D",
+    "gold": "#E5BE72",
+    "success_bg": "#18392D",
+    "success_border": "#438D6D",
+    "success_text": "#DDF4E7",
+    "table_header": "#294336",
 }
 
 LIGHT_THEME = {
     "name": "light",
-    "page": "#eef3f8",
-    "page_grad_1": "#eef3f8",
-    "page_grad_2": "#e6edf5",
-    "sidebar": "#e7eef6",
-    "hero": "#ffffff",
-    "hero2": "#f6f9fc",
-    "panel": "#ffffff",
-    "panel_alt": "#f7fafd",
-    "panel_soft": "#f3f7fb",
-    "border": "#d7e1ec",
-    "tab_bg": "#ffffff",
-    "tab_active": "#dfeaf7",
-    "tab_text": "#42566f",
-    "tab_active_border": "#6f93bb",
-    "text": "#32465d",
-    "muted": "#6b7e93",
-    "blue": "#6f93bb",
-    "blue_light": "#87a9cf",
-    "teal": "#5db39f",
-    "gold": "#d8aa4f",
-    "success_bg": "#ecf7f4",
-    "success_border": "#b7ded4",
-    "success_text": "#355f59",
-    "table_header": "#edf3f8",
+    "page": "#F3F0E7",
+    "page_grad_1": "#F8F6EF",
+    "page_grad_2": "#EAE7DC",
+    "sidebar": "#E4E6D9",
+    "hero": "#FFFEF8",
+    "hero2": "#E8F0E7",
+    "panel": "#FFFEF9",
+    "panel_alt": "#F4F5EC",
+    "panel_soft": "#EAF0E8",
+    "border": "#D0D9CB",
+    "tab_bg": "#FFFEF9",
+    "tab_active": "#DCECE1",
+    "tab_text": "#40564A",
+    "tab_active_border": "#218A67",
+    "text": "#26382E",
+    "muted": "#68796D",
+    "blue": "#178765",
+    "blue_light": "#55A989",
+    "teal": "#B96F49",
+    "gold": "#C69A4B",
+    "success_bg": "#E7F3E9",
+    "success_border": "#B8D8C0",
+    "success_text": "#315D42",
+    "table_header": "#E6EDE3",
 }
 
 theme = DARK_THEME if st.session_state.theme_mode == "dark" else LIGHT_THEME
@@ -865,6 +865,125 @@ if not st.session_state.show_dashboard:
     )
 
 # =========================================================
+# FOREST + SAND GLASS UI — GLOBAL PRESENTATION OVERRIDES
+# CSS-only layer: keeps all existing Python logic and widgets intact.
+# =========================================================
+st.markdown(
+    """
+    <style>
+    :root {
+      --forest-accent: var(--blue);
+      --forest-accent-soft: var(--blue-light);
+      --forest-copper: var(--teal);
+      --forest-gold: var(--gold);
+      --forest-glass: color-mix(in srgb, var(--panel) 78%, transparent);
+      --forest-glass-strong: color-mix(in srgb, var(--panel-alt) 88%, transparent);
+      --forest-line: color-mix(in srgb, var(--border) 78%, transparent);
+    }
+    .stApp {
+      background:
+        radial-gradient(ellipse at 10% 0%, color-mix(in srgb, var(--blue) 17%, transparent), transparent 34%),
+        radial-gradient(ellipse at 92% 12%, color-mix(in srgb, var(--teal) 13%, transparent), transparent 30%),
+        linear-gradient(135deg, var(--page-grad-1), var(--page-grad-2)) !important;
+      background-attachment: fixed !important;
+      color: var(--text) !important;
+    }
+    [data-testid="stAppViewContainer"], [data-testid="stMain"] { background: transparent !important; }
+    [data-testid="stHeader"] {
+      background: color-mix(in srgb, var(--page) 74%, transparent) !important;
+      backdrop-filter: blur(20px) saturate(145%) !important;
+    }
+    [data-testid="stSidebar"] > div:first-child {
+      background: linear-gradient(165deg, color-mix(in srgb, var(--sidebar) 94%, transparent), color-mix(in srgb, var(--panel) 88%, transparent)) !important;
+      border-right: 1px solid var(--forest-line) !important;
+      box-shadow: 12px 0 36px rgba(0,0,0,.10) !important;
+      backdrop-filter: blur(26px) saturate(150%) !important;
+    }
+    .sf-hero, .sf-landing-hero {
+      background:
+        radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--blue) 18%, transparent), transparent 32%),
+        linear-gradient(125deg, var(--hero), var(--hero2)) !important;
+      border: 1px solid var(--forest-line) !important;
+      border-radius: 24px !important;
+      box-shadow: 0 22px 55px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.09) !important;
+      backdrop-filter: blur(22px) saturate(145%) !important;
+    }
+    .sf-landing-hero:before { border-color: color-mix(in srgb, var(--blue-light) 38%, transparent) !important; box-shadow: 0 0 0 28px color-mix(in srgb, var(--blue) 7%, transparent), 0 0 0 62px color-mix(in srgb, var(--blue) 5%, transparent) !important; }
+    .sf-brand, .sf-landing-kicker, .sf-eyebrow { color: var(--blue-light) !important; }
+    .sf-landing-title, .sf-preview-heading, .sf-title { color: var(--text) !important; }
+    .sf-landing-title span, .sf-kicker-dot { color: var(--blue-light) !important; background: var(--blue) !important; }
+    .sf-landing-copy, .sf-landing-points, .sf-preview-sub, .sf-preview-top { color: var(--muted) !important; }
+    .sf-landing-points span:before { color: var(--blue) !important; }
+    .sf-preview-card, .sf-feature, .sf-preview-kpi, .sf-chart-shell, .sf-model-tags span {
+      background: var(--forest-glass) !important;
+      border: 1px solid var(--forest-line) !important;
+      border-radius: 18px !important;
+      box-shadow: 0 14px 36px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.08) !important;
+      backdrop-filter: blur(20px) saturate(145%) !important;
+    }
+    .sf-live-pill { color: var(--blue-light) !important; background: color-mix(in srgb, var(--blue) 13%, transparent) !important; border-color: color-mix(in srgb, var(--blue) 35%, transparent) !important; }
+    .sf-chart span { background: linear-gradient(180deg, var(--blue-light), var(--blue)) !important; box-shadow: 0 0 13px color-mix(in srgb, var(--blue) 18%, transparent) !important; }
+    .sf-feature-icon { background: color-mix(in srgb, var(--blue) 13%, transparent) !important; border-color: color-mix(in srgb, var(--blue) 30%, transparent) !important; }
+    [data-testid="stVerticalBlockBorderWrapper"], [data-testid="stMetric"],
+    [data-testid="stExpander"] details, [data-testid="stAlert"],
+    [data-testid="stPlotlyChart"], [data-testid="stDataFrame"], [data-testid="stTable"] {
+      background: var(--forest-glass) !important;
+      border: 1px solid var(--forest-line) !important;
+      border-radius: 18px !important;
+      box-shadow: 0 14px 36px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.07) !important;
+      backdrop-filter: blur(18px) saturate(140%) !important;
+    }
+    [data-testid="stMetric"] { padding: 18px !important; }
+    [data-testid="stVerticalBlockBorderWrapper"]:hover, [data-testid="stMetric"]:hover {
+      border-color: color-mix(in srgb, var(--blue) 55%, var(--border)) !important;
+      transform: translateY(-1px);
+    }
+    [data-testid="stTabs"] [role="tablist"] {
+      gap: 7px !important; padding: 7px !important;
+      background: var(--forest-glass) !important;
+      border: 1px solid var(--forest-line) !important;
+      border-radius: 17px !important;
+      backdrop-filter: blur(18px) !important;
+    }
+    [data-testid="stTabs"] button[role="tab"] { border-radius: 12px !important; color: var(--muted) !important; }
+    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+      background: color-mix(in srgb, var(--blue) 19%, var(--panel)) !important;
+      border: 1px solid color-mix(in srgb, var(--blue) 48%, var(--border)) !important;
+      color: var(--text) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10) !important;
+    }
+    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {
+      background: var(--forest-glass-strong) !important;
+      border: 1px solid var(--forest-line) !important;
+      border-radius: 13px !important;
+      color: var(--text) !important;
+      backdrop-filter: blur(14px) !important;
+    }
+    .stButton button, [data-testid="stDownloadButton"] button,
+    [data-testid="stFormSubmitButton"] button, div[data-testid="stButton"] button[kind="primary"] {
+      border: 1px solid color-mix(in srgb, var(--blue) 58%, var(--border)) !important;
+      border-radius: 13px !important;
+      background: linear-gradient(120deg, var(--blue), color-mix(in srgb, var(--blue) 66%, var(--teal))) !important;
+      color: #fff !important;
+      box-shadow: 0 9px 24px color-mix(in srgb, var(--blue) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.17) !important;
+      transition: transform .18s ease, filter .18s ease !important;
+    }
+    .stButton button:hover, [data-testid="stDownloadButton"] button:hover,
+    [data-testid="stFormSubmitButton"] button:hover { filter: brightness(1.08) !important; transform: translateY(-2px) !important; }
+    [data-testid="stDataFrame"] *, [data-testid="stTable"] * { color: var(--text); }
+    hr { border-color: var(--forest-line) !important; }
+    .sf-panel-title, .sf-section-heading { color: var(--text) !important; }
+    .sf-panel-subtitle, .sf-section-copy, .sf-metric-label, .sf-metric-note { color: var(--muted) !important; }
+    .sf-metric-value { color: var(--text) !important; }
+    @media (max-width: 850px) { .sf-landing-hero { grid-template-columns: 1fr !important; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# =========================================================
 # HELPER FUNCTIONS
 # =========================================================
 def panel_heading(title: str, subtitle: str | None = None) -> None:
@@ -899,6 +1018,7 @@ def dashboard_metric(label: str, value: str, note: str = "") -> None:
 def style_figure(fig, height: int = 340):
     fig.update_layout(
         template="plotly_dark" if theme["name"] == "dark" else "plotly_white",
+        colorway=[theme["blue"], theme["teal"], theme["gold"], theme["blue_light"], "#8D9B65", "#C47B62"],
         height=height,
         autosize=True,
         paper_bgcolor="rgba(0,0,0,0)",
