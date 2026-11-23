@@ -10,6 +10,7 @@ from uuid import uuid4
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+import textwrap
 
 
 # =========================================================
@@ -1553,130 +1554,132 @@ if not st.session_state.show_dashboard:
         )
 
     st.markdown(
-        """
-        <style>
-        .sf-landing-hero {
-            display:grid; grid-template-columns:1.02fr .98fr;
-            align-items:center; gap:clamp(24px,4vw,52px);
-            min-height:470px; padding:clamp(28px,4.5vw,58px);
-            border-radius:18px; border:1px solid var(--border);
-            background:linear-gradient(115deg,var(--hero),var(--hero2));
-            box-shadow:0 14px 36px rgba(0,0,0,.12);
-        }
-        .sf-landing-kicker {color:var(--blue-light);font-size:.70rem;
-            font-weight:800;letter-spacing:.18em;margin-bottom:1.2rem;}
-        .sf-landing-title {color:var(--text);font-size:clamp(2.1rem,4vw,3.65rem);
-            font-weight:850;line-height:1.08;letter-spacing:-.045em;margin:0;}
-        .sf-landing-title span {color:var(--blue-light);}
-        .sf-landing-copy {color:var(--muted);font-size:.96rem;line-height:1.8;
-            max-width:590px;margin:1.2rem 0 1.4rem;}
-        .sf-landing-points {display:flex;flex-wrap:wrap;gap:10px 18px;
-            color:var(--text);font-size:.76rem;}
-        .sf-landing-points span:before {content:"✓";color:var(--teal);
-            font-weight:900;margin-right:7px;}
-        .sf-preview-card {padding:22px;border:1px solid var(--border);
-            border-radius:14px;background:var(--panel);
-            box-shadow:0 12px 28px rgba(0,0,0,.10);}
-        .sf-preview-top {display:flex;justify-content:space-between;align-items:center;
-            gap:8px;color:var(--muted);font-size:.63rem;font-weight:800;letter-spacing:.12em;}
-        .sf-live-pill {color:var(--teal);background:var(--success-bg);
-            border:1px solid var(--success-border);border-radius:20px;
-            padding:5px 9px;font-size:.59rem;white-space:nowrap;}
-        .sf-preview-heading {color:var(--text);font-size:1.22rem;
-            font-weight:800;margin:17px 0 3px;}
-        .sf-preview-sub {color:var(--muted);font-size:.72rem;margin-bottom:18px;}
-        .sf-chart-shell {border:1px solid var(--border);border-radius:11px;
-            background:var(--panel-soft);padding:14px 14px 9px;}
-        .sf-chart-label {display:flex;justify-content:space-between;gap:8px;
-            color:var(--muted);font-size:.62rem;font-weight:750;
-            letter-spacing:.08em;margin-bottom:8px;}
-        .sf-chart-svg {width:100%;height:auto;display:block;}
-        .sf-chart-note {color:var(--muted);font-size:.62rem;margin-top:7px;}
-        .sf-model-tags {display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
-        .sf-model-tags span {color:var(--text);font-size:.61rem;padding:5px 8px;
-            border:1px solid var(--border);border-radius:6px;background:var(--panel-soft);}
-        @media(max-width:850px) {
-            .sf-landing-hero {grid-template-columns:1fr;min-height:0;padding:28px 22px;}
-        }
-        </style>
+        textwrap.dedent(
+            """
+            <style>
+            .sf-landing-hero {
+                display:grid; grid-template-columns:1.02fr .98fr;
+                align-items:center; gap:clamp(24px,4vw,52px);
+                min-height:470px; padding:clamp(28px,4.5vw,58px);
+                border-radius:18px; border:1px solid var(--border);
+                background:linear-gradient(115deg,var(--hero),var(--hero2));
+                box-shadow:0 14px 36px rgba(0,0,0,.12);
+            }
+            .sf-landing-kicker {color:var(--blue-light);font-size:.70rem;
+                font-weight:800;letter-spacing:.18em;margin-bottom:1.2rem;}
+            .sf-landing-title {color:var(--text);font-size:clamp(2.1rem,4vw,3.65rem);
+                font-weight:850;line-height:1.08;letter-spacing:-.045em;margin:0;}
+            .sf-landing-title span {color:var(--blue-light);}
+            .sf-landing-copy {color:var(--muted);font-size:.96rem;line-height:1.8;
+                max-width:590px;margin:1.2rem 0 1.4rem;}
+            .sf-landing-points {display:flex;flex-wrap:wrap;gap:10px 18px;
+                color:var(--text);font-size:.76rem;}
+            .sf-landing-points span:before {content:"✓";color:var(--teal);
+                font-weight:900;margin-right:7px;}
+            .sf-preview-card {padding:22px;border:1px solid var(--border);
+                border-radius:14px;background:var(--panel);
+                box-shadow:0 12px 28px rgba(0,0,0,.10);}
+            .sf-preview-top {display:flex;justify-content:space-between;align-items:center;
+                gap:8px;color:var(--muted);font-size:.63rem;font-weight:800;letter-spacing:.12em;}
+            .sf-live-pill {color:var(--teal);background:var(--success-bg);
+                border:1px solid var(--success-border);border-radius:20px;
+                padding:5px 9px;font-size:.59rem;white-space:nowrap;}
+            .sf-preview-heading {color:var(--text);font-size:1.22rem;
+                font-weight:800;margin:17px 0 3px;}
+            .sf-preview-sub {color:var(--muted);font-size:.72rem;margin-bottom:18px;}
+            .sf-chart-shell {border:1px solid var(--border);border-radius:11px;
+                background:var(--panel-soft);padding:14px 14px 9px;}
+            .sf-chart-label {display:flex;justify-content:space-between;gap:8px;
+                color:var(--muted);font-size:.62rem;font-weight:750;
+                letter-spacing:.08em;margin-bottom:8px;}
+            .sf-chart-svg {width:100%;height:auto;display:block;}
+            .sf-chart-note {color:var(--muted);font-size:.62rem;margin-top:7px;}
+            .sf-model-tags {display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;}
+            .sf-model-tags span {color:var(--text);font-size:.61rem;padding:5px 8px;
+                border:1px solid var(--border);border-radius:6px;background:var(--panel-soft);}
+            @media(max-width:850px) {
+                .sf-landing-hero {grid-template-columns:1fr;min-height:0;padding:28px 22px;}
+            }
+            </style>
 
-        <div class="sf-landing-wrap">
-          <section class="sf-landing-hero">
-            <div class="sf-landing-copy-wrap">
-              <div class="sf-landing-kicker">● BUSINESS INTELLIGENCE PLATFORM</div>
-              <h1 class="sf-landing-title">Turn Sales Data Into <span>Smarter Decisions.</span></h1>
-              <p class="sf-landing-copy">
-                Monitor historical demand, compare forecasting models, and examine
-                predicted sales through one decision support workspace. Transform
-                recorded sales data into clear, practical insights for better planning.
-              </p>
-              <div class="sf-landing-points">
-                <span>Historical Demand Analysis</span>
-                <span>Forecast Model Comparison</span>
-                <span>Demand Prediction</span>
-              </div>
-            </div>
-
-            <div class="sf-preview-card">
-              <div class="sf-preview-top">
-                <span>SALES PERFORMANCE OVERVIEW</span>
-                <span class="sf-live-pill">ANALYTICS PREVIEW</span>
-              </div>
-              <div class="sf-preview-heading">Sales Forecasting DSS</div>
-              <div class="sf-preview-sub">A clear view of sales movement and demand patterns</div>
-
-              <div class="sf-chart-shell">
-                <div class="sf-chart-label">
-                  <span>SALES TREND PREVIEW</span><span>ILLUSTRATIVE</span>
+            <div class="sf-landing-wrap">
+              <section class="sf-landing-hero">
+                <div class="sf-landing-copy-wrap">
+                  <div class="sf-landing-kicker">● BUSINESS INTELLIGENCE PLATFORM</div>
+                  <h1 class="sf-landing-title">Turn Sales Data Into <span>Smarter Decisions.</span></h1>
+                  <p class="sf-landing-copy">
+                    Monitor historical demand, compare forecasting models, and examine
+                    predicted sales through one decision support workspace. Transform
+                    recorded sales data into clear, practical insights for better planning.
+                  </p>
+                  <div class="sf-landing-points">
+                    <span>Historical Demand Analysis</span>
+                    <span>Forecast Model Comparison</span>
+                    <span>Demand Prediction</span>
+                  </div>
                 </div>
-                <svg class="sf-chart-svg" viewBox="0 0 520 225" role="img"
-                     aria-label="Illustrative sales trend line graph">
-                  <defs>
-                    <linearGradient id="sfArea" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#43B99A" stop-opacity=".28"/>
-                      <stop offset="100%" stop-color="#43B99A" stop-opacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <g stroke="var(--border)" stroke-width="1" opacity=".75">
-                    <line x1="42" y1="25" x2="500" y2="25"/>
-                    <line x1="42" y1="70" x2="500" y2="70"/>
-                    <line x1="42" y1="115" x2="500" y2="115"/>
-                    <line x1="42" y1="160" x2="500" y2="160"/>
-                    <line x1="42" y1="195" x2="500" y2="195"/>
-                  </g>
-                  <g fill="var(--muted)" font-size="10">
-                    <text x="5" y="29">100</text><text x="11" y="74">75</text>
-                    <text x="11" y="119">50</text><text x="11" y="164">25</text>
-                    <text x="19" y="199">0</text><text x="42" y="215">Jan</text>
-                    <text x="130" y="215">Feb</text><text x="220" y="215">Mar</text>
-                    <text x="310" y="215">Apr</text><text x="400" y="215">May</text>
-                    <text x="480" y="215">Jun</text>
-                  </g>
-                  <path d="M42 155 L125 130 L208 143 L291 88 L374 103 L457 42 L457 195 L42 195 Z"
-                        fill="url(#sfArea)"/>
-                  <path d="M42 155 L125 130 L208 143 L291 88 L374 103 L457 42"
-                        fill="none" stroke="#43B99A" stroke-width="4"
-                        stroke-linecap="round" stroke-linejoin="round"/>
-                  <g fill="#43B99A" stroke="var(--panel)" stroke-width="3">
-                    <circle cx="42" cy="155" r="5"/><circle cx="125" cy="130" r="5"/>
-                    <circle cx="208" cy="143" r="5"/><circle cx="291" cy="88" r="5"/>
-                    <circle cx="374" cy="103" r="5"/><circle cx="457" cy="42" r="5"/>
-                  </g>
-                </svg>
-                <div class="sf-chart-note">
-                  Illustrative graph only. Actual results appear inside the dashboard
-                  after a dataset is loaded.
-                </div>
-              </div>
 
-              <div class="sf-model-tags">
-                <span>ARIMA</span><span>SARIMA</span>
-                <span>PROPHET</span><span>RANDOM FOREST</span>
-              </div>
+                <div class="sf-preview-card">
+                  <div class="sf-preview-top">
+                    <span>SALES PERFORMANCE OVERVIEW</span>
+                    <span class="sf-live-pill">ANALYTICS PREVIEW</span>
+                  </div>
+                  <div class="sf-preview-heading">Sales Forecasting DSS</div>
+                  <div class="sf-preview-sub">A clear view of sales movement and demand patterns</div>
+
+                  <div class="sf-chart-shell">
+                    <div class="sf-chart-label">
+                      <span>SALES TREND PREVIEW</span><span>ILLUSTRATIVE</span>
+                    </div>
+                    <svg class="sf-chart-svg" viewBox="0 0 520 225" role="img"
+                         aria-label="Illustrative sales trend line graph">
+                      <defs>
+                        <linearGradient id="sfArea" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="#43B99A" stop-opacity=".28"/>
+                          <stop offset="100%" stop-color="#43B99A" stop-opacity="0"/>
+                        </linearGradient>
+                      </defs>
+                      <g stroke="var(--border)" stroke-width="1" opacity=".75">
+                        <line x1="42" y1="25" x2="500" y2="25"/>
+                        <line x1="42" y1="70" x2="500" y2="70"/>
+                        <line x1="42" y1="115" x2="500" y2="115"/>
+                        <line x1="42" y1="160" x2="500" y2="160"/>
+                        <line x1="42" y1="195" x2="500" y2="195"/>
+                      </g>
+                      <g fill="var(--muted)" font-size="10">
+                        <text x="5" y="29">100</text><text x="11" y="74">75</text>
+                        <text x="11" y="119">50</text><text x="11" y="164">25</text>
+                        <text x="19" y="199">0</text><text x="42" y="215">Jan</text>
+                        <text x="130" y="215">Feb</text><text x="220" y="215">Mar</text>
+                        <text x="310" y="215">Apr</text><text x="400" y="215">May</text>
+                        <text x="480" y="215">Jun</text>
+                      </g>
+                      <path d="M42 155 L125 130 L208 143 L291 88 L374 103 L457 42 L457 195 L42 195 Z"
+                            fill="url(#sfArea)"/>
+                      <path d="M42 155 L125 130 L208 143 L291 88 L374 103 L457 42"
+                            fill="none" stroke="#43B99A" stroke-width="4"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+                      <g fill="#43B99A" stroke="var(--panel)" stroke-width="3">
+                        <circle cx="42" cy="155" r="5"/><circle cx="125" cy="130" r="5"/>
+                        <circle cx="208" cy="143" r="5"/><circle cx="291" cy="88" r="5"/>
+                        <circle cx="374" cy="103" r="5"/><circle cx="457" cy="42" r="5"/>
+                      </g>
+                    </svg>
+                    <div class="sf-chart-note">
+                      Illustrative graph only. Actual results appear inside the dashboard
+                      after a dataset is loaded.
+                    </div>
+                  </div>
+
+                  <div class="sf-model-tags">
+                    <span>ARIMA</span><span>SARIMA</span>
+                    <span>PROPHET</span><span>RANDOM FOREST</span>
+                  </div>
+                </div>
+              </section>
             </div>
-          </section>
-        </div>
-        """,
+            """
+        ),
         unsafe_allow_html=True,
     )
 
