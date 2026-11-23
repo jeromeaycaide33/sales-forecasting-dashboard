@@ -1870,6 +1870,108 @@ except Exception as error:
     st.error(f"Unable to load standardized forecasting data: {error}")
     st.stop()
 
+
+# =========================================================
+# UNIFIED ACTIVE DATASET
+# Completed Phase 2 runs become the single source of truth
+# for Overview, Model Evaluation, and Forecast Analysis.
+# =========================================================
+phase2_active_results = st.session_state.get("phase2_results")
+phase2_active_source = st.session_state.get("phase2_source_name")
+
+if phase2_active_results:
+    active_target = st.sidebar.selectbox(
+        "Dashboard data target",
+        options=["Quantity_Sold", "Total_Sales"],
+        format_func=lambda value: (
+            "Quantity Sold (units)" if value == "Quantity_Sold"
+            else "Total Sales (currency units)"
+        ),
+        key="unified_dashboard_target",
+        help="This target drives Overview, Model Evaluation, and Forecast Analysis.",
+    )
+
+    active_daily = phase2_active_results["daily"].copy()
+    active_daily["Date"] = pd.to_datetime(active_daily["Date"], errors="coerce")
+    active_daily[active_target] = pd.to_numeric(
+        active_daily[active_target], errors="coerce"
+    )
+    active_daily = active_daily.dropna(
+        subset=["Date", active_target]
+    ).sort_values("Date")
+
+    actual_df = active_daily[["Date", active_target]].rename(
+        columns={"Date": "date", active_target: "daily_demand"}
+    ).reset_index(drop=True)
+
+    def _legacy_metrics(frame):
+        result = frame.loc[frame["Target"] == active_target].copy()
+        return result.rename(
+            columns={
+                "Model": "model_name",
+                "MAE": "mae",
+                "RMSE": "rmse",
+                "MAPE (%)": "mape",
+                "WAPE (%)": "wape",
+            }
+        )[["model_name", "mae", "rmse", "mape", "wape"]]
+
+    validation_performance = _legacy_metrics(
+        phase2_active_results["validation_metrics"]
+    )
+    test_performance = _legacy_metrics(
+        phase2_active_results["test_metrics"]
+    )
+
+    def _legacy_predictions(frame):
+        result = frame.loc[frame["Target"] == active_target].copy()
+        return result.rename(
+            columns={
+                "Date": "forecast_date",
+                "Actual": "actual_demand",
+                "Model": "model_name",
+                "Predicted": "predicted_demand",
+            }
+        )[["forecast_date", "actual_demand", "model_name", "predicted_demand"]]
+
+    validation_forecasts = _legacy_predictions(
+        phase2_active_results["validation_predictions"]
+    )
+    test_forecasts = _legacy_predictions(
+        phase2_active_results["test_predictions"]
+    )
+
+    future_df = phase2_active_results["future_forecasts"].loc[
+        phase2_active_results["future_forecasts"]["Target"] == active_target
+    ].rename(
+        columns={
+            "Forecast_Date": "forecast_date",
+            "Model": "model_name",
+            "Predicted_Value": "predicted_demand",
+            "Forecast_Origin": "forecast_origin",
+        }
+    ).copy()
+    future_df["forecast_type"] = "Dynamic Phase 2 forecast"
+
+    best_active = phase2_active_results["best_models"].loc[
+        phase2_active_results["best_models"]["Target"] == active_target
+    ]
+    if not best_active.empty:
+        model_selection_summary = pd.DataFrame([{
+            "Selected_Model": best_active.iloc[0]["Selected_Model"],
+            "Selection_Metric": "Validation WAPE",
+            "Selection_Period": str(phase2_active_results["validation_year"]),
+            "Selected_Model_Validation_WAPE_Percent":
+                best_active.iloc[0]["Validation_WAPE_Percent"],
+        }])
+
+    st.sidebar.caption(
+        f"Active dataset: {phase2_active_source or 'Completed Phase 2 run'}"
+    )
+    st.sidebar.caption(
+        f"Dashboard source: completed Phase 2 run · {active_target}"
+    )
+
 if (
     actual_df.empty
     or validation_performance.empty
@@ -2095,7 +2197,7 @@ with tab_overview:
        st.metric(
     "Best Model · Validation WAPE",
     f"{lowest_wape:.2f}%",
-    help=f"Selected using 2023 validation WAPE: {best_model}",
+    help=f"Selected using validation WAPE: {best_model}",
 )
     st.caption(
         f"Historical coverage: {actual_df['date'].min():%b %d, %Y} – "
@@ -2109,7 +2211,7 @@ with tab_overview:
         with st.container(border=True):
             panel_heading(
                 "Forecast Model Performance",
-                "Model comparison using saved MAPE values · lower is better",
+                "Model comparison using active-dataset validation WAPE · lower is better",
             )
             model_chart_data = ranking.sort_values("wape", ascending=True)
             fig_overview_models = px.bar(
@@ -2229,16 +2331,23 @@ with tab_overview:
             with forecast_kpis[2]:
                 st.metric("Forecast Records", f"{len(model_data):,}")
 
-    st.caption(
-        "Dashboard values are calculated from the historical sales file and saved forecast results."
-    )
+    if phase2_active_results:
+        st.caption(
+            f"All Overview charts and KPIs use the latest completed dataset: "
+            f"{phase2_active_source} · Target: {active_target}."
+        )
+    else:
+        st.caption(
+            "Showing the repository's standardized baseline data. Upload and run a dataset "
+            "in Automatic Forecasting to switch the dashboard to that completed run."
+        )
 
 # =========================================================
 # MODEL EVALUATION
 # =========================================================
 with tab_evaluation:
     st.subheader("Forecast Model Evaluation")
-    st.caption("Compare all available models using the MAE and MAPE values stored in the forecast results.")
+    st.caption("Compare all available models using metrics calculated from the active dataset.")
 
     metric_col1, metric_col2 = st.columns(2, gap="medium")
 
@@ -2291,7 +2400,10 @@ with tab_evaluation:
     st.dataframe(performance_display, use_container_width=True, hide_index=True)
 
    # 2023 VALIDATION PERFORMANCE
-st.subheader("Model Performance Ranking (2023 Validation)")
+st.subheader(
+    f"Model Performance Ranking ({phase2_active_results['validation_year']} Validation)"
+    if phase2_active_results else "Model Performance Ranking (2023 Validation)"
+)
 
 ranking_display = ranking.copy()
 
@@ -2305,7 +2417,10 @@ st.dataframe(
 )
 
 # 2024 FINAL HOLDOUT PERFORMANCE
-st.subheader("2024 Final Holdout Performance")
+st.subheader(
+    f"{phase2_active_results['test_year']} Final Holdout Performance"
+    if phase2_active_results else "2024 Final Holdout Performance"
+)
 
 st.caption(
     "Final test results are reported separately. "
@@ -2328,7 +2443,7 @@ st.subheader("Forecasting Approach Comparison")
 
 st.caption(
     "Statistical and machine-learning approaches are compared "
-    "using 2024 final-test performance metrics."
+    "using final-test performance metrics from the active dataset."
 )
 
    # 2024 FINAL TEST: FORECASTING APPROACH COMPARISON
@@ -2377,7 +2492,7 @@ with approach_col1:
         y="mape",
         color="Approach",
         text="mape",
-       title="2024 Final-Test MAPE by Forecasting Approach",
+       title="Final-Test MAPE by Forecasting Approach",
         color_discrete_sequence=[theme["teal"], theme["blue"]],
 )
 fig_approach_mape.update_traces(texttemplate="%{text:.2f}%", textposition="outside", cliponaxis=False)
@@ -2394,7 +2509,7 @@ with approach_col2:
         y="mae",
         color="Approach",
         text="mae",
-        title="2024 Final-Test MAE by Forecasting Approach",
+        title="Final-Test MAE by Forecasting Approach",
         color_discrete_sequence=[theme["teal"], theme["blue"]],
     )
     fig_approach_mae.update_traces(texttemplate="%{text:.2f}", textposition="outside", cliponaxis=False)
@@ -2405,8 +2520,8 @@ with approach_col2:
     st.plotly_chart(add_chart_motion(fig_approach_mae), use_container_width=True, config={"responsive": True, "displayModeBar": False})
 
 st.info(
-        "Interpretation: Models are ranked using 2023 validation WAPE. "
-        "The 2024 final-test metrics are reported separately and are not used "
+        "Interpretation: Models are ranked using validation WAPE. "
+        "The final-test metrics are reported separately and are not used "
         "for model selection. All four models are compared using the same "
         "evaluation period and demand target."
     )
@@ -2416,7 +2531,7 @@ st.info(
 # =========================================================
 with tab_analysis:
     st.subheader(f"{selected_model} Forecast Analysis")
-    st.caption("The selected model controls the forecast charts and forecast summary below.")
+    st.caption("The selected model controls the forecast charts and forecast summary below." + (f" Active dataset: {phase2_active_source} · {active_target}." if phase2_active_results else " Showing standardized baseline results."))
 
     forecast_summary_cols = st.columns(3, gap="medium")
     with forecast_summary_cols[0]:
