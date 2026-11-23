@@ -573,128 +573,6 @@ def build_css(t):
             padding-right: 1rem;
         }}
     }}
-    /* =====================================================
-       GLASSMORPHISM UI REFRESH — VISUAL LAYER ONLY
-       Existing data, model, storage and navigation logic retained.
-       ===================================================== */
-    :root {{
-        --glass-surface: rgba(17, 35, 61, 0.58);
-        --glass-surface-strong: rgba(20, 43, 73, 0.76);
-        --glass-border: rgba(148, 190, 239, 0.22);
-        --glass-shadow: 0 18px 45px rgba(0, 0, 0, 0.20);
-        --glass-blur: 18px;
-    }}
-
-    .stApp {{
-        background:
-            radial-gradient(ellipse at 12% 8%, rgba(43, 116, 220, 0.23), transparent 34%),
-            radial-gradient(ellipse at 88% 18%, rgba(42, 190, 190, 0.12), transparent 30%),
-            linear-gradient(135deg, #061225 0%, #0a1b33 48%, #071326 100%) !important;
-        background-attachment: fixed !important;
-    }}
-
-    .block-container {{ position: relative; z-index: 1; }}
-
-    div[data-testid="stVerticalBlockBorderWrapper"],
-    div[data-testid="stMetric"],
-    .sf-hero,
-    div[data-testid="stExpander"],
-    div[data-testid="stAlert"] {{
-        background: linear-gradient(135deg, rgba(28, 55, 88, 0.66), rgba(12, 29, 52, 0.56)) !important;
-        border: 1px solid var(--glass-border) !important;
-        box-shadow: var(--glass-shadow) !important;
-        -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(145%);
-        backdrop-filter: blur(var(--glass-blur)) saturate(145%);
-    }}
-
-    div[data-testid="stVerticalBlockBorderWrapper"] {{
-        border-radius: 20px !important;
-        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
-    }}
-    div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
-        border-color: rgba(105, 174, 255, 0.48) !important;
-        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.26) !important;
-    }}
-
-    div[data-testid="stMetric"] {{
-        border-radius: 18px !important;
-        min-height: 112px;
-    }}
-    .sf-hero {{
-        border-radius: 24px !important;
-        background: linear-gradient(115deg, rgba(24, 58, 98, 0.82), rgba(16, 39, 68, 0.62)) !important;
-        border-color: rgba(125, 183, 247, 0.30) !important;
-        box-shadow: 0 24px 58px rgba(0, 0, 0, 0.24) !important;
-    }}
-
-    section[data-testid="stSidebar"] {{
-        background: rgba(7, 21, 40, 0.76) !important;
-        border-right: 1px solid rgba(148, 190, 239, 0.18) !important;
-        -webkit-backdrop-filter: blur(22px) saturate(150%);
-        backdrop-filter: blur(22px) saturate(150%);
-    }}
-
-    div[data-testid="stTabs"] [role="tablist"] {{
-        border: 1px solid rgba(148, 190, 239, 0.18) !important;
-        border-radius: 17px !important;
-        padding: 7px !important;
-        background: rgba(8, 23, 43, 0.58) !important;
-        -webkit-backdrop-filter: blur(16px);
-        backdrop-filter: blur(16px);
-    }}
-    div[data-testid="stTabs"] button[role="tab"] {{
-        border: 1px solid transparent !important;
-        border-radius: 12px !important;
-        background: transparent !important;
-    }}
-    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
-        background: linear-gradient(135deg, rgba(47, 128, 237, 0.34), rgba(34, 91, 160, 0.22)) !important;
-        border: 1px solid rgba(111, 180, 255, 0.42) !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 6px 18px rgba(0,0,0,0.14) !important;
-    }}
-
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="input"] > div,
-    div[data-baseweb="textarea"] > div,
-    [data-testid="stFileUploader"] section {{
-        background: rgba(13, 31, 54, 0.70) !important;
-        border: 1px solid rgba(148, 190, 239, 0.25) !important;
-        border-radius: 13px !important;
-        -webkit-backdrop-filter: blur(12px);
-        backdrop-filter: blur(12px);
-    }}
-
-    .stButton button, div[data-testid="stDownloadButton"] button,
-    section[data-testid="stSidebar"] button {{
-        border: 1px solid rgba(125, 183, 247, 0.34) !important;
-        border-radius: 13px !important;
-        background: linear-gradient(135deg, rgba(45, 117, 207, 0.40), rgba(24, 70, 125, 0.36)) !important;
-        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255,255,255,0.09) !important;
-    }}
-    .stButton button:hover, div[data-testid="stDownloadButton"] button:hover {{
-        border-color: rgba(125, 196, 255, 0.72) !important;
-        background: linear-gradient(135deg, rgba(55, 139, 239, 0.55), rgba(29, 91, 159, 0.48)) !important;
-        transform: translateY(-2px);
-    }}
-
-    div[data-testid="stDataFrame"], div[data-testid="stTable"] {{
-        border: 1px solid rgba(148, 190, 239, 0.22) !important;
-        border-radius: 15px !important;
-        overflow: hidden !important;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.14) !important;
-    }}
-
-    div[data-testid="stPlotlyChart"] {{
-        border-radius: 17px !important;
-        padding: 5px !important;
-    }}
-
-    hr {{ border-color: rgba(148, 190, 239, 0.18) !important; }}
-
-    @media (prefers-reduced-motion: reduce) {{
-        *, *::before, *::after {{ transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }}
-    }}
-
     </style>
     """
 
@@ -800,6 +678,106 @@ if not st.session_state.show_dashboard:
             .sf-preview-kpi {display:flex;justify-content:space-between;align-items:center;}
             .sf-chart {height:90px;gap:4px;}
         }
+
+
+    /* =====================================================
+       GLASSMORPHISM REDESIGN — CSS ONLY
+       No Python functions, calculations, model logic, storage,
+       widget keys, navigation, or callbacks are changed.
+       ===================================================== */
+    :root {{
+        --glass-border: rgba(151, 194, 245, .24);
+        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .28);
+        --glass-bg: rgba(13, 31, 55, .68);
+    }}
+    .stApp {{
+        background:
+          radial-gradient(ellipse at 12% 7%, rgba(37, 112, 220, .28), transparent 34%),
+          radial-gradient(ellipse at 88% 18%, rgba(24, 170, 190, .15), transparent 30%),
+          linear-gradient(135deg, #050D1B 0%, #0A1C34 52%, #071326 100%) !important;
+        background-attachment: fixed !important;
+    }}
+    [data-testid="stAppViewContainer"] {{
+        background: transparent !important;
+    }}
+    [data-testid="stHeader"] {{
+        background: rgba(5, 15, 30, .48) !important;
+        backdrop-filter: blur(18px);
+    }}
+    [data-testid="stSidebar"] > div:first-child {{
+        background: linear-gradient(180deg, rgba(10, 28, 51, .94), rgba(5, 16, 31, .88)) !important;
+        border-right: 1px solid var(--glass-border) !important;
+        backdrop-filter: blur(24px) saturate(150%) !important;
+    }}
+    [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stMetric"],
+    [data-testid="stExpander"],
+    [data-testid="stAlert"],
+    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
+    .sf-metric-row {{
+        background: linear-gradient(145deg, rgba(27, 54, 85, .76), rgba(9, 25, 46, .70)) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 20px !important;
+        box-shadow: var(--glass-shadow) !important;
+        backdrop-filter: blur(20px) saturate(145%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
+    }}
+    [data-testid="stVerticalBlockBorderWrapper"] {{
+        transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }}
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {{
+        border-color: rgba(99, 174, 255, .52) !important;
+        box-shadow: 0 22px 54px rgba(0, 0, 0, .34) !important;
+    }}
+    [data-testid="stMetric"] {{ padding: 17px !important; }}
+    [data-testid="stTabs"] [role="tablist"] {{
+        gap: 8px !important; padding: 7px !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 17px !important;
+        background: rgba(7, 22, 41, .68) !important;
+        backdrop-filter: blur(16px) !important;
+    }}
+    [data-testid="stTabs"] button[role="tab"] {{
+        border: 1px solid transparent !important; border-radius: 12px !important;
+        background: transparent !important; transition: all .18s ease;
+    }}
+    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
+        background: linear-gradient(135deg, rgba(44, 126, 230, .42), rgba(25, 76, 139, .34)) !important;
+        border: 1px solid rgba(112, 183, 255, .48) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 7px 22px rgba(0,0,0,.18) !important;
+    }}
+    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {{
+        background: rgba(9, 27, 49, .78) !important;
+        border: 1px solid rgba(143, 187, 239, .30) !important;
+        border-radius: 13px !important;
+        backdrop-filter: blur(12px) !important;
+    }}
+    .stButton button, [data-testid="stDownloadButton"] button,
+    [data-testid="stFormSubmitButton"] button {{
+        border: 1px solid rgba(117, 181, 250, .48) !important;
+        border-radius: 13px !important;
+        background: linear-gradient(135deg, rgba(43, 119, 213, .88), rgba(24, 73, 135, .88)) !important;
+        color: #F4F8FF !important;
+        box-shadow: 0 9px 24px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.13) !important;
+        transition: transform .18s ease, filter .18s ease !important;
+    }}
+    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {{
+        filter: brightness(1.16) !important; transform: translateY(-2px) !important;
+    }}
+    [data-testid="stDataFrame"], [data-testid="stTable"],
+    [data-testid="stPlotlyChart"] {{
+        border: 1px solid rgba(143, 187, 239, .20) !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
+    }}
+    hr {{ border-color: rgba(143, 187, 239, .20) !important; }}
+    h1, h2, h3 {{ letter-spacing: -.025em; }}
+    @media (prefers-reduced-motion: reduce) {{
+        *, *::before, *::after {{ transition-duration: .01ms !important; animation-duration: .01ms !important; }}
+    }}
+
         </style>
         """,
         unsafe_allow_html=True,
