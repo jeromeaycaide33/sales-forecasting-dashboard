@@ -26,9 +26,6 @@ st.set_page_config(
 # =========================================================
 # THEME STATE
 # =========================================================
-if "theme_mode" not in st.session_state:
-    st.session_state.theme_mode = "dark"
-
 # Landing page is shown first. The existing dashboard remains intact.
 if "show_dashboard" not in st.session_state:
     st.session_state.show_dashboard = False
@@ -40,12 +37,6 @@ def open_dashboard():
 
 def go_home():
     st.session_state.show_dashboard = False
-
-
-def toggle_theme():
-    st.session_state.theme_mode = (
-        "light" if st.session_state.theme_mode == "dark" else "dark"
-    )
 
 
 DARK_THEME = {
@@ -104,7 +95,131 @@ LIGHT_THEME = {
     "table_header": "#edf3f8",
 }
 
-theme = DARK_THEME if st.session_state.theme_mode == "dark" else LIGHT_THEME
+# Every visual color is user-editable. Presets are starting points only;
+# changing any color picker immediately applies that color on the next rerun.
+THEME_COLOR_FIELDS = {
+    "page": "Page background",
+    "sidebar": "Sidebar background",
+    "hero": "Header / hero base",
+    "hero2": "Header / hero highlight",
+    "panel": "Glass card base",
+    "panel_alt": "Metric card background",
+    "panel_soft": "Input / soft surface",
+    "border": "Borders",
+    "text": "Main text",
+    "muted": "Secondary text",
+    "blue": "Primary accent",
+    "blue_light": "Secondary accent",
+    "teal": "Chart color 3 / teal",
+    "gold": "Chart color 4 / gold",
+    "table_header": "Table header",
+    "success_bg": "Success message background",
+    "success_border": "Success message border",
+    "success_text": "Success message text",
+    "tab_bg": "Navigation background",
+    "tab_active": "Active navigation background",
+    "tab_text": "Navigation text",
+    "tab_active_border": "Active navigation border",
+}
+
+PALETTE_PRESETS = {
+    "Midnight Glass": DARK_THEME,
+    "Arctic Pearl": LIGHT_THEME,
+    "Ocean Teal": {
+        **DARK_THEME, "page": "#071B24", "page_grad_1": "#09232D",
+        "page_grad_2": "#06151D", "sidebar": "#08232B",
+        "hero": "#103743", "hero2": "#14505A", "panel": "#0B2932",
+        "panel_alt": "#103640", "panel_soft": "#0D303A",
+        "border": "#28606A", "text": "#E9FAF8", "muted": "#9BC5C4",
+        "blue": "#20B8C5", "blue_light": "#75E0D5",
+        "teal": "#5CC9A7", "gold": "#E8B968",
+        "table_header": "#123D46",
+    },
+    "Amethyst Night": {
+        **DARK_THEME, "page": "#100D22", "page_grad_1": "#17112E",
+        "page_grad_2": "#0B0A18", "sidebar": "#17132B",
+        "hero": "#282047", "hero2": "#35285B", "panel": "#1A1732",
+        "panel_alt": "#242044", "panel_soft": "#201B3C",
+        "border": "#514477", "text": "#F5F0FF", "muted": "#B8ACD3",
+        "blue": "#A78BFA", "blue_light": "#D0BFFF",
+        "teal": "#5ED6C1", "gold": "#F2C879",
+        "table_header": "#2C254B",
+    },
+    "Graphite Lime": {
+        **DARK_THEME, "page": "#14191C", "page_grad_1": "#1A2225",
+        "page_grad_2": "#101517", "sidebar": "#171F22",
+        "hero": "#263237", "hero2": "#304248", "panel": "#1B272B",
+        "panel_alt": "#243237", "panel_soft": "#202D31",
+        "border": "#40575B", "text": "#F1F7F4", "muted": "#A9BBB5",
+        "blue": "#A3D65C", "blue_light": "#D0F08A",
+        "teal": "#54C6A5", "gold": "#E7B85E",
+        "table_header": "#293A3D",
+    },
+}
+
+if "theme_preset" not in st.session_state:
+    st.session_state.theme_preset = "Midnight Glass"
+
+for color_key in THEME_COLOR_FIELDS:
+    state_key = f"theme_color_{color_key}"
+    if state_key not in st.session_state:
+        st.session_state[state_key] = DARK_THEME.get(color_key, "#398BFF")
+
+
+def apply_theme_preset():
+    chosen = PALETTE_PRESETS.get(st.session_state.theme_preset, DARK_THEME)
+    for color_key in THEME_COLOR_FIELDS:
+        st.session_state[f"theme_color_{color_key}"] = chosen.get(
+            color_key, DARK_THEME.get(color_key, "#398BFF")
+        )
+
+
+def reset_theme_colors():
+    st.session_state.theme_preset = "Midnight Glass"
+    apply_theme_preset()
+
+
+def render_theme_controls(container):
+    with container.expander("🎨 Customize colors", expanded=False):
+        st.selectbox(
+            "Starting palette",
+            options=list(PALETTE_PRESETS.keys()),
+            key="theme_preset",
+            on_change=apply_theme_preset,
+        )
+        st.caption("Choose a preset, then adjust any color below. Changes apply across the dashboard and charts.")
+        color_columns = st.columns(2)
+        for index, (color_key, label) in enumerate(THEME_COLOR_FIELDS.items()):
+            with color_columns[index % 2]:
+                st.color_picker(
+                    label,
+                    key=f"theme_color_{color_key}",
+                )
+        st.button(
+            "Reset to Midnight Glass",
+            use_container_width=True,
+            key="reset_theme_colors",
+            on_click=reset_theme_colors,
+        )
+
+
+theme = DARK_THEME.copy()
+for color_key in THEME_COLOR_FIELDS:
+    theme[color_key] = st.session_state[f"theme_color_{color_key}"]
+
+# Pick the Plotly light/dark template from the selected page background luminance.
+def _hex_is_light(value):
+    value = str(value).lstrip("#")
+    try:
+        r, g, b = (int(value[i:i + 2], 16) for i in (0, 2, 4))
+        luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
+        return luminance > 0.58
+    except (TypeError, ValueError):
+        return False
+
+theme["name"] = "light" if _hex_is_light(theme["page"]) else "dark"
+theme["page_grad_1"] = theme["page"]
+theme["page_grad_2"] = theme["panel_soft"]
 
 
 # =========================================================
@@ -527,6 +642,26 @@ def build_css(t):
     section[data-testid="stSidebar"] {{
         padding-top: 0.75rem;
     }}
+    section[data-testid="stSidebar"] [data-testid="stExpander"] {{
+        border: 1px solid var(--border) !important;
+        border-radius: 15px !important;
+        background: color-mix(in srgb, var(--panel) 72%, transparent) !important;
+        backdrop-filter: blur(18px) saturate(140%) !important;
+    }}
+    section[data-testid="stSidebar"] [data-testid="stExpander"] summary {{
+        color: var(--text) !important;
+        font-weight: 750 !important;
+    }}
+    [data-testid="stColorPicker"] {{
+        border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+        border-radius: 10px;
+        padding: 5px 7px;
+        background: color-mix(in srgb, var(--panel-soft) 70%, transparent);
+    }}
+    [data-testid="stColorPicker"] label {{
+        font-size: .72rem !important;
+        color: var(--muted) !important;
+    }}
 
     section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {{
         gap: 0.75rem;
@@ -587,16 +722,16 @@ if not st.session_state.show_dashboard:
         section[data-testid="stSidebar"] {display: none !important;}
         .block-container {max-width: 1440px !important; padding-top: 1.65rem !important;}
         .sf-landing-wrap {max-width: 1380px; margin: 0 auto;}
-        .sf-brand {color:#75B5FF; font-size:.72rem; font-weight:850;
+        .sf-brand {color:var(--blue-light); font-size:.72rem; font-weight:850;
             letter-spacing:.19em; text-transform:uppercase;}
         .sf-top-note {color:var(--muted);font-size:.72rem;letter-spacing:.08em;}
         .sf-landing-hero {
             position:relative; overflow:hidden; display:grid;
             grid-template-columns:1.08fr .92fr; gap:clamp(24px,4vw,58px);
             align-items:center; padding:clamp(28px,5vw,66px);
-            border-radius:24px; border:1px solid #285080;
-            background:radial-gradient(circle at 90% 8%,rgba(57,139,255,.23),transparent 32%),
-                       linear-gradient(120deg,#0B1C34 0%,#10294A 58%,#102442 100%);
+            border-radius:24px; border:1px solid var(--border);
+            background:radial-gradient(circle at 90% 8%,color-mix(in srgb,var(--blue) 24%,transparent),transparent 32%),
+                       linear-gradient(120deg,var(--hero) 0%,var(--hero2) 58%,var(--panel) 100%);
             box-shadow:0 22px 60px rgba(0,0,0,.28);
         }
         .sf-landing-hero:before {content:"";position:absolute;width:390px;height:390px;
@@ -605,51 +740,51 @@ if not st.session_state.show_dashboard:
             0 0 0 62px rgba(57,139,255,.035);pointer-events:none;}
         .sf-landing-copy-wrap {position:relative;z-index:1;}
         .sf-landing-kicker {display:inline-flex;align-items:center;gap:8px;
-            color:#8CC4FF;font-size:.7rem;font-weight:850;letter-spacing:.19em;
+            color:var(--blue-light);font-size:.7rem;font-weight:850;letter-spacing:.19em;
             text-transform:uppercase;margin-bottom:1.15rem;}
-        .sf-kicker-dot {width:7px;height:7px;border-radius:50%;background:#398BFF;
-            box-shadow:0 0 14px #398BFF;display:inline-block;}
-        .sf-landing-title {color:#F4F8FF;font-size:clamp(2.25rem,4.7vw,4.35rem);
+        .sf-kicker-dot {width:7px;height:7px;border-radius:50%;background:var(--blue);
+            box-shadow:0 0 14px var(--blue);display:inline-block;}
+        .sf-landing-title {color:var(--text);font-size:clamp(2.25rem,4.7vw,4.35rem);
             line-height:1.035;letter-spacing:-.052em;font-weight:880;
             margin:0;max-width:720px;}
-        .sf-landing-title span {color:#69AEFF;}
-        .sf-landing-copy {color:#B8CBE2;font-size:1rem;line-height:1.8;
+        .sf-landing-title span {color:var(--blue-light);}
+        .sf-landing-copy {color:var(--muted);font-size:1rem;line-height:1.8;
             max-width:650px;margin:1.25rem 0 1.45rem 0;}
         .sf-landing-points {display:flex;gap:10px 18px;flex-wrap:wrap;
-            color:#D0DDF0;font-size:.76rem;}
-        .sf-landing-points span:before {content:"✓";color:#65CDB5;font-weight:900;margin-right:7px;}
+            color:var(--text);font-size:.76rem;}
+        .sf-landing-points span:before {content:"✓";color:var(--teal);font-weight:900;margin-right:7px;}
         .sf-preview-card {position:relative;z-index:1;padding:22px;border-radius:19px;
-            border:1px solid rgba(115,169,226,.32);
-            background:linear-gradient(155deg,rgba(12,31,55,.96),rgba(8,22,41,.97));
-            box-shadow:0 18px 44px rgba(0,0,0,.3);}
+            border:1px solid color-mix(in srgb,var(--border) 85%,transparent);
+            background:linear-gradient(155deg,color-mix(in srgb,var(--panel-alt) 94%,transparent),color-mix(in srgb,var(--panel) 96%,transparent));
+            box-shadow:0 18px 44px rgba(0,0,0,.20);backdrop-filter:blur(18px) saturate(145%);}
         .sf-preview-top {display:flex;justify-content:space-between;align-items:center;
-            gap:10px;color:#9DB6D4;font-size:.66rem;font-weight:800;letter-spacing:.12em;}
-        .sf-live-pill {padding:5px 9px;border-radius:20px;color:#9CE5D4;
-            background:rgba(45,181,147,.12);border:1px solid rgba(83,204,171,.25);
+            gap:10px;color:var(--muted);font-size:.66rem;font-weight:800;letter-spacing:.12em;}
+        .sf-live-pill {padding:5px 9px;border-radius:20px;color:var(--teal);
+            background:color-mix(in srgb,var(--teal) 15%,transparent);border:1px solid color-mix(in srgb,var(--teal) 45%,transparent);
             letter-spacing:.06em;font-size:.61rem;white-space:nowrap;}
-        .sf-preview-heading {color:#F2F7FF;font-size:1.25rem;font-weight:800;
+        .sf-preview-heading {color:var(--text);font-size:1.25rem;font-weight:800;
             margin:18px 0 3px 0;}
-        .sf-preview-sub {color:#91A9C5;font-size:.72rem;}
+        .sf-preview-sub {color:var(--muted);font-size:.72rem;}
         .sf-preview-kpis {display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:20px 0 17px;}
-        .sf-preview-kpi {padding:11px 10px;border:1px solid rgba(112,157,207,.2);
-            border-radius:11px;background:rgba(31,62,98,.34);}
-        .sf-preview-kpi-label {color:#9DB4D0;font-size:.61rem;line-height:1.4;}
-        .sf-preview-kpi-value {color:#F3F8FF;font-size:.92rem;font-weight:850;margin-top:5px;}
-        .sf-chart-shell {border:1px solid rgba(112,157,207,.18);border-radius:13px;
-            background:rgba(7,19,35,.52);padding:13px 13px 10px;}
+        .sf-preview-kpi {padding:11px 10px;border:1px solid color-mix(in srgb,var(--border) 72%,transparent);
+            border-radius:11px;background:color-mix(in srgb,var(--panel-soft) 78%,transparent);}
+        .sf-preview-kpi-label {color:var(--muted);font-size:.61rem;line-height:1.4;}
+        .sf-preview-kpi-value {color:var(--text);font-size:.92rem;font-weight:850;margin-top:5px;}
+        .sf-chart-shell {border:1px solid color-mix(in srgb,var(--border) 72%,transparent);border-radius:13px;
+            background:color-mix(in srgb,var(--panel) 76%,transparent);padding:13px 13px 10px;}
         .sf-chart-label {display:flex;justify-content:space-between;gap:8px;
-            color:#A9BED8;font-size:.64rem;font-weight:750;letter-spacing:.08em;}
+            color:var(--muted);font-size:.64rem;font-weight:750;letter-spacing:.08em;}
         .sf-chart {height:112px;display:flex;align-items:flex-end;gap:7px;
-            padding:12px 2px 0;border-bottom:1px solid rgba(126,164,207,.25);
-            background:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,rgba(123,158,197,.09) 28px);}
+            padding:12px 2px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);
+            background:repeating-linear-gradient(to bottom,transparent 0,transparent 27px,color-mix(in srgb,var(--border) 20%,transparent) 28px);}
         .sf-chart span {flex:1;min-width:5px;border-radius:4px 4px 0 0;
-            background:linear-gradient(180deg,#75B5FF 0%,#2878E8 100%);
-            box-shadow:0 0 13px rgba(57,139,255,.14);opacity:.95;}
-        .sf-chart-legend {display:flex;justify-content:space-between;color:#829BB8;
+            background:linear-gradient(180deg,var(--blue-light) 0%,var(--blue) 100%);
+            box-shadow:0 0 13px color-mix(in srgb,var(--blue) 25%,transparent);opacity:.95;}
+        .sf-chart-legend {display:flex;justify-content:space-between;color:var(--muted);
             font-size:.61rem;margin-top:9px;}
         .sf-model-tags {display:flex;flex-wrap:wrap;gap:6px;margin-top:15px;}
-        .sf-model-tags span {font-size:.61rem;color:#B8CBE2;padding:5px 8px;
-            border:1px solid rgba(117,165,219,.22);border-radius:6px;background:rgba(36,68,105,.35);}
+        .sf-model-tags span {font-size:.61rem;color:var(--text);padding:5px 8px;
+            border:1px solid color-mix(in srgb,var(--border) 80%,transparent);border-radius:6px;background:color-mix(in srgb,var(--panel-soft) 76%,transparent);}
         .sf-section-heading {font-size:1.35rem;font-weight:850;color:var(--text);
             margin:2.25rem 0 .35rem 0;letter-spacing:-.02em;}
         .sf-section-copy {color:var(--muted);font-size:.87rem;margin-bottom:1rem;line-height:1.6;}
@@ -657,7 +792,7 @@ if not st.session_state.show_dashboard:
             border:1px solid var(--border);background:linear-gradient(150deg,var(--panel),var(--panel-soft));
             box-shadow:0 7px 22px rgba(0,0,0,.09);}
         .sf-feature-icon {width:42px;height:42px;display:flex;align-items:center;justify-content:center;
-            border-radius:12px;background:rgba(57,139,255,.13);border:1px solid rgba(57,139,255,.22);
+            border-radius:12px;background:color-mix(in srgb,var(--blue) 14%,transparent);border:1px solid color-mix(in srgb,var(--blue) 35%,transparent);
             font-size:1.25rem;margin-bottom:14px;}
         .sf-feature-title {color:var(--text);font-weight:850;font-size:.98rem;margin-bottom:7px;}
         .sf-feature-copy {color:var(--muted);font-size:.79rem;line-height:1.65;}
@@ -665,9 +800,9 @@ if not st.session_state.show_dashboard:
         .sf-footer {text-align:center;color:var(--muted);font-size:.68rem;
             letter-spacing:.08em;padding:15px 0 8px;}
         div[data-testid="stButton"] button[kind="primary"] {
-            background:linear-gradient(110deg,#2878E8,#398BFF) !important;
-            border:1px solid #69AEFF !important;color:white !important;
-            box-shadow:0 8px 24px rgba(40,120,232,.24) !important;}
+            background:linear-gradient(110deg,var(--blue),var(--blue-light)) !important;
+            border:1px solid var(--blue-light) !important;color:white !important;
+            box-shadow:0 8px 24px color-mix(in srgb,var(--blue) 24%,transparent) !important;}
         @media(max-width:850px) {
             .sf-landing-hero {grid-template-columns:1fr;padding:28px 22px;}
             .sf-preview-card {max-width:100%;}
@@ -686,15 +821,15 @@ if not st.session_state.show_dashboard:
        widget keys, navigation, or callbacks are changed.
        ===================================================== */
     :root {{
-        --glass-border: rgba(151, 194, 245, .24);
-        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .28);
-        --glass-bg: rgba(13, 31, 55, .68);
+        --glass-border: color-mix(in srgb, var(--border) 78%, transparent);
+        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .20);
+        --glass-bg: color-mix(in srgb, var(--panel) 78%, transparent);
     }}
     .stApp {{
         background:
-          radial-gradient(ellipse at 12% 7%, rgba(37, 112, 220, .28), transparent 34%),
-          radial-gradient(ellipse at 88% 18%, rgba(24, 170, 190, .15), transparent 30%),
-          linear-gradient(135deg, #050D1B 0%, #0A1C34 52%, #071326 100%) !important;
+          radial-gradient(ellipse at 12% 7%, color-mix(in srgb, var(--blue) 24%, transparent), transparent 36%),
+          radial-gradient(ellipse at 88% 18%, color-mix(in srgb, var(--teal) 15%, transparent), transparent 32%),
+          linear-gradient(135deg, var(--page) 0%, var(--page-grad-1) 52%, var(--page-grad-2) 100%) !important;
         background-attachment: fixed !important;
     }}
     [data-testid="stAppViewContainer"] {{
@@ -705,7 +840,7 @@ if not st.session_state.show_dashboard:
         backdrop-filter: blur(18px);
     }}
     [data-testid="stSidebar"] > div:first-child {{
-        background: linear-gradient(180deg, rgba(10, 28, 51, .94), rgba(5, 16, 31, .88)) !important;
+        background: linear-gradient(180deg, color-mix(in srgb, var(--sidebar) 96%, transparent), color-mix(in srgb, var(--sidebar) 88%, transparent)) !important;
         border-right: 1px solid var(--glass-border) !important;
         backdrop-filter: blur(24px) saturate(150%) !important;
     }}
@@ -715,7 +850,7 @@ if not st.session_state.show_dashboard:
     [data-testid="stAlert"],
     .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
     .sf-metric-row {{
-        background: linear-gradient(145deg, rgba(27, 54, 85, .76), rgba(9, 25, 46, .70)) !important;
+        background: linear-gradient(145deg, color-mix(in srgb, var(--panel-alt) 82%, transparent), color-mix(in srgb, var(--panel) 76%, transparent)) !important;
         border: 1px solid var(--glass-border) !important;
         border-radius: 20px !important;
         box-shadow: var(--glass-shadow) !important;
@@ -734,7 +869,7 @@ if not st.session_state.show_dashboard:
         gap: 8px !important; padding: 7px !important;
         border: 1px solid var(--glass-border) !important;
         border-radius: 17px !important;
-        background: rgba(7, 22, 41, .68) !important;
+        background: color-mix(in srgb, var(--panel) 78%, transparent) !important;
         backdrop-filter: blur(16px) !important;
     }}
     [data-testid="stTabs"] button[role="tab"] {{
@@ -742,22 +877,22 @@ if not st.session_state.show_dashboard:
         background: transparent !important; transition: all .18s ease;
     }}
     [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
-        background: linear-gradient(135deg, rgba(44, 126, 230, .42), rgba(25, 76, 139, .34)) !important;
-        border: 1px solid rgba(112, 183, 255, .48) !important;
+        background: linear-gradient(135deg, color-mix(in srgb, var(--blue) 42%, transparent), color-mix(in srgb, var(--blue-light) 24%, transparent)) !important;
+        border: 1px solid color-mix(in srgb, var(--blue-light) 62%, var(--border)) !important;
         box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 7px 22px rgba(0,0,0,.18) !important;
     }}
     [data-baseweb="select"] > div, [data-baseweb="input"] > div,
     [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {{
-        background: rgba(9, 27, 49, .78) !important;
-        border: 1px solid rgba(143, 187, 239, .30) !important;
+        background: color-mix(in srgb, var(--panel-soft) 84%, transparent) !important;
+        border: 1px solid color-mix(in srgb, var(--border) 85%, transparent) !important;
         border-radius: 13px !important;
         backdrop-filter: blur(12px) !important;
     }}
     .stButton button, [data-testid="stDownloadButton"] button,
     [data-testid="stFormSubmitButton"] button {{
-        border: 1px solid rgba(117, 181, 250, .48) !important;
+        border: 1px solid color-mix(in srgb, var(--blue-light) 60%, var(--border)) !important;
         border-radius: 13px !important;
-        background: linear-gradient(135deg, rgba(43, 119, 213, .88), rgba(24, 73, 135, .88)) !important;
+        background: linear-gradient(135deg, var(--blue), color-mix(in srgb, var(--blue) 65%, var(--panel))) !important;
         color: #F4F8FF !important;
         box-shadow: 0 9px 24px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.13) !important;
         transition: transform .18s ease, filter .18s ease !important;
@@ -767,12 +902,12 @@ if not st.session_state.show_dashboard:
     }}
     [data-testid="stDataFrame"], [data-testid="stTable"],
     [data-testid="stPlotlyChart"] {{
-        border: 1px solid rgba(143, 187, 239, .20) !important;
+        border: 1px solid color-mix(in srgb, var(--border) 72%, transparent) !important;
         border-radius: 16px !important;
         overflow: hidden !important;
         box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
     }}
-    hr {{ border-color: rgba(143, 187, 239, .20) !important; }}
+    hr {{ border-color: color-mix(in srgb, var(--border) 78%, transparent) !important; }}
     h1, h2, h3 {{ letter-spacing: -.025em; }}
     @media (prefers-reduced-motion: reduce) {{
         *, *::before, *::after {{ transition-duration: .01ms !important; animation-duration: .01ms !important; }}
@@ -865,13 +1000,7 @@ if not st.session_state.show_dashboard:
             unsafe_allow_html=True,
         )
     with top_right:
-        landing_theme_label = "☀️ Light Mode" if st.session_state.theme_mode == "dark" else "🌙 Dark Mode"
-        st.button(
-            landing_theme_label,
-            key="landing_theme_toggle",
-            on_click=toggle_theme,
-            use_container_width=True,
-        )
+        render_theme_controls(st)
 
     st.markdown(
         """
@@ -1787,14 +1916,9 @@ MAE · RMSE · MAPE · WAPE
         """
     )
 
-# Theme control directly below System Information.
-st.sidebar.markdown('<div class="theme-label">Appearance</div>', unsafe_allow_html=True)
-theme_button_label = "Switch to Light Mode" if st.session_state.theme_mode == "dark" else "Switch to Dark Mode"
-st.sidebar.button(
-    theme_button_label,
-    on_click=toggle_theme,
-    use_container_width=True,
-)
+# User-controlled color palette replaces the old Light/Dark toggle.
+st.sidebar.markdown('<div class="theme-label">PERSONALIZE WORKSPACE</div>', unsafe_allow_html=True)
+render_theme_controls(st.sidebar)
 
 model_data = df[df["model_name"] == selected_model].copy()
 comparison = model_data.merge(
