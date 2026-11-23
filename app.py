@@ -2591,6 +2591,28 @@ tab_overview, tab_evaluation, tab_analysis, tab_auto_forecast, tab_live_dataset,
 # =========================================================
 # OVERVIEW
 # =========================================================
+
+# Do not display repository baseline charts as if they belonged to an uploaded
+# dataset. Charts become visible only after a dataset has completed forecasting.
+if not st.session_state.get("phase2_results"):
+    st.markdown(
+        """
+        <style>
+        /* Hide every Plotly chart panel while there is no completed uploaded run. */
+        div[data-testid="stElementContainer"]:has(.js-plotly-plot) {
+            display: none !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.info(
+        "No active uploaded dataset yet. Upload a CSV/XLSX file in "
+        "**Downloads & Data**, then run **Automatic Forecasting**. "
+        "Charts and animated graphs will appear only after a successful run, "
+        "using values from that dataset."
+    )
+
 with tab_overview:
     total_demand = actual_df["daily_demand"].sum()
     average_demand = actual_df["daily_demand"].mean()
