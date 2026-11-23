@@ -50,58 +50,58 @@ def toggle_theme():
 
 DARK_THEME = {
     "name": "dark",
-    "page": "#090D1C",
-    "page_grad_1": "#10162B",
-    "page_grad_2": "#070B17",
-    "sidebar": "#0C1225",
-    "hero": "#151F3D",
-    "hero2": "#202C50",
-    "panel": "#121B33",
-    "panel_alt": "#1A2745",
-    "panel_soft": "#111A31",
-    "border": "#394B78",
-    "tab_bg": "#101A32",
-    "tab_active": "#263B68",
-    "tab_text": "#D1D9F0",
-    "tab_active_border": "#55D6E8",
-    "text": "#F2F5FF",
-    "muted": "#A9B5D0",
-    "blue": "#55D6E8",
-    "blue_light": "#A5F0F4",
-    "teal": "#9B8CFF",
-    "gold": "#F2B879",
-    "success_bg": "#12343A",
-    "success_border": "#278A91",
-    "success_text": "#D7FBF6",
-    "table_header": "#202D4C",
+    "page": "#071326",
+    "page_grad_1": "#08172D",
+    "page_grad_2": "#050E1D",
+    "sidebar": "#09182C",
+    "hero": "#102442",
+    "hero2": "#142E52",
+    "panel": "#0B1B31",
+    "panel_alt": "#102541",
+    "panel_soft": "#0D2039",
+    "border": "#29466B",
+    "tab_bg": "#0D2038",
+    "tab_active": "#12396A",
+    "tab_text": "#c8d4e3",
+    "tab_active_border": "#398BFF",
+    "text": "#edf3fb",
+    "muted": "#9db0c5",
+    "blue": "#398BFF",
+    "blue_light": "#75B5FF",
+    "teal": "#55b8a5",
+    "gold": "#e0b85c",
+    "success_bg": "#0B2938",
+    "success_border": "#1C7895",
+    "success_text": "#d4eff0",
+    "table_header": "#132B49",
 }
 
 LIGHT_THEME = {
     "name": "light",
-    "page": "#EEF1F8",
-    "page_grad_1": "#F7F8FC",
-    "page_grad_2": "#E8ECF6",
-    "sidebar": "#E5EAF5",
-    "hero": "#FFFFFF",
-    "hero2": "#E8EEFA",
-    "panel": "#FFFFFF",
-    "panel_alt": "#F3F5FC",
-    "panel_soft": "#EDF1FA",
-    "border": "#D2D9EA",
-    "tab_bg": "#FFFFFF",
-    "tab_active": "#E2F5F8",
-    "tab_text": "#45516D",
-    "tab_active_border": "#229FB2",
-    "text": "#202A43",
-    "muted": "#68748F",
-    "blue": "#159DB2",
-    "blue_light": "#4BC4D1",
-    "teal": "#7866D8",
-    "gold": "#C47A3C",
-    "success_bg": "#E6F6F3",
-    "success_border": "#A8DCD4",
-    "success_text": "#235B57",
-    "table_header": "#E8EDF7",
+    "page": "#eef3f8",
+    "page_grad_1": "#eef3f8",
+    "page_grad_2": "#e6edf5",
+    "sidebar": "#e7eef6",
+    "hero": "#ffffff",
+    "hero2": "#f6f9fc",
+    "panel": "#ffffff",
+    "panel_alt": "#f7fafd",
+    "panel_soft": "#f3f7fb",
+    "border": "#d7e1ec",
+    "tab_bg": "#ffffff",
+    "tab_active": "#dfeaf7",
+    "tab_text": "#42566f",
+    "tab_active_border": "#6f93bb",
+    "text": "#32465d",
+    "muted": "#6b7e93",
+    "blue": "#6f93bb",
+    "blue_light": "#87a9cf",
+    "teal": "#5db39f",
+    "gold": "#d8aa4f",
+    "success_bg": "#ecf7f4",
+    "success_border": "#b7ded4",
+    "success_text": "#355f59",
+    "table_header": "#edf3f8",
 }
 
 theme = DARK_THEME if st.session_state.theme_mode == "dark" else LIGHT_THEME
@@ -579,185 +579,6 @@ def build_css(t):
 
 st.markdown(build_css(theme), unsafe_allow_html=True)
 
-# =========================================================
-# GLOBAL GLASSMORPHISM UI — PRESENTATION ONLY
-# Applied on both landing page and dashboard.
-# =========================================================
-st.markdown(
-    """
-    <style>
-    /* =====================================================
-       GLASSMORPHISM REDESIGN — CSS ONLY
-       No Python functions, calculations, model logic, storage,
-       widget keys, navigation, or callbacks are changed.
-       ===================================================== */
-    :root {
-        --glass-border: rgba(151, 194, 245, .24);
-        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .28);
-        --glass-bg: rgba(13, 31, 55, .68);
-    }
-    .stApp {
-        background:
-          radial-gradient(ellipse at 12% 7%, rgba(37, 112, 220, .28), transparent 34%),
-          radial-gradient(ellipse at 88% 18%, rgba(24, 170, 190, .15), transparent 30%),
-          linear-gradient(135deg, #050D1B 0%, #0A1C34 52%, #071326 100%) !important;
-        background-attachment: fixed !important;
-    }
-    [data-testid="stAppViewContainer"] {
-        background: transparent !important;
-    }
-    [data-testid="stHeader"] {
-        background: rgba(5, 15, 30, .48) !important;
-        backdrop-filter: blur(18px);
-    }
-    [data-testid="stSidebar"] > div:first-child {
-        background: linear-gradient(180deg, rgba(10, 28, 51, .94), rgba(5, 16, 31, .88)) !important;
-        border-right: 1px solid var(--glass-border) !important;
-        backdrop-filter: blur(24px) saturate(150%) !important;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"],
-    [data-testid="stMetric"],
-    [data-testid="stExpander"],
-    [data-testid="stAlert"],
-    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
-    .sf-metric-row {
-        background: linear-gradient(145deg, rgba(27, 54, 85, .76), rgba(9, 25, 46, .70)) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 20px !important;
-        box-shadow: var(--glass-shadow) !important;
-        backdrop-filter: blur(20px) saturate(145%) !important;
-        -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"]:hover {
-        border-color: rgba(99, 174, 255, .52) !important;
-        box-shadow: 0 22px 54px rgba(0, 0, 0, .34) !important;
-    }
-    [data-testid="stMetric"] { padding: 17px !important; }
-    [data-testid="stTabs"] [role="tablist"] {
-        gap: 8px !important; padding: 7px !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 17px !important;
-        background: rgba(7, 22, 41, .68) !important;
-        backdrop-filter: blur(16px) !important;
-    }
-    [data-testid="stTabs"] button[role="tab"] {
-        border: 1px solid transparent !important; border-radius: 12px !important;
-        background: transparent !important; transition: all .18s ease;
-    }
-    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-        background: linear-gradient(135deg, rgba(44, 126, 230, .42), rgba(25, 76, 139, .34)) !important;
-        border: 1px solid rgba(112, 183, 255, .48) !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 7px 22px rgba(0,0,0,.18) !important;
-    }
-    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
-    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {
-        background: rgba(9, 27, 49, .78) !important;
-        border: 1px solid rgba(143, 187, 239, .30) !important;
-        border-radius: 13px !important;
-        backdrop-filter: blur(12px) !important;
-    }
-    .stButton button, [data-testid="stDownloadButton"] button,
-    [data-testid="stFormSubmitButton"] button {
-        border: 1px solid rgba(117, 181, 250, .48) !important;
-        border-radius: 13px !important;
-        background: linear-gradient(135deg, rgba(43, 119, 213, .88), rgba(24, 73, 135, .88)) !important;
-        color: #F4F8FF !important;
-        box-shadow: 0 9px 24px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.13) !important;
-        transition: transform .18s ease, filter .18s ease !important;
-    }
-    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {
-        filter: brightness(1.16) !important; transform: translateY(-2px) !important;
-    }
-    [data-testid="stDataFrame"], [data-testid="stTable"],
-    [data-testid="stPlotlyChart"] {
-        border: 1px solid rgba(143, 187, 239, .20) !important;
-        border-radius: 16px !important;
-        overflow: hidden !important;
-        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
-    }
-    hr { border-color: rgba(143, 187, 239, .20) !important; }
-    h1, h2, h3 { letter-spacing: -.025em; }
-    @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
-    }
-
-
-    /* Ensure the dashboard's main content surfaces read as frosted glass. */
-    [data-testid="stMain"] .block-container {
-        position: relative;
-        z-index: 1;
-    }
-    [data-testid="stVerticalBlockBorderWrapper"],
-    [data-testid="stMetric"],
-    [data-testid="stExpander"] details,
-    [data-testid="stAlert"] {
-        background: rgba(15, 35, 61, .66) !important;
-        border: 1px solid rgba(151, 194, 245, .28) !important;
-        border-radius: 18px !important;
-        box-shadow: 0 14px 38px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.05) !important;
-        backdrop-filter: blur(18px) saturate(145%) !important;
-        -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
-    }
-    [data-testid="stPlotlyChart"] > div {
-        background: rgba(12, 29, 51, .52) !important;
-        border: 1px solid rgba(143, 187, 239, .24) !important;
-        border-radius: 17px !important;
-        padding: 8px !important;
-        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
-        backdrop-filter: blur(14px) !important;
-    }
-    [data-testid="stDataFrame"], [data-testid="stTable"] {
-        background: rgba(12, 29, 51, .55) !important;
-        border: 1px solid rgba(143, 187, 239, .26) !important;
-        border-radius: 15px !important;
-        overflow: hidden !important;
-        box-shadow: 0 12px 30px rgba(0,0,0,.17) !important;
-    }
-    [data-testid="stTabs"] [role="tablist"] {
-        background: rgba(9, 26, 47, .62) !important;
-        border: 1px solid rgba(151, 194, 245, .24) !important;
-        border-radius: 16px !important;
-        padding: 7px !important;
-        backdrop-filter: blur(16px) !important;
-    }
-    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-        background: rgba(47, 121, 213, .35) !important;
-        border: 1px solid rgba(112, 183, 255, .52) !important;
-        border-radius: 11px !important;
-    }
-    [data-testid="stSidebar"] > div:first-child {
-        background: linear-gradient(180deg, rgba(10, 28, 51, .92), rgba(5, 16, 31, .90)) !important;
-        border-right: 1px solid rgba(151, 194, 245, .24) !important;
-        backdrop-filter: blur(22px) saturate(150%) !important;
-    }
-    [data-baseweb="select"] > div,
-    [data-baseweb="input"] > div,
-    [data-baseweb="textarea"] > div {
-        background: rgba(9, 27, 49, .78) !important;
-        border: 1px solid rgba(143, 187, 239, .32) !important;
-        border-radius: 12px !important;
-    }
-    .stButton button, [data-testid="stDownloadButton"] button,
-    [data-testid="stFormSubmitButton"] button {
-        border: 1px solid rgba(117, 181, 250, .50) !important;
-        border-radius: 12px !important;
-        background: linear-gradient(135deg, rgba(43, 119, 213, .90), rgba(24, 73, 135, .90)) !important;
-        color: #F4F8FF !important;
-        box-shadow: 0 8px 22px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.12) !important;
-    }
-    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {
-        filter: brightness(1.12) !important;
-        transform: translateY(-1px) !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
 # Landing-page-only visual styling.
 if not st.session_state.show_dashboard:
     st.markdown(
@@ -859,129 +680,108 @@ if not st.session_state.show_dashboard:
         }
 
 
+    /* =====================================================
+       GLASSMORPHISM REDESIGN — CSS ONLY
+       No Python functions, calculations, model logic, storage,
+       widget keys, navigation, or callbacks are changed.
+       ===================================================== */
+    :root {{
+        --glass-border: rgba(151, 194, 245, .24);
+        --glass-shadow: 0 18px 48px rgba(0, 0, 0, .28);
+        --glass-bg: rgba(13, 31, 55, .68);
+    }}
+    .stApp {{
+        background:
+          radial-gradient(ellipse at 12% 7%, rgba(37, 112, 220, .28), transparent 34%),
+          radial-gradient(ellipse at 88% 18%, rgba(24, 170, 190, .15), transparent 30%),
+          linear-gradient(135deg, #050D1B 0%, #0A1C34 52%, #071326 100%) !important;
+        background-attachment: fixed !important;
+    }}
+    [data-testid="stAppViewContainer"] {{
+        background: transparent !important;
+    }}
+    [data-testid="stHeader"] {{
+        background: rgba(5, 15, 30, .48) !important;
+        backdrop-filter: blur(18px);
+    }}
+    [data-testid="stSidebar"] > div:first-child {{
+        background: linear-gradient(180deg, rgba(10, 28, 51, .94), rgba(5, 16, 31, .88)) !important;
+        border-right: 1px solid var(--glass-border) !important;
+        backdrop-filter: blur(24px) saturate(150%) !important;
+    }}
+    [data-testid="stVerticalBlockBorderWrapper"],
+    [data-testid="stMetric"],
+    [data-testid="stExpander"],
+    [data-testid="stAlert"],
+    .sf-hero, .sf-landing-hero, .sf-preview-card, .sf-feature,
+    .sf-metric-row {{
+        background: linear-gradient(145deg, rgba(27, 54, 85, .76), rgba(9, 25, 46, .70)) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 20px !important;
+        box-shadow: var(--glass-shadow) !important;
+        backdrop-filter: blur(20px) saturate(145%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
+    }}
+    [data-testid="stVerticalBlockBorderWrapper"] {{
+        transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }}
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {{
+        border-color: rgba(99, 174, 255, .52) !important;
+        box-shadow: 0 22px 54px rgba(0, 0, 0, .34) !important;
+    }}
+    [data-testid="stMetric"] {{ padding: 17px !important; }}
+    [data-testid="stTabs"] [role="tablist"] {{
+        gap: 8px !important; padding: 7px !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 17px !important;
+        background: rgba(7, 22, 41, .68) !important;
+        backdrop-filter: blur(16px) !important;
+    }}
+    [data-testid="stTabs"] button[role="tab"] {{
+        border: 1px solid transparent !important; border-radius: 12px !important;
+        background: transparent !important; transition: all .18s ease;
+    }}
+    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {{
+        background: linear-gradient(135deg, rgba(44, 126, 230, .42), rgba(25, 76, 139, .34)) !important;
+        border: 1px solid rgba(112, 183, 255, .48) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 7px 22px rgba(0,0,0,.18) !important;
+    }}
+    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
+    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {{
+        background: rgba(9, 27, 49, .78) !important;
+        border: 1px solid rgba(143, 187, 239, .30) !important;
+        border-radius: 13px !important;
+        backdrop-filter: blur(12px) !important;
+    }}
+    .stButton button, [data-testid="stDownloadButton"] button,
+    [data-testid="stFormSubmitButton"] button {{
+        border: 1px solid rgba(117, 181, 250, .48) !important;
+        border-radius: 13px !important;
+        background: linear-gradient(135deg, rgba(43, 119, 213, .88), rgba(24, 73, 135, .88)) !important;
+        color: #F4F8FF !important;
+        box-shadow: 0 9px 24px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255,255,255,.13) !important;
+        transition: transform .18s ease, filter .18s ease !important;
+    }}
+    .stButton button:hover, [data-testid="stDownloadButton"] button:hover {{
+        filter: brightness(1.16) !important; transform: translateY(-2px) !important;
+    }}
+    [data-testid="stDataFrame"], [data-testid="stTable"],
+    [data-testid="stPlotlyChart"] {{
+        border: 1px solid rgba(143, 187, 239, .20) !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+        box-shadow: 0 12px 32px rgba(0,0,0,.18) !important;
+    }}
+    hr {{ border-color: rgba(143, 187, 239, .20) !important; }}
+    h1, h2, h3 {{ letter-spacing: -.025em; }}
+    @media (prefers-reduced-motion: reduce) {{
+        *, *::before, *::after {{ transition-duration: .01ms !important; animation-duration: .01ms !important; }}
+    }}
+
         </style>
         """,
         unsafe_allow_html=True,
     )
-
-# =========================================================
-# FOREST + SAND GLASS UI — GLOBAL PRESENTATION OVERRIDES
-# CSS-only layer: keeps all existing Python logic and widgets intact.
-# =========================================================
-st.markdown(
-    """
-    <style>
-    :root {
-      --forest-accent: var(--blue);
-      --forest-accent-soft: var(--blue-light);
-      --forest-copper: var(--teal);
-      --forest-gold: var(--gold);
-      --forest-glass: color-mix(in srgb, var(--panel) 78%, transparent);
-      --forest-glass-strong: color-mix(in srgb, var(--panel-alt) 88%, transparent);
-      --forest-line: color-mix(in srgb, var(--border) 78%, transparent);
-    }
-    .stApp {
-      background:
-        radial-gradient(ellipse at 10% 0%, color-mix(in srgb, var(--blue) 17%, transparent), transparent 34%),
-        radial-gradient(ellipse at 92% 12%, color-mix(in srgb, var(--teal) 13%, transparent), transparent 30%),
-        linear-gradient(135deg, var(--page-grad-1), var(--page-grad-2)) !important;
-      background-attachment: fixed !important;
-      color: var(--text) !important;
-    }
-    [data-testid="stAppViewContainer"], [data-testid="stMain"] { background: transparent !important; }
-    [data-testid="stHeader"] {
-      background: color-mix(in srgb, var(--page) 74%, transparent) !important;
-      backdrop-filter: blur(20px) saturate(145%) !important;
-    }
-    [data-testid="stSidebar"] > div:first-child {
-      background: linear-gradient(165deg, color-mix(in srgb, var(--sidebar) 94%, transparent), color-mix(in srgb, var(--panel) 88%, transparent)) !important;
-      border-right: 1px solid var(--forest-line) !important;
-      box-shadow: 12px 0 36px rgba(0,0,0,.10) !important;
-      backdrop-filter: blur(26px) saturate(150%) !important;
-    }
-    .sf-hero, .sf-landing-hero {
-      background:
-        radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--blue) 18%, transparent), transparent 32%),
-        linear-gradient(125deg, var(--hero), var(--hero2)) !important;
-      border: 1px solid var(--forest-line) !important;
-      border-radius: 24px !important;
-      box-shadow: 0 22px 55px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.09) !important;
-      backdrop-filter: blur(22px) saturate(145%) !important;
-    }
-    .sf-landing-hero:before { border-color: color-mix(in srgb, var(--blue-light) 38%, transparent) !important; box-shadow: 0 0 0 28px color-mix(in srgb, var(--blue) 7%, transparent), 0 0 0 62px color-mix(in srgb, var(--blue) 5%, transparent) !important; }
-    .sf-brand, .sf-landing-kicker, .sf-eyebrow { color: var(--blue-light) !important; }
-    .sf-landing-title, .sf-preview-heading, .sf-title { color: var(--text) !important; }
-    .sf-landing-title span, .sf-kicker-dot { color: var(--blue-light) !important; background: var(--blue) !important; }
-    .sf-landing-copy, .sf-landing-points, .sf-preview-sub, .sf-preview-top { color: var(--muted) !important; }
-    .sf-landing-points span:before { color: var(--blue) !important; }
-    .sf-preview-card, .sf-feature, .sf-preview-kpi, .sf-chart-shell, .sf-model-tags span {
-      background: var(--forest-glass) !important;
-      border: 1px solid var(--forest-line) !important;
-      border-radius: 18px !important;
-      box-shadow: 0 14px 36px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.08) !important;
-      backdrop-filter: blur(20px) saturate(145%) !important;
-    }
-    .sf-live-pill { color: var(--blue-light) !important; background: color-mix(in srgb, var(--blue) 13%, transparent) !important; border-color: color-mix(in srgb, var(--blue) 35%, transparent) !important; }
-    .sf-chart span { background: linear-gradient(180deg, var(--blue-light), var(--blue)) !important; box-shadow: 0 0 13px color-mix(in srgb, var(--blue) 18%, transparent) !important; }
-    .sf-feature-icon { background: color-mix(in srgb, var(--blue) 13%, transparent) !important; border-color: color-mix(in srgb, var(--blue) 30%, transparent) !important; }
-    [data-testid="stVerticalBlockBorderWrapper"], [data-testid="stMetric"],
-    [data-testid="stExpander"] details, [data-testid="stAlert"],
-    [data-testid="stPlotlyChart"], [data-testid="stDataFrame"], [data-testid="stTable"] {
-      background: var(--forest-glass) !important;
-      border: 1px solid var(--forest-line) !important;
-      border-radius: 18px !important;
-      box-shadow: 0 14px 36px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.07) !important;
-      backdrop-filter: blur(18px) saturate(140%) !important;
-    }
-    [data-testid="stMetric"] { padding: 18px !important; }
-    [data-testid="stVerticalBlockBorderWrapper"]:hover, [data-testid="stMetric"]:hover {
-      border-color: color-mix(in srgb, var(--blue) 55%, var(--border)) !important;
-      transform: translateY(-1px);
-    }
-    [data-testid="stTabs"] [role="tablist"] {
-      gap: 7px !important; padding: 7px !important;
-      background: var(--forest-glass) !important;
-      border: 1px solid var(--forest-line) !important;
-      border-radius: 17px !important;
-      backdrop-filter: blur(18px) !important;
-    }
-    [data-testid="stTabs"] button[role="tab"] { border-radius: 12px !important; color: var(--muted) !important; }
-    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-      background: color-mix(in srgb, var(--blue) 19%, var(--panel)) !important;
-      border: 1px solid color-mix(in srgb, var(--blue) 48%, var(--border)) !important;
-      color: var(--text) !important;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10) !important;
-    }
-    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
-    [data-baseweb="textarea"] > div, [data-testid="stFileUploader"] section {
-      background: var(--forest-glass-strong) !important;
-      border: 1px solid var(--forest-line) !important;
-      border-radius: 13px !important;
-      color: var(--text) !important;
-      backdrop-filter: blur(14px) !important;
-    }
-    .stButton button, [data-testid="stDownloadButton"] button,
-    [data-testid="stFormSubmitButton"] button, div[data-testid="stButton"] button[kind="primary"] {
-      border: 1px solid color-mix(in srgb, var(--blue) 58%, var(--border)) !important;
-      border-radius: 13px !important;
-      background: linear-gradient(120deg, var(--blue), color-mix(in srgb, var(--blue) 66%, var(--teal))) !important;
-      color: #fff !important;
-      box-shadow: 0 9px 24px color-mix(in srgb, var(--blue) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.17) !important;
-      transition: transform .18s ease, filter .18s ease !important;
-    }
-    .stButton button:hover, [data-testid="stDownloadButton"] button:hover,
-    [data-testid="stFormSubmitButton"] button:hover { filter: brightness(1.08) !important; transform: translateY(-2px) !important; }
-    [data-testid="stDataFrame"] *, [data-testid="stTable"] * { color: var(--text); }
-    hr { border-color: var(--forest-line) !important; }
-    .sf-panel-title, .sf-section-heading { color: var(--text) !important; }
-    .sf-panel-subtitle, .sf-section-copy, .sf-metric-label, .sf-metric-note { color: var(--muted) !important; }
-    .sf-metric-value { color: var(--text) !important; }
-    @media (max-width: 850px) { .sf-landing-hero { grid-template-columns: 1fr !important; } }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # =========================================================
 # HELPER FUNCTIONS
@@ -1018,7 +818,6 @@ def dashboard_metric(label: str, value: str, note: str = "") -> None:
 def style_figure(fig, height: int = 340):
     fig.update_layout(
         template="plotly_dark" if theme["name"] == "dark" else "plotly_white",
-        colorway=[theme["blue"], theme["teal"], theme["gold"], theme["blue_light"], "#F2B879", "#E879A8"],
         height=height,
         autosize=True,
         paper_bgcolor="rgba(0,0,0,0)",
@@ -1188,153 +987,6 @@ if not st.session_state.show_dashboard:
         unsafe_allow_html=True,
     )
     st.stop()
-
-# =========================================================
-# FINAL GLASS LAYOUT OVERRIDES — PRESENTATION ONLY
-# =========================================================
-st.markdown(
-    """
-    <style>
-    :root {
-      --glass-edge: rgba(170, 199, 255, .20);
-      --glass-fill: rgba(19, 29, 56, .58);
-      --glass-highlight: rgba(255,255,255,.075);
-    }
-    .stApp {
-      background:
-        radial-gradient(ellipse at 8% 0%, rgba(85,214,232,.14), transparent 34%),
-        radial-gradient(ellipse at 92% 8%, rgba(155,140,255,.16), transparent 32%),
-        radial-gradient(ellipse at 52% 100%, rgba(242,184,121,.07), transparent 38%),
-        linear-gradient(135deg, #090D1C 0%, #111A32 48%, #080D1B 100%) !important;
-      background-attachment: fixed !important;
-    }
-    [data-testid="stSidebar"] { display:none !important; }
-    [data-testid="stAppViewContainer"], [data-testid="stMain"] { background:transparent !important; }
-    [data-testid="stHeader"] {
-      background:rgba(8,13,28,.54) !important;
-      backdrop-filter:blur(22px) saturate(155%) !important;
-      border-bottom:1px solid rgba(170,199,255,.10);
-    }
-    .block-container, section[data-testid="stMain"] .block-container {
-      max-width:1540px !important;
-      padding-top:2.0rem !important;
-      padding-bottom:3rem !important;
-      padding-left:clamp(1.1rem,3vw,3.2rem) !important;
-      padding-right:clamp(1.1rem,3vw,3.2rem) !important;
-    }
-    .sf-hero {
-      position:relative; overflow:hidden;
-      padding:27px 32px !important;
-      margin:0 0 18px 0 !important;
-      border-radius:22px !important;
-      background:
-        radial-gradient(circle at 88% 12%, rgba(85,214,232,.19), transparent 28%),
-        radial-gradient(circle at 100% 100%, rgba(155,140,255,.17), transparent 35%),
-        linear-gradient(125deg, rgba(22,32,63,.78), rgba(26,38,72,.58)) !important;
-      border:1px solid rgba(170,199,255,.24) !important;
-      box-shadow:0 22px 60px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.11) !important;
-      backdrop-filter:blur(24px) saturate(155%) !important;
-    }
-    .sf-hero:after {
-      content:""; position:absolute; width:270px; height:270px; right:-115px; top:-170px;
-      border:1px solid rgba(165,240,244,.28); border-radius:50%;
-      box-shadow:0 0 0 25px rgba(85,214,232,.045), 0 0 0 55px rgba(155,140,255,.04);
-      pointer-events:none;
-    }
-    .sf-eyebrow, .sf-brand, .sf-landing-kicker { color:#A5F0F4 !important; }
-    .sf-title, .sf-landing-title, .sf-preview-heading { color:#F2F5FF !important; }
-    .sf-landing-title span { color:#55D6E8 !important; }
-    .sf-subtitle, .sf-landing-copy, .sf-preview-sub { color:#B8C4DF !important; }
-    .sf-accent { background:linear-gradient(90deg,#55D6E8,#9B8CFF) !important; border-radius:20px; }
-    div[data-testid="stHorizontalBlock"] { gap: .9rem !important; align-items:stretch; }
-    /* Floating control dock replaces the old left sidebar. */
-    div[data-testid="stMain"] div[data-testid="stHorizontalBlock"]:has(button[key="top_back_home"]) {
-      padding:13px 15px 10px; margin:0 0 20px 0;
-      border:1px solid var(--glass-edge); border-radius:18px;
-      background:rgba(16,25,49,.58);
-      box-shadow:0 14px 38px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.07);
-      backdrop-filter:blur(22px) saturate(150%);
-    }
-    [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"],
-    [data-testid="stExpander"], [data-testid="stPopover"],
-    [data-testid="stDataFrame"], [data-testid="stTable"],
-    [data-testid="stFileUploader"], [data-testid="stAlert"],
-    [data-testid="stForm"], [data-testid="stPlotlyChart"],
-    [data-testid="stVegaLiteChart"], [data-testid="stAltairChart"] {
-      background:rgba(17,27,53,.55) !important;
-      border:1px solid rgba(170,199,255,.19) !important;
-      border-radius:18px !important;
-      box-shadow:0 14px 38px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.055) !important;
-      backdrop-filter:blur(18px) saturate(145%) !important;
-    }
-    [data-testid="stMetric"] { padding:17px 19px !important; }
-    [data-testid="stMetricLabel"], [data-testid="stCaptionContainer"] { color:#A9B5D0 !important; }
-    [data-testid="stMetricValue"] { color:#F4F7FF !important; font-weight:800 !important; }
-    [data-baseweb="select"] > div, [data-baseweb="input"] > div,
-    [data-baseweb="textarea"] > div, [data-testid="stNumberInput"] input {
-      background:rgba(9,16,34,.78) !important;
-      border:1px solid rgba(170,199,255,.22) !important;
-      border-radius:11px !important; color:#F2F5FF !important;
-    }
-    input, textarea { color:#F2F5FF !important; }
-    .stButton > button, .stDownloadButton > button,
-    [data-testid="stFormSubmitButton"] > button {
-      color:#081322 !important;
-      background:linear-gradient(110deg,#6CE2EA 0%,#8DB8FF 55%,#B19CFF 100%) !important;
-      border:1px solid rgba(202,238,255,.52) !important;
-      border-radius:12px !important; font-weight:750 !important;
-      min-height:2.55rem; box-shadow:0 8px 24px rgba(85,214,232,.16) !important;
-      transition:transform .18s ease, filter .18s ease, box-shadow .18s ease;
-    }
-    .stButton > button:hover, .stDownloadButton > button:hover {
-      transform:translateY(-2px); filter:brightness(1.07);
-      box-shadow:0 12px 30px rgba(85,214,232,.24) !important;
-    }
-    [data-testid="stTabs"] [data-baseweb="tab-list"] {
-      display:flex; flex-wrap:wrap; gap:8px;
-      background:rgba(14,23,46,.62) !important;
-      border:1px solid rgba(170,199,255,.19) !important;
-      border-radius:16px !important; padding:7px !important;
-      box-shadow:0 12px 30px rgba(0,0,0,.14);
-      backdrop-filter:blur(20px);
-    }
-    [data-testid="stTabs"] button[role="tab"] {
-      color:#AEBBD6 !important; border-radius:10px !important;
-      padding:10px 15px !important; font-weight:650 !important;
-    }
-    [data-testid="stTabs"] button[aria-selected="true"] {
-      color:#F7FCFF !important;
-      background:linear-gradient(110deg,rgba(85,214,232,.20),rgba(155,140,255,.22)) !important;
-      border:1px solid rgba(165,240,244,.24) !important;
-    }
-    [data-testid="stPlotlyChart"] { padding:9px !important; }
-    [data-testid="stDataFrame"], [data-testid="stTable"] { padding:7px !important; }
-    hr { border-color:rgba(170,199,255,.16) !important; }
-    .sf-landing-hero {
-      background:radial-gradient(circle at 90% 8%,rgba(85,214,232,.20),transparent 30%),
-        radial-gradient(circle at 5% 100%,rgba(155,140,255,.14),transparent 34%),
-        linear-gradient(125deg,rgba(20,30,59,.80),rgba(26,39,73,.60)) !important;
-      border:1px solid rgba(170,199,255,.23) !important;
-      border-radius:26px !important; box-shadow:0 24px 65px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.10) !important;
-      backdrop-filter:blur(24px) saturate(155%) !important;
-    }
-    .sf-preview-card, .sf-preview-kpi, .sf-chart-shell, .sf-feature, .sf-model-tags span {
-      background:rgba(15,25,49,.62) !important;
-      border:1px solid rgba(170,199,255,.19) !important;
-      border-radius:17px !important;
-      box-shadow:0 14px 38px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.06) !important;
-      backdrop-filter:blur(20px) saturate(150%) !important;
-    }
-    .sf-chart span { background:linear-gradient(180deg,#A5F0F4,#55D6E8 55%,#8B83F5) !important; }
-    .sf-live-pill { color:#A5F0F4 !important; background:rgba(85,214,232,.12) !important; border-color:rgba(85,214,232,.25) !important; }
-    @media(max-width:900px) {
-      .block-container {padding-left:1rem !important;padding-right:1rem !important;}
-      [data-testid="stTabs"] [data-baseweb="tab-list"] {overflow-x:auto;flex-wrap:nowrap;}
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # =========================================================
 # DATA LOADING
@@ -2088,30 +1740,61 @@ st.markdown(
 
 
 # =========================================================
-# TOP CONTROL BAR — relocated from the sidebar (same controls)
+# SIDEBAR
 # =========================================================
-control_home, control_model, control_info, control_theme = st.columns(
-    [0.95, 2.15, 1.25, 1.15], gap="small"
+st.sidebar.button(
+    "← Back to Home",
+    on_click=go_home,
+    use_container_width=True,
 )
-with control_home:
-    st.button("← Home", on_click=go_home, use_container_width=True, key="top_back_home")
-with control_model:
-    selected_model = st.selectbox(
-        "Forecasting Model", model_options,
-        index=model_options.index("Random Forest"),
-        key="forecast_model_selector",
+
+st.sidebar.markdown(
+    """
+    <div style="padding: 4px 0 8px 0;">
+        <div style="font-size:1.22rem;font-weight:800;">
+            Forecast Controls
+        </div>
+        <div style="font-size:0.76rem;margin-top:5px;line-height:1.45;">
+            Select a forecasting model to inspect its saved predictions.
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+selected_model = st.sidebar.selectbox(
+    "Forecasting Model",
+    model_options,
+    index=model_options.index("Random Forest"),
+    key="forecast_model_selector",
+)
+
+st.sidebar.divider()
+with st.sidebar.expander("System Information", expanded=False):
+    st.markdown(
+        """
+        **Dataset**  
+        Sta. Cruz Laguna Sales Dataset
+
+        **Forecasting Models**  
+        ARIMA · SARIMA · Prophet · Random Forest
+
+       **Evaluation Metrics**
+MAE · RMSE · MAPE · WAPE
+
+        **Platform**  
+        Python + Streamlit
+        """
     )
-with control_info:
-    with st.expander("System Information", expanded=False):
-        st.markdown(
-            "**Dataset**  \nSta. Cruz Laguna Sales Dataset  \n\n**Forecasting Models**  \nARIMA · SARIMA · Prophet · Random Forest  \n\n**Evaluation Metrics**  \nMAE · RMSE · MAPE · WAPE  \n\n**Platform**  \nPython + Streamlit"
-        )
-with control_theme:
-    theme_button_label = "☀ Light Mode" if st.session_state.theme_mode == "dark" else "☾ Dark Mode"
-    st.button(
-        theme_button_label, on_click=toggle_theme,
-        use_container_width=True, key="top_theme_toggle",
-    )
+
+# Theme control directly below System Information.
+st.sidebar.markdown('<div class="theme-label">Appearance</div>', unsafe_allow_html=True)
+theme_button_label = "Switch to Light Mode" if st.session_state.theme_mode == "dark" else "Switch to Dark Mode"
+st.sidebar.button(
+    theme_button_label,
+    on_click=toggle_theme,
+    use_container_width=True,
+)
 
 model_data = df[df["model_name"] == selected_model].copy()
 comparison = model_data.merge(
