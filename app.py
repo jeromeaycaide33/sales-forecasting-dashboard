@@ -1742,16 +1742,6 @@ def download_supabase_dataset(object_name: str):
     return client.storage.from_(SUPABASE_BUCKET).download(f"uploads/{object_name}")
 
 
-def delete_supabase_dataset(object_name: str):
-    """Permanently delete one uploaded dataset from the uploads/ folder."""
-    safe_name = Path(str(object_name)).name
-    if not safe_name or safe_name in {".", ".."} or safe_name != str(object_name):
-        raise ValueError("Invalid dataset filename. Only files inside uploads/ can be deleted.")
-
-    client = get_supabase_client()
-    return client.storage.from_(SUPABASE_BUCKET).remove([f"uploads/{safe_name}"])
-
-
 # =========================================================
 # PHASE 2: AUTOMATIC DUAL-TARGET FORECASTING
 # Methodology follows the project's original Colab notebook:
@@ -3540,60 +3530,6 @@ with tab_downloads:
                         )
                     except Exception as download_error:
                         st.warning(f"Download unavailable: {download_error}")
-
-                    if st.button(
-                        "Delete",
-                        key=f"request_delete_supabase_{object_name}",
-                        use_container_width=True,
-                        type="secondary",
-                    ):
-                        st.session_state["pending_dataset_delete"] = object_name
-                        st.rerun()
-
-                if st.session_state.get("pending_dataset_delete") == object_name:
-                    st.warning(
-                        f"Are you sure you want to permanently delete **{object_name}** "
-                        "from Supabase Storage? This cannot be undone."
-                    )
-                    confirm_col, cancel_col = st.columns(2, gap="small")
-                    with confirm_col:
-                        if st.button(
-                            "Yes, delete permanently",
-                            key=f"confirm_delete_supabase_{object_name}",
-                            type="primary",
-                            use_container_width=True,
-                        ):
-                            try:
-                                delete_supabase_dataset(object_name)
-
-                                # If this file powers the active dashboard, clear its
-                                # in-memory results so charts disappear immediately.
-                                if st.session_state.get("phase2_source_name") == object_name:
-                                    for state_key in (
-                                        "phase2_results",
-                                        "phase2_archive",
-                                        "phase2_archive_name",
-                                        "phase2_storage_path",
-                                        "phase2_source_name",
-                                        "phase2_run_id",
-                                    ):
-                                        st.session_state.pop(state_key, None)
-                                    st.session_state.pop("unified_dashboard_target", None)
-                                    st.session_state.pop("phase2_result_target", None)
-
-                                st.session_state.pop("pending_dataset_delete", None)
-                                st.success(f"Deleted {object_name} from Supabase Storage.")
-                                st.rerun()
-                            except Exception as delete_error:
-                                st.error(f"Could not delete dataset: {delete_error}")
-                    with cancel_col:
-                        if st.button(
-                            "Cancel",
-                            key=f"cancel_delete_supabase_{object_name}",
-                            use_container_width=True,
-                        ):
-                            st.session_state.pop("pending_dataset_delete", None)
-                            st.rerun()
     except Exception as storage_error:
         st.warning(f"Could not retrieve saved datasets: {storage_error}")
         st.caption(
