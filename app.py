@@ -2688,6 +2688,11 @@ with tab_auto_forecast:
                 st.session_state["phase2_archive_name"] = f"dual_target_forecast_{run_id}.zip"
                 st.session_state["phase2_storage_path"] = stored_run_path
                 st.session_state["phase2_source_name"] = selected_upload
+                st.session_state["phase2_run_id"] = run_id
+
+                # Re-execute the app so every dashboard tab is rebuilt from this
+                # newly completed run, rather than showing one stale render.
+                st.rerun()
             except Exception as forecast_error:
                 st.error(f"Automatic forecasting could not be completed: {forecast_error}")
                 st.warning(
@@ -3073,36 +3078,79 @@ with tab_downloads:
         st.download_button("Historical Sales Data", actual_csv, file_name="daily_sales_clean.csv", mime="text/csv", use_container_width=True)
     st.divider()
 
-    st.subheader("Standardized DSS Data Exports")
+    st.subheader("Dataset-Driven DSS Exports")
 
-    st.caption(
-        "Download the standardized datasets used by the academic "
-        "forecasting and decision support system."
-    )
-
-    export_files = [
-        ("Daily Demand Data", "aggregated_daily_demand.csv"),
-        ("2023 Validation Metrics", "validation_model_performance.csv"),
-        ("2024 Test Metrics", "test_model_performance_2024.csv"),
-        ("2023 Validation Forecasts", "validation_forecasts_2023.csv"),
-        ("2024 Test Forecasts", "test_forecasts_2024.csv"),
-        ("Future Forecasts", "future_forecasts.csv"),
-        ("Model Selection Summary", "model_selection_summary.csv"),
-    ]
+    if phase2_active_results:
+        st.caption(
+            f"These exports are generated from the latest completed upload: "
+            f"{phase2_active_source}. Daily data, validation, holdout, and future "
+            "forecast files include both Quantity_Sold and Total_Sales targets."
+        )
+        active_export_files = {
+            "Daily Quantity & Sales Data": (
+                "daily_quantity_and_sales.csv",
+                phase2_active_results["daily"],
+            ),
+            "Validation Metrics (Both Targets)": (
+                "validation_metrics.csv",
+                phase2_active_results["validation_metrics"],
+            ),
+            "Final Holdout Metrics (Both Targets)": (
+                "final_test_metrics.csv",
+                phase2_active_results["test_metrics"],
+            ),
+            "Validation Predictions (Both Targets)": (
+                "validation_predictions.csv",
+                phase2_active_results["validation_predictions"],
+            ),
+            "Final Holdout Predictions (Both Targets)": (
+                "final_test_predictions.csv",
+                phase2_active_results["test_predictions"],
+            ),
+            "Future Forecasts (Both Targets)": (
+                "future_forecasts.csv",
+                phase2_active_results["future_forecasts"],
+            ),
+            "Selected Models (Both Targets)": (
+                "selected_models.csv",
+                phase2_active_results["best_models"],
+            ),
+        }
+        export_files = [
+            (label, filename, frame.to_csv(index=False).encode("utf-8"))
+            for label, (filename, frame) in active_export_files.items()
+        ]
+    else:
+        st.caption(
+            "No completed upload run is active yet. These downloads show the "
+            "repository's standardized baseline data. Run Automatic Forecasting "
+            "to switch these exports to the latest uploaded dataset."
+        )
+        baseline_exports = [
+            ("Daily Demand Data", "aggregated_daily_demand.csv"),
+            ("2023 Validation Metrics", "validation_model_performance.csv"),
+            ("2024 Test Metrics", "test_model_performance_2024.csv"),
+            ("2023 Validation Forecasts", "validation_forecasts_2023.csv"),
+            ("2024 Test Forecasts", "test_forecasts_2024.csv"),
+            ("Future Forecasts", "future_forecasts.csv"),
+            ("Model Selection Summary", "model_selection_summary.csv"),
+        ]
+        export_files = [
+            (label, filename, (DATA_DIR / filename).read_bytes())
+            for label, filename in baseline_exports
+        ]
 
     for start in range(0, len(export_files), 2):
         cols = st.columns(2, gap="medium")
-
-        for col, item in zip(cols, export_files[start:start + 2]):
-            label, filename = item
-
+        for col, (label, filename, file_data) in zip(cols, export_files[start:start + 2]):
             with col:
                 st.download_button(
                     label,
-                    data=(DATA_DIR / filename).read_bytes(),
+                    data=file_data,
                     file_name=filename,
                     mime="text/csv",
                     use_container_width=True,
+                    key=f"dss_export_{filename}",
                 )
     st.divider()
     st.subheader("Forecast Data")
